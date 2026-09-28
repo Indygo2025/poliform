@@ -555,13 +555,11 @@ section { padding: 74px 0; }
   padding: 20px;
   overflow: hidden;
 }
-/* рифлёный задник лотка */
+/* гладкий задник лотка, без рифления */
 .card-figure::after {
   content: "";
   position: absolute; inset: 0;
-  background-image: url("../images/ribs.svg");
-  background-size: 26px 100%;
-  opacity: .22;
+  background: radial-gradient(65% 45% at 50% 22%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 72%);
   pointer-events: none;
 }
 .card-figure img {
@@ -909,9 +907,7 @@ tbody tr:hover td code { color: var(--ink); }
 .footer::before {
   content: "";
   position: absolute; inset: 0;
-  background-image: url("../images/ribs.svg");
-  background-size: 36px 100%;
-  opacity: .18;
+  background: radial-gradient(80% 45% at 50% 0%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 70%);
   pointer-events: none;
 }
 .footer-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); gap: 30px; position: relative; }
@@ -1034,9 +1030,7 @@ tbody tr:hover td code { color: var(--ink); }
 .use-fig::after {
   content: "";
   position: absolute; inset: 0;
-  background-image: url("../images/ribs.svg");
-  background-size: 24px 100%;
-  opacity: .20;
+  background: radial-gradient(65% 45% at 50% 22%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 72%);
   pointer-events: none;
 }
 .use-fig img {
