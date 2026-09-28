@@ -688,13 +688,13 @@ section { padding: 74px 0; }
   transition: transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s;
 }
 .shot:hover { transform: translateY(-7px); box-shadow: var(--e2); }
-/* рифлёный пластик + матовое стекло */
+/* гладкая матовая панель под фото, без рифления */
 .shot::before {
   content: "";
   position: absolute; inset: 0;
-  background-image: url("../images/ribs.svg");
-  background-size: 24px 100%;
-  opacity: .30;
+  background:
+    radial-gradient(70% 55% at 50% 30%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, #f2f7fa 0%, #e4ebf0 60%, #dbe3e9 100%);
   z-index: 0;
 }
 .shot::after {
