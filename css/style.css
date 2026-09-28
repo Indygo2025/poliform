@@ -401,7 +401,7 @@ section { padding: 74px 0; }
 .hero { padding: 58px 0 68px; }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 42px; align-items: center; }
 
-.hero h1 { font-size: clamp(2.6rem, 7.4vw, 5.3rem); margin: 22px 0 0; text-transform: uppercase; }
+.hero h1 { font-size: clamp(2.5rem, 6.4vw, 4.7rem); margin: 22px 0 0; text-transform: uppercase; overflow-wrap: break-word; }
 .hero h1 .row { display: block; }
 
 /* Крупная жёлтая отливка в заголовке */
@@ -644,8 +644,11 @@ section { padding: 74px 0; }
 .step-n {
   display: inline-grid;
   place-items: center;
-  width: 52px; height: 52px;
-  border-radius: 50%;
+  justify-items: center;
+  min-width: 52px; height: 52px;
+  padding: 0 15px;
+  border-radius: 26px;
+  white-space: nowrap;
   background: linear-gradient(180deg, #ffffff, var(--pl-mid));
   border: 1px solid var(--line);
   box-shadow: var(--hard-sm), inset 0 2px 0 #fff, inset 0 -2px 4px rgba(16,22,26,.08);
@@ -817,7 +820,7 @@ tbody tr:hover td code { color: var(--ink); }
 }
 .contact-card h3 { font-size: 1.2rem; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
 .contact-list { display: grid; gap: 14px; }
-.contact-row { display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.contact-row { display: grid; grid-template-columns: minmax(108px, 150px) minmax(0, 1fr); gap: 12px; align-items: baseline; }
 .contact-row dt { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 .contact-row dd { font-size: 1rem; font-weight: 700; }
 .contact-row dd a {
@@ -845,7 +848,7 @@ tbody tr:hover td code { color: var(--ink); }
   box-shadow: var(--e2), inset 0 1px 0 rgba(255,255,255,.18);
 }
 .requisites h3 { color: var(--signal); font-family: var(--font-mono); font-size: .9rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 18px; }
-.requisites dl { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px 14px; font-size: .9rem; }
+.requisites dl { display: grid; grid-template-columns: minmax(96px, 140px) minmax(0, 1fr); gap: 10px 14px; font-size: .9rem; }
 .requisites dt { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; color: var(--steel); text-transform: uppercase; padding-top: 2px; }
 .requisites dd { font-family: var(--font-mono); font-weight: 700; }
 .requisites .warn { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(147,162,173,.35); font-size: .8rem; color: var(--steel); line-height: 1.6; font-family: var(--font-display); }
@@ -941,7 +944,7 @@ tbody tr:hover td code { color: var(--ink); }
 .crumbs a:hover { color: var(--ink); background: linear-gradient(180deg, #ffe680, var(--signal-2)); }
 
 .page-hero { padding: 46px 0 50px; border-bottom: 1px solid var(--line); }
-.page-hero h1 { font-size: clamp(2.3rem, 5.6vw, 4rem); margin-top: 18px; text-transform: uppercase; }
+.page-hero h1 { font-size: clamp(2.3rem, 5.2vw, 3.8rem); margin-top: 18px; text-transform: uppercase; overflow-wrap: break-word; }
 .page-hero p {
   margin-top: 20px;
   font-size: 1.08rem;
@@ -1157,3 +1160,113 @@ tbody tr:hover td code { color: var(--ink); }
   }
   tbody td:first-child { font-weight: 700; background: linear-gradient(90deg, rgba(255,212,0,.10), rgba(255,212,0,0)); }
 }
+
+/* =========================================================
+   Телефон → ультраширокий экран
+   ========================================================= */
+
+/* Вырезы и «безопасные зоны»: в ландшафте контент не заезжает под чёрные поля */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Крупные зоны нажатия (WCAG 2.5.8): область клика расширяется,
+   внешний вид элементов при этом не меняется */
+.card-link, .footer-links a, .crumbs a, .nav a, .logo { position: relative; }
+.card-link::after, .footer-links a::after, .crumbs a::after, .nav a::after, .logo::after {
+  content: "";
+  position: absolute;
+  pointer-events: auto;
+}
+.card-link::after { inset: -13px -8px; }
+.footer-links a::after { inset: -9px -10px; }
+.crumbs a::after { inset: -10px -6px; }
+.nav a::after { inset: -6px 0; }
+.logo::after { inset: -11px 0; }
+
+/* Крупные зоны нажатия на сенсорных экранах (WCAG 2.5.8) */
+@media (pointer: coarse) {
+  a, button, [role="button"], summary { touch-action: manipulation; }
+  .card-link { min-height: 44px; margin-top: 11px; }
+  .footer-links a { min-height: 44px; display: flex; align-items: center; }
+  .nav a { min-height: 44px; display: flex; align-items: center; }
+  .crumbs a { min-height: 36px; display: inline-flex; align-items: center; }
+  .logo { min-height: 44px; }
+  .btn { min-height: 48px; }
+  .burger { min-width: 48px; min-height: 48px; }
+}
+
+/* Узкие телефоны: 320–359 px */
+@media (max-width: 359px) {
+  .container { width: calc(100% - 24px); }
+  .logo-mark { width: 38px; height: 38px; }
+  .logo-name { font-size: 1.12rem; }
+  .kpi b { font-size: 1.5rem; }
+  .cta { padding: 28px 18px; }
+  .cta-actions { flex-direction: column; }
+  .footer-links a { font-size: .82rem; }
+}
+
+/* Телефон в ландшафте: мало высоты — сжимаем шапку, бегущую строку и герой */
+@media (orientation: landscape) and (max-height: 500px) {
+  .ticker { padding: 5px 0; }
+  .header-inner { height: 58px; }
+  .logo-mark { width: 34px; height: 34px; }
+  .logo-name { font-size: 1.05rem; }
+  .logo-sub { display: none; }
+  .hero { padding: 30px 0 34px; }
+  .hero h1 { font-size: clamp(1.9rem, 5.2vw, 2.6rem); }
+  .hero-tag { display: none; }
+  section { padding: 34px 0; }
+  .page-hero { padding: 26px 0 30px; }
+  .nav { top: 58px; max-height: calc(100vh - 58px); overflow-y: auto; }
+}
+
+/* Крупные ноутбуки и QHD: расширяем контейнер, добавляем колонки */
+@media (min-width: 1500px) {
+  .container { width: min(1400px, 90%); }
+  .hero-grid { gap: 54px; }
+  .sec-head { grid-template-columns: minmax(0, 1fr) minmax(0, 520px); }
+  .gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cards, .use-grid, .masonry { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .masonry, .use-grid { gap: 20px; }
+}
+
+@media (min-width: 1900px) {
+  :root { font-size: 17px; }
+  .container { width: min(1640px, 88%); }
+  .hero h1 { letter-spacing: -0.035em; }
+  .cards, .use-grid, .masonry { gap: 24px; }
+  .footer-grid { gap: 40px; }
+  section { padding: 104px 0; }
+}
+
+@media (min-width: 2400px) {
+  :root { font-size: 18px; }
+  .container { width: min(1880px, 86%); }
+  .hero-grid { gap: 68px; }
+  .sec-head { grid-template-columns: minmax(0, 1fr) minmax(0, 620px); }
+  .cards, .use-grid, .masonry, .gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kpi-row { gap: 24px; }
+  .steps { gap: 0; }
+  .footer-grid { gap: 56px; }
+  section { padding: 118px 0; }
+}
+
+@media (min-width: 3000px) {
+  :root { font-size: 20px; }
+  .container { width: min(2200px, 84%); }
+  .cards, .use-grid, .masonry, .gallery { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .opening-note { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hero-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); }
+}
+
+/* На широких экранах держим ровные строки в заголовках и абзацах */
+@media (min-width: 1081px) {
+  h1, h2, h3, .sec-title, .logo-name { text-wrap: balance; }
+  p, li, dd { text-wrap: pretty; }
+}
+
+/* Крупная точка отслеживания не должна ловить «залипание» после нажатия */
+.ticker-track, .card, .btn, .nav a, .footer-links a { -webkit-tap-highlight-color: rgba(255, 212, 0, .22); }
