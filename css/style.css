@@ -371,13 +371,11 @@ section { padding: 74px 0; }
   padding: 10px 0;
   box-shadow: 0 3px 14px rgba(16,22,26,.22), inset 0 1px 0 rgba(255,255,255,.12);
 }
-/* продольное ребро жёсткости */
+/* мягкий блик по глянцевой поверхности */
 .ticker::before {
   content: "";
   position: absolute; inset: 0;
-  background-image: url("../images/ribs.svg");
-  background-size: 32px 100%;
-  opacity: .30;
+  background: linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 55%);
   pointer-events: none;
 }
 .ticker::after {
@@ -887,9 +885,7 @@ tbody tr:hover td code { color: var(--ink); }
 .cta::before {
   content: "";
   position: absolute; inset: 0;
-  background-image: url("../images/ribs.svg");
-  background-size: 30px 100%;
-  opacity: .18;
+  background: linear-gradient(160deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 42%);
   pointer-events: none;
 }
 .cta h2 { font-size: clamp(1.7rem, 3.6vw, 2.7rem); text-transform: uppercase; position: relative; }
