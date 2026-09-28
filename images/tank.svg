@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 132" role="img" aria-label="Пластиковый бак и ёмкость">
+  <defs>
+    <linearGradient id="tnBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4f4e48"/><stop offset=".16" stop-color="#a19e96"/>
+      <stop offset=".38" stop-color="#f4f2ec"/><stop offset=".58" stop-color="#cbc8c0"/>
+      <stop offset=".82" stop-color="#84827a"/><stop offset="1" stop-color="#45443f"/>
+    </linearGradient>
+    <linearGradient id="tnLid" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#63625b"/><stop offset=".35" stop-color="#dcd9d1"/>
+      <stop offset=".65" stop-color="#f8f6f1"/><stop offset="1" stop-color="#6a6860"/>
+    </linearGradient>
+    <linearGradient id="tnRib" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3f3e39" stop-opacity=".55"/>
+      <stop offset=".4" stop-color="#ffffff" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#3f3e39" stop-opacity=".5"/>
+    </linearGradient>
+    <radialGradient id="tnShadow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#14130f" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#14130f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="120" cy="120" rx="86" ry="10" fill="url(#tnShadow)"/>
+
+  <g stroke="#14130f" stroke-width="1.6" stroke-linejoin="round">
+    <path d="M56 30 H184 V110 a8 8 0 0 1 -8 8 H64 a8 8 0 0 1 -8 -8 Z" fill="url(#tnBody)"/>
+    <path d="M56 30 H184 V110 a8 8 0 0 1 -8 8 H64 a8 8 0 0 1 -8 -8 Z" fill="none"/>
+  </g>
+  <g fill="url(#tnRib)">
+    <rect x="58" y="48" width="124" height="9"/>
+    <rect x="58" y="70" width="124" height="9"/>
+    <rect x="58" y="92" width="124" height="9"/>
+  </g>
+  <g stroke="#14130f" stroke-width="1" opacity=".3">
+    <path d="M58 53 H182M58 75 H182M58 97 H182"/>
+  </g>
+  <path d="M64 36 V106" stroke="#ffffff" stroke-width="3.4" opacity=".5" stroke-linecap="round"/>
+  <path d="M78 36 V106" stroke="#ffffff" stroke-width="1.2" opacity=".22" stroke-linecap="round"/>
+
+  <g stroke="#14130f" stroke-width="1.6" stroke-linejoin="round">
+    <path d="M48 22 H192 a8 8 0 0 1 8 8 v2 a8 8 0 0 1 -8 8 H48 a8 8 0 0 1 -8 -8 v-2 a8 8 0 0 1 8 -8 Z" fill="url(#tnLid)"/>
+    <path d="M100 22 v-8 h40 v8" fill="none"/>
+  </g>
+  <path d="M52 25 H188" stroke="#ffffff" stroke-width="2.2" opacity=".55" stroke-linecap="round"/>
+
+  <rect x="84" y="80" width="72" height="20" fill="#ffd400" stroke="#14130f" stroke-width="1.4" opacity=".9"/>
+  <g stroke="#14130f" stroke-width="1.5" opacity=".65">
+    <path d="M90 87 H150M90 93 H136"/>
+  </g>
+</svg>

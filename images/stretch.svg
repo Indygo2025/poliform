@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 132" role="img" aria-label="Паллетная обмотка и транспортная упаковка">
+  <defs>
+    <linearGradient id="stWood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfa871"/><stop offset=".5" stop-color="#b18a52"/>
+      <stop offset="1" stop-color="#8a6437"/>
+    </linearGradient>
+    <linearGradient id="stFilm" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".42"/>
+      <stop offset=".18" stop-color="#e9e6df" stop-opacity=".24"/>
+      <stop offset=".38" stop-color="#ffffff" stop-opacity=".5"/>
+      <stop offset=".58" stop-color="#d8d4cc" stop-opacity=".26"/>
+      <stop offset=".78" stop-color="#ffffff" stop-opacity=".44"/>
+      <stop offset="1" stop-color="#cbc7bf" stop-opacity=".3"/>
+    </linearGradient>
+    <linearGradient id="stStack" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2f0ea"/><stop offset=".5" stop-color="#d3d0c8"/>
+      <stop offset="1" stop-color="#9d9a92"/>
+    </linearGradient>
+    <radialGradient id="stShadow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#14130f" stop-opacity=".36"/>
+      <stop offset="1" stop-color="#14130f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="120" cy="118" rx="94" ry="10" fill="url(#stShadow)"/>
+
+  <g stroke="#14130f" stroke-width="1.4" stroke-linejoin="round">
+    <path d="M52 20 H188 L200 34 H40 Z" fill="url(#stStack)"/>
+    <path d="M40 34 H200 V100 H40 Z" fill="url(#stStack)"/>
+    <path d="M40 100 L52 114 H188 L200 100" fill="url(#stStack)"/>
+    <path d="M40 34 H200 M40 100 H200 M52 20 V114 M188 20 V114" fill="none" stroke-width="1.2"/>
+  </g>
+  <g stroke="#14130f" stroke-width="1" opacity=".2">
+    <path d="M40 48 H200M40 62 H200M40 76 H200M40 88 H200"/>
+  </g>
+  <path d="M46 38 H194" stroke="#ffffff" stroke-width="3" opacity=".5" stroke-linecap="round"/>
+
+  <g stroke="#14130f" stroke-width="1.6" stroke-linejoin="round">
+    <path d="M34 34 H206 L212 44 H28 Z" fill="url(#stFilm)"/>
+    <path d="M28 44 H212 V98 H28 Z" fill="url(#stFilm)"/>
+    <path d="M28 98 L34 110 H206 L212 98" fill="url(#stFilm)"/>
+  </g>
+  <g stroke="#ffffff" stroke-width="2" opacity=".55" stroke-linecap="round">
+    <path d="M50 46 L74 46 M96 46 L128 46 M150 46 L186 46"/>
+    <path d="M44 60 L80 60 M104 60 L140 60 M160 60 L200 60"/>
+    <path d="M52 88 L88 88 M112 88 L152 88 M168 88 L200 88"/>
+  </g>
+
+  <g stroke="#14130f" stroke-width="1.4" stroke-linejoin="round">
+    <path d="M24 108 H216 L210 122 H30 Z" fill="url(#stWood)"/>
+    <path d="M24 108 H216" fill="none"/>
+    <path d="M48 108 V120M80 108 V121M112 108 V121M144 108 V121M176 108 V120" stroke-width="1" opacity=".55"/>
+  </g>
+
+  <rect x="150" y="56" width="46" height="24" fill="#ffd400" stroke="#14130f" stroke-width="1.5" opacity=".92"/>
+  <g stroke="#14130f" stroke-width="1.6" opacity=".7">
+    <path d="M156 64 H190M156 70 H182"/>
+  </g>
+</svg>

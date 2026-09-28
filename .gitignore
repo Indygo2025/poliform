@@ -1,0 +1,24 @@
+# Служебное
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Временные файлы и черновики
+*.tmp
+*.bak
+*.log
+__check.html
+_tmp/
+tmp/
+
+# Локальное окружение
+.env
+.env.*
+.venv/
+node_modules/
+
+# Секреты — не должны попасть в репозиторий
+*.pem
+*.key
+secrets.json
+credentials.json

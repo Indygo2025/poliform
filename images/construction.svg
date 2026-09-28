@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 132" role="img" aria-label="Строительные изделия из пластмасс">
+  <defs>
+    <linearGradient id="cPanel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fdfcfa"/><stop offset=".4" stop-color="#e4e1da"/>
+      <stop offset=".7" stop-color="#d2cec5"/><stop offset="1" stop-color="#a9a59c"/>
+    </linearGradient>
+    <linearGradient id="cPanel2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#eceae4"/>
+      <stop offset="1" stop-color="#b4b0a7"/>
+    </linearGradient>
+    <linearGradient id="cScrew" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff3bd"/><stop offset=".5" stop-color="#f0c400"/>
+      <stop offset="1" stop-color="#a58200"/>
+    </linearGradient>
+    <radialGradient id="cShadow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#14130f" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#14130f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="104" cy="116" rx="76" ry="9" fill="url(#cShadow)"/>
+  <ellipse cx="196" cy="118" rx="26" ry="7" fill="url(#cShadow)"/>
+
+  <g stroke="#14130f" stroke-width="1.5">
+    <rect x="24" y="18" width="126" height="94" rx="1" fill="url(#cPanel)"/>
+    <rect x="24" y="18" width="126" height="94" rx="1" fill="none"/>
+  </g>
+  <g stroke="#14130f" stroke-width=".9" opacity=".35">
+    <path d="M24 34 H150M24 50 H150M24 66 H150M24 82 H150M24 98 H150"/>
+  </g>
+  <g stroke="#ffffff" stroke-width="1.4" opacity=".6">
+    <path d="M28 30 H146M28 46 H146M28 62 H146M28 78 H146"/>
+  </g>
+  <path d="M28 22 H146" stroke="#ffffff" stroke-width="2.4" opacity=".5" stroke-linecap="round"/>
+
+  <g fill="url(#cScrew)" stroke="#14130f" stroke-width="1.2">
+    <circle cx="38" cy="28" r="4.4"/><circle cx="136" cy="28" r="4.4"/>
+    <circle cx="38" cy="102" r="4.4"/><circle cx="136" cy="102" r="4.4"/>
+  </g>
+  <g stroke="#14130f" stroke-width=".9" opacity=".7">
+    <path d="M34 28 H42M136 24 V32M34 102 H42M136 98 V106"/>
+  </g>
+
+  <g stroke="#14130f" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M178 36 L196 26 L214 36 V100 L196 110 L178 100 Z" fill="url(#cPanel2)"/>
+    <path d="M178 36 L196 46 L214 36" fill="none"/>
+    <path d="M196 46 V110" stroke-width="1" opacity=".45"/>
+  </g>
+  <path d="M182 40 V98" stroke="#ffffff" stroke-width="2" opacity=".55" stroke-linecap="round"/>
+</svg>
