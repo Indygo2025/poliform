@@ -1,7 +1,7 @@
 /* ==========================================================================
    ПОЛИФОРМ — слой «живая пластмасса»
-   Подключается после style.css: скользящий блик, штупы, защёлки,
-   пружинная физика деталей и 3D-сцена в герое. Без зависимостей.
+   Подключается после style.css: скользящий блик, защёлки,
+   пружинная физика деталей, 3D-сцена в герое и просмотр фото. Без зависимостей.
    ========================================================================== */
 
 :root {
@@ -12,21 +12,11 @@
   --spring: cubic-bezier(.34, 1.56, .64, 1);
   --snap: cubic-bezier(.2, 1.35, .35, 1);
 
-  /* Геометрия штупа: круглая бобышка литой детали */
-  --stud-cell: 30px;
-  --stud-h: 15px;
-  --stud-1: #ffe680;
-  --stud-2: #d9a000;
-  --stud-cast: rgba(16, 22, 26, .22);
-
+  /* Геометрия штупа больше не используется — бобышки убраны */
   --sheen-soft: radial-gradient(240px 240px at var(--px) var(--py),
     rgba(255,255,255,.44) 0%, rgba(255,255,255,.12) 40%, rgba(255,255,255,0) 70%);
   --sheen-glass: radial-gradient(300px 300px at var(--px) var(--py),
     rgba(255,255,255,.80) 0%, rgba(255,255,255,.22) 42%, rgba(255,255,255,0) 72%);
-
-  --studs: radial-gradient(circle at 15px 5px, rgba(255,255,255,.95) 0 3px, rgba(255,255,255,0) 3.6px),
-           radial-gradient(circle at 15px 8px, var(--stud-1) 0 7px, var(--stud-2) 7.6px 8px, rgba(255,255,255,0) 8.4px),
-           radial-gradient(circle at 15px 11px, var(--stud-cast) 0 7px, rgba(16,22,26,0) 7.8px);
 }
 
 .sr-only {
@@ -62,60 +52,15 @@
   transition: transform .4s var(--snap);
 }
 
-/* ---------- Штупы: бобышки крепления на кромке детали ---------- */
-.card-figure::before, .use-fig::before {
-  content: "";
-  position: absolute;
-  top: 13px; left: 15px;
-  width: 120px; height: var(--stud-h);
-  z-index: 2;
-  pointer-events: none;
-  background-image: var(--studs);
-  background-size: var(--stud-cell) var(--stud-h);
-  background-repeat: repeat-x;
-  transform-origin: 0 50%;
-  opacity: .5;
-  transform: translateY(0) scale(1);
-  filter: drop-shadow(0 2px 2px rgba(16,22,26,.14));
-  transition: transform .4s var(--snap), opacity .4s;
-}
-.card:hover .card-figure::before, .use-card:hover .use-fig::before {
-  opacity: 1;
-  transform: translateY(-3px) scale(1.06);
-}
+/* ---------- Углы карточек: только блик ---------- */
+/* Бобышки (штупы) убраны по просьбе: жёлтые точки на светлом пластике читались как грязь.
+   Остались блик, пружина деталей и объём в 3D-сцене. */
 
-/* Пустые фото-слоты — монтажная плита: ждёт детали */
-.photo-slot::after, .gallery-slot::after {
-  content: "";
-  position: absolute;
-  left: 18px; right: 18px; bottom: 15px;
-  height: var(--stud-h);
-  pointer-events: none;
-  background-image: var(--studs);
-  background-size: var(--stud-cell) var(--stud-h);
-  background-repeat: repeat-x;
-  transform-origin: 50% 100%;
-  opacity: .45;
-  transform: translateY(0);
-  transition: transform .4s var(--snap), opacity .4s;
-}
-.photo-slot:hover::after, .gallery-slot:hover::after { opacity: .95; transform: translateY(-4px); }
+/* Фото-слоты остаются чистыми рамками для реальных снимков */
+.photo-slot, .gallery-slot { position: relative; }
 
 /* Блок преимуществ в фактах героя */
 .hero-fact { position: relative; }
-.hero-fact::after {
-  content: "";
-  position: absolute;
-  top: 11px; right: 13px;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 30%, #fff6cf 0 26%, var(--signal) 62%, var(--signal-2) 100%);
-  box-shadow: 0 2px 3px rgba(16,22,26,.2), inset 0 1px 0 rgba(255,255,255,.9);
-  opacity: .45;
-  transform: scale(1);
-  transition: transform .35s var(--snap), opacity .35s;
-}
-.hero-fact:hover::after { opacity: 1; transform: scale(1.35); }
 
 /* ---------- Защёлки: деталь щёлкается на место ---------- */
 .sec-title em::before, .sec-title em::after,
@@ -137,22 +82,7 @@
 .sec-title em:hover::before, .hero h1 .mark:hover::before { transform: translate(-3px, -4px) rotate(-18deg); }
 .sec-title em:hover::after,  .hero h1 .mark:hover::after  { transform: translate(3px, -4px) rotate(18deg); }
 
-/* Две штупы на жёлтой отливке CTA */
-.cta::after {
-  content: "";
-  position: absolute;
-  top: 18px; left: 22px;
-  width: calc(var(--stud-cell) * 2); height: var(--stud-h);
-  pointer-events: none;
-  background-image: var(--studs);
-  background-size: var(--stud-cell) var(--stud-h);
-  background-repeat: repeat-x;
-  opacity: .6;
-  transform-origin: 0 50%;
-  transition: transform .4s var(--snap);
-}
-.cta:hover::after { transform: translateY(-3px) scale(1.06); }
-
+/* ---------- Физика деталей: пружина вместо линейной анимации ---------- */
 /* Защёлки приезжают вместе с блоком и щёлкают при появлении */
 .has-js [data-reveal] .sec-title em::before { opacity: 0; transform: translate(-18px, -8px) rotate(-32deg); }
 .has-js [data-reveal] .sec-title em::after  { opacity: 0; transform: translate(18px, -8px) rotate(32deg); }
@@ -184,6 +114,18 @@
   transition: opacity .45s ease;
 }
 .hero-visual--scene:hover::before { opacity: 1; }
+
+/* ---------- Герой: фотография изделий вместо сцены ---------- */
+.hero-visual--photo { perspective: none; aspect-ratio: 2752 / 1536; min-height: 0; }
+.hero-visual--photo::before { content: none; }
+.hero-visual--photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: none;
+}
+.hero-visual--photo:hover img { transform: scale(1.04); }
 
 /* Длинная жёлтая плашка в заголовке: уменьшенный кегль, чтобы встать в колонку */
 .hero h1 .mark--tight {
@@ -247,18 +189,18 @@
   animation-duration: 8.6s;
   animation-delay: -1s;
 }
+/* Кромка плиты: только мягкая тень, без рёбер и штупов */
 .pl-plate::after {
   content: "";
   position: absolute;
-  left: 11%; right: 11%; bottom: 8px;
-  height: var(--stud-h);
-  background-image: var(--studs);
-  background-size: var(--stud-cell) var(--stud-h);
-  background-repeat: repeat-x;
-  opacity: .45;
+  left: 8%; right: 8%; bottom: 9px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(16, 22, 26, .16);
+  opacity: .55;
   transition: opacity .4s;
 }
-.hero-visual:hover .pl-plate::after { opacity: .9; }
+.hero-visual:hover .pl-plate::after { opacity: .85; }
 
 /* рулон плёнки */
 .pl-roll {
@@ -316,7 +258,7 @@
 .pl-angle i:nth-child(1) { left: 0; bottom: 0; width: 100%; height: 30%; }
 .pl-angle i:nth-child(2) { left: 0; bottom: 0; width: 26%; height: 100%; }
 
-/* кирпич 2×4 с четырьмя штупами */
+/* литой блок */
 .pl-brick {
   left: 17%; bottom: 18%;
   width: 48%; height: 21%;
@@ -328,24 +270,18 @@
   animation-duration: 6.4s;
   animation-delay: -.6s;
 }
-.pl-brick i {
+/* верхняя грань отливки вместо штупов */
+.pl-brick::after {
+  content: "";
   position: absolute;
-  top: -8px;
-  left: 7%;
-  width: 15px; height: 15px;
-  margin-left: -7.5px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 30%, #fff6cf 0 26%, var(--signal) 62%, var(--signal-2) 100%);
-  box-shadow: 0 4px 5px rgba(16,22,26,.28), inset 0 1px 0 rgba(255,255,255,.9);
-  transition: transform .45s var(--snap);
+  left: 8%; right: 8%; top: 9px;
+  height: 32%;
+  border-radius: 5px;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));
+  opacity: .8;
+  transition: opacity .4s;
 }
-.pl-brick i:nth-child(2) { left: 35%; }
-.pl-brick i:nth-child(3) { left: 63%; }
-.pl-brick i:nth-child(4) { left: 91%; }
-.hero-visual:hover .pl-brick i { transform: translateY(-4px) scale(1.08); }
-.hero-visual:hover .pl-brick i:nth-child(2) { transition-delay: .06s; }
-.hero-visual:hover .pl-brick i:nth-child(3) { transition-delay: .12s; }
-.hero-visual:hover .pl-brick i:nth-child(4) { transition-delay: .18s; }
+.hero-visual:hover .pl-brick::after { opacity: 1; }
 
 /* гранулят */
 .pl-pellet {
@@ -359,15 +295,156 @@
 .pl-p2 { left: 63%; top: 34%; --tf: translate3d(0,0,20px) scale(.8); animation-delay: -2.9s; }
 .pl-p3 { left: 30%; top: 6%;  --tf: translate3d(0,0,-10px) scale(.9); animation-delay: -4.2s; }
 
+/* ---------- Реальные фото вместо иллюстраций ---------- */
+/* Лоток под снимок: без блика, фото идёт в обрез по размеру рамки */
+.card .card-figure.photo-tray, .use-card .use-fig.photo-tray {
+  padding: 0;
+  background: #e9eef1;
+}
+.card .card-figure.photo-tray img { height: 196px; object-fit: cover; filter: none; }
+.use-card .use-fig.photo-tray img { height: 186px; object-fit: cover; filter: none; }
+.card:hover .card-figure.photo-tray img { transform: scale(1.05); filter: none; }
+.use-card:hover .use-fig.photo-tray img { transform: scale(1.05); }
+.card-figure.photo-tray::after, .use-fig.photo-tray::after { content: none; }
+
+/* Подсказка «открыть фото» */
+.photo-tray, .photo-frame { position: relative; cursor: zoom-in; }
+.photo-tray img, .photo-frame img { cursor: zoom-in; transition: transform .5s var(--snap); }
+.photo-tray::before, .photo-frame::before {
+  content: "";
+  position: absolute;
+  right: 10px; bottom: 10px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.92) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310161a' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M14 4h6v6'/%3E%3Cpath d='M20 4l-7 7'/%3E%3Cpath d='M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'/%3E%3C/svg%3E") center / 17px no-repeat;
+  box-shadow: 0 4px 10px rgba(16,22,26,.28);
+  opacity: 0;
+  transform: scale(.7);
+  transition: opacity .3s, transform .4s var(--snap);
+  pointer-events: none;
+  z-index: 4;
+}
+.photo-tray:hover::before, .photo-frame:hover::before { opacity: 1; transform: scale(1); }
+
+/* Рамка для фото внутри текстовых панелей (каталог на products.html, about.html) */
+.photo-frame {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #e9eef1;
+  box-shadow: var(--e2);
+}
+.photo-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.photo-frame::before { right: 14px; bottom: 14px; }
+
+/* ---------- Просмотр фото на весь экран ---------- */
+.pl-lb-open { overflow: hidden; }
+
+.pl-lb {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  animation: pl-lb-in .25s ease;
+}
+.pl-lb[hidden] { display: none; }
+@keyframes pl-lb-in { from { opacity: 0; } to { opacity: 1; } }
+
+.pl-lb__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(9,13,16,.93);
+  backdrop-filter: blur(6px);
+  border: 0;
+}
+
+.pl-lb__figure {
+  position: relative;
+  margin: 0;
+  max-width: min(1400px, 94vw);
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.pl-lb__img {
+  max-width: 100%;
+  max-height: 74vh;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #11171b;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.8);
+}
+.pl-lb__cap {
+  color: rgba(255,255,255,.86);
+  font-size: .92rem;
+  text-align: center;
+  max-width: 60ch;
+}
+.pl-lb__count {
+  position: relative;
+  margin: 0;
+  color: rgba(255,255,255,.55);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  letter-spacing: .08em;
+}
+.pl-lb__count:empty { display: none; }
+
+.pl-lb__btn {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 46px; height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 50%;
+  background: rgba(255,255,255,.10);
+  color: #fff;
+  cursor: pointer;
+  transition: background .2s, transform .3s var(--snap), border-color .2s;
+}
+.pl-lb__btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.pl-lb__btn:hover { background: var(--signal); border-color: var(--signal); color: #10161a; transform: scale(1.08); }
+.pl-lb__btn:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+
+.pl-lb__close { top: 18px; right: 18px; position: absolute; }
+.pl-lb__nav { top: 50%; margin-top: -23px; }
+.pl-lb__prev { left: 18px; }
+.pl-lb__next { right: 18px; }
+
+@media (max-width: 640px) {
+  .pl-lb { padding: 12px; }
+  .pl-lb__img { max-height: 68vh; }
+  .pl-lb__btn { width: 40px; height: 40px; }
+  .pl-lb__close { top: 10px; right: 10px; }
+  .pl-lb__prev { left: 8px; }
+  .pl-lb__next { right: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-lb { animation: none; }
+  .pl-lb__btn, .photo-tray img, .photo-tray::before { transition: none !important; }
+}
+
 /* ---------- Адаптив и отказ от анимаций ---------- */
 @media (max-width: 620px) {
   .hero-visual--scene { min-height: 260px; }
   .pl-cl { width: 100%; }
-  .card-figure::before, .use-fig::before { width: 90px; opacity: .4; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pl-x, .pl-brick i, .card-figure::before, .use-fig::before, .photo-slot::after,
-  .gallery-slot::after, .hero-fact::after, .cta::after { animation: none !important; transition: none !important; }
+  .pl-x, .pl-plate::after, .pl-brick::after { animation: none !important; transition: none !important; }
   .btn, .card-specs li { transition: none !important; }
 }

@@ -22,3 +22,7 @@ node_modules/
 *.key
 secrets.json
 credentials.json
+
+# Исходные фотографии из Kartinki (43 МБ) не публикуем
+# Оптимизированные версии лежат в images/ и images/photo/
+Kartinki/

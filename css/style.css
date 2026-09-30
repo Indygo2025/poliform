@@ -473,22 +473,6 @@ section { padding: 74px 0; }
 .hero-visual img { width: 100%; height: auto; transform: scale(1.02); transition: transform .8s cubic-bezier(.2,.7,.3,1); }
 .hero-visual:hover img { transform: scale(1.07) rotate(-.5deg); }
 
-.hero-tag {
-  position: absolute;
-  bottom: 16px; left: 16px;
-  background: linear-gradient(180deg, #ffe680 0%, var(--signal) 48%, var(--signal-2) 100%);
-  border: 1px solid rgba(217,160,0,.65);
-  border-radius: var(--r-pill);
-  padding: 9px 18px;
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  box-shadow: var(--hard), inset 0 1px 0 rgba(255,255,255,.9);
-  z-index: 4;
-}
-
 /* ---------- KPI ---------- */
 .kpi-strip { padding: 0 0 20px; margin-top: -36px; position: relative; z-index: 3; }
 .kpi-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
@@ -1127,7 +1111,6 @@ tbody tr:hover td code { color: var(--ink); }
   .logo-sub { display: none; }
   h1, .page-hero h1, .hero h1 { word-break: break-word; }
   .cta { padding: 34px 24px; }
-  .hero-tag { bottom: 12px; left: 12px; padding: 8px 14px; }
 
   /* таблица превращается в стопку карточек — без горизонтальной прокрутки */
   .table-wrap { overflow-x: visible; box-shadow: var(--e1); }
@@ -1217,7 +1200,6 @@ body {
   .logo-sub { display: none; }
   .hero { padding: 30px 0 34px; }
   .hero h1 { font-size: clamp(1.9rem, 5.2vw, 2.6rem); }
-  .hero-tag { display: none; }
   section { padding: 34px 0; }
   .page-hero { padding: 26px 0 30px; }
   .nav { top: 58px; max-height: calc(100vh - 58px); overflow-y: auto; }
