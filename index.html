@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/plastic-live.css">
 </head>
 <body>
 
@@ -65,10 +66,10 @@
     <div>
       <span class="eyebrow">Оптовое производство · Смоленская обл.</span>
       <h1>
-        <span class="row">Пластмасса</span>
-        <span class="row"><span class="mark">в профиле</span></span>
+        <span class="row">Полиформ — пластмасса</span>
+        <span class="row"><span class="mark mark--tight">в промышленных объёмах</span></span>
       </h1>
-      <p class="hero-lead">Плиты, листы, полосы, плёнка, трубы и профили из пластмасс — под типоразмеры вашей закупки. Партиями от небольшой до полной загрузки транспорта.</p>
+      <p class="hero-lead">Плиты, листы, полосы, плёнка, трубы и профили собственного производства. Партии под типоразмеры заказчика, стабильные характеристики от партии к партии, полный пакет документов для стройбаз и дистрибьюторов.</p>
       <div class="hero-actions">
         <a class="btn btn-signal" href="#catalog">Каталог продукции</a>
         <a class="btn btn-ghost" href="#contacts">Запросить КП и цены</a>
@@ -80,8 +81,20 @@
         <div class="hero-fact"><b>ЦОД</b><span>Смоленская обл.</span></div>
       </div>
     </div>
-    <figure class="hero-visual">
-      <img src="images/hero.svg" alt="Экструзия пластмассового листа на производственной линии" width="640" height="520">
+    <figure class="hero-visual hero-visual--scene">
+      <div class="pl-stage" data-pl-stage aria-hidden="true">
+        <div class="pl-cl">
+          <div class="pl-x pl-plate"></div>
+          <div class="pl-x pl-roll"><i></i></div>
+          <div class="pl-x pl-tube"><i></i></div>
+          <div class="pl-x pl-angle"><i></i><i></i></div>
+          <div class="pl-x pl-brick"><i></i><i></i><i></i><i></i></div>
+          <div class="pl-x pl-pellet pl-p1"></div>
+          <div class="pl-x pl-pellet pl-p2"></div>
+          <div class="pl-x pl-pellet pl-p3"></div>
+        </div>
+      </div>
+      <span class="sr-only">Изделия собственного производства: плита, труба, угловой профиль, рулон плёнки, гранулят.</span>
       <figcaption class="hero-tag">ОКВЭД 22.21 · плиты, полосы, трубы, профили</figcaption>
     </figure>
   </div>
@@ -516,5 +529,6 @@
 }
 </script>
 <script src="js/main.js"></script>
+<script src="js/plastic-live.js"></script>
 </body>
 </html>
