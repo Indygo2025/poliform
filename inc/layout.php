@@ -139,7 +139,7 @@ function pl_header(array $d, string $active = ''): void {
     </nav>
     <a class="cart-btn" href="cart.php" aria-label="Корзина">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" aria-hidden="true"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/></svg>
-      Корзина <span class="cart-btn__count">0</span>
+      <span class="cart-btn__label">Корзина</span> <span class="cart-btn__count">0</span>
     </a>
     <div class="header-tel">
       <?php if ($phoneText !== ''): ?><b><?= e($phoneText) ?></b><?php endif; ?>

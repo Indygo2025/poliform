@@ -721,8 +721,8 @@
 .ppb__actions .btn { flex: 1; min-width: 170px; }
 .ppb__note { font-size: .8rem; color: var(--ink-3); margin-top: 12px; line-height: 1.45; }
 
-.spec-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-.spec-table th, .spec-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--shop-line); font-size: .88rem; vertical-align: top; }
+.spec-table { width: 100%; min-width: 0; border-collapse: collapse; margin-top: 8px; }
+.spec-table th, .spec-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--shop-line); font-size: .88rem; vertical-align: top; overflow-wrap: anywhere; }
 .spec-table th { font-weight: 500; color: var(--ink-3); width: 42%; }
 .spec-table td { font-weight: 600; color: var(--ink); }
 .feature-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
@@ -956,6 +956,13 @@
   .gallery { position: static; max-width: 520px; }
   .pricing-bar__note { display: none; }
   .pricing-bar .container { gap: 12px; }
+  /* На планшете каталог в две колонки выглядел пустовато */
+  .shop-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+}
+@media (max-width: 760px) {
+  /* Длинные слова в таблице характеристиок растягивали её за пределы карточки */
+  .spec-table th, .spec-table td { padding: 9px 8px; font-size: .84rem; overflow-wrap: anywhere; }
+  .spec-table th { width: 38%; }
 }
 @media (max-width: 620px) {
   .pricing-bar__label { display: none; }
@@ -966,12 +973,43 @@
   .pcard__body { padding: 13px 12px 15px; }
   .price-now b { font-size: 1.3rem; }
   .pcard__add { font-size: .78rem; padding: 9px 8px; }
+
+  /* Кнопка корзины в шапке: только иконка со счётчиком, иначе не помещалась в 296px */
+  .cart-btn { padding: 9px 11px; gap: 6px; }
+  .cart-btn__label { display: none; }
+
+  /* Цели касания: на телефоне мелкие ссылки и чипы неудобны */
+  .fopt { padding: 11px 4px; }
+  .fopt input { width: 18px; height: 18px; }
+  .chip { padding: 9px 14px; }
+  .filters__reset { padding: 12px; }
+  .catalog-toolbar__sort select { min-height: 42px; }
+  .catalog-toolbar__sort { width: 100%; justify-content: space-between; }
+  .pcard__add { min-height: 42px; }
+  .gallery { max-width: none; }
+  .gallery__thumbs { gap: 8px; }
+  .gallery__thumbs button { width: 64px; height: 64px; }
+
   .cart-row { grid-template-columns: 62px minmax(0, 1fr); }
   .cart-row__img { width: 62px; height: 62px; }
   .cart-row__right { grid-column: 1 / -1; justify-content: space-between; }
   .form-row { grid-template-columns: 1fr; }
   .block--tint { padding: 18px 16px; }
   .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
+}
+
+@media (pointer: coarse) {
+  /* Управление каталогом и корзиной на телефоне: крупные цели вместо мелких ссылок */
+  .chip { padding: 11px 16px; }
+  .fopt { padding: 12px 4px; }
+  .fopt input { width: 20px; height: 20px; }
+  .pcard__add { min-height: 44px; }
+  .cart-btn { min-height: 44px; }
+  .filters__reset { padding: 13px; }
+  .gallery__thumbs button { width: 72px; height: 72px; }
+  .catalog-toolbar__sort select { min-height: 44px; }
+  .pricing-switch button { min-height: 46px; }
+  .cart-row__del { min-width: 44px; min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
