@@ -988,9 +988,22 @@
     initSort();
     initForm();
     renderAll();
+    loadCatalog();
+  }
 
-    loadJson(API_URL)
-      .catch(function () { return loadJson(FALLBACK_URL); })
+  function loadCatalog() {
+    var tried = [];
+    function step(i, list) {
+      if (i >= list.length) return Promise.reject(new Error(tried.join(' · ')));
+      return loadJson(list[i]).then(
+        function (data) { return data; },
+        function (e) {
+          tried.push(list[i] + ' — ' + ((e && e.message) || 'причина неизвестна'));
+          return step(i + 1, list);
+        }
+      );
+    }
+    return step(0, [API_URL, FALLBACK_URL])
       .then(function (data) {
         catalog = data;
         products = data.products || [];
@@ -1003,15 +1016,30 @@
         renderAll();
       })
       .catch(function (err) {
-        $$('[data-grid], [data-home-grid], [data-home-cats]').forEach(function (n) {
-          n.innerHTML = '';
-          var e = el('div', 'empty-state');
-          e.appendChild(el('b', null, 'Каталог не загрузился'));
-          e.appendChild(el('span', null, 'Проверьте подключение или позвоните менеджеру: ' + ((settings.contacts || {}).phone || '')));
-          n.appendChild(e);
-        });
+        showCatalogError(err && err.message ? err.message : 'причина неизвестна');
         if (window.console) console.error('Каталог:', err);
       });
+  }
+
+  function showCatalogError(reason) {
+    var tel = ((settings.contacts || {}).phone || '');
+    $$('[data-grid], [data-home-grid], [data-home-cats]').forEach(function (n) {
+      n.innerHTML = '';
+      var e = el('div', 'empty-state');
+      e.appendChild(el('b', null, 'Каталог не загрузился'));
+      e.appendChild(el('span', null, tel ? 'Позвоните менеджеру: ' + tel : 'Проверьте подключение или позвоните менеджеру'));
+      var why = el('span', 'empty-state__why', 'Причина: ' + reason);
+      e.appendChild(why);
+      var again = el('button', 'empty-state__retry', 'Повторить загрузку');
+      again.type = 'button';
+      again.addEventListener('click', function () {
+        again.disabled = true;
+        again.textContent = 'Загружаю…';
+        loadCatalog();
+      });
+      e.appendChild(again);
+      n.appendChild(e);
+    });
   }
 
   /* ---------- Настройки с сервера ---------- */

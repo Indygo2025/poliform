@@ -597,6 +597,15 @@
   border-radius: var(--r-lg);
 }
 .empty-state b { display: block; font-size: 1.1rem; color: var(--ink); margin-bottom: 8px; }
+.empty-state span { display: block; }
+.empty-state__why { margin-top: 10px; font-size: .82rem; opacity: .75; word-break: break-word; }
+.empty-state__retry {
+  margin-top: 16px; padding: 12px 22px; cursor: pointer;
+  font: inherit; color: var(--ink); background: var(--shop-card);
+  border: 1px solid var(--shop-line); border-radius: var(--r-lg);
+}
+.empty-state__retry:hover { border-color: var(--ink-3); }
+.empty-state__retry:disabled { opacity: .55; cursor: default; }
 
 /* ---------- Страница товара ---------- */
 .crumbs {
