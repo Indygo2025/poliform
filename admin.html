@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Полиформ — админка</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ===================================================== вход -->
+<div class="ab-login" id="login" hidden>
+  <form class="ab-login__card" id="login-form" autocomplete="on">
+    <div class="ab-login__logo"><span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6"/></svg></span> ПОЛИФОРМ</div>
+    <h1>Вход в админку</h1>
+    <p>Управление каталогом, заявками и текстами сайта.</p>
+    <div id="login-msg"></div>
+    <div class="ab-field">
+      <label for="lg-user">Логин</label>
+      <input id="lg-user" name="username" autocomplete="username" required>
+    </div>
+    <div class="ab-field">
+      <label for="lg-pass">Пароль</label>
+      <input id="lg-pass" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="ab-btn ab-btn--primary ab-grow" type="submit">Войти</button>
+  </form>
+</div>
+
+<!-- ===================================================== корпус -->
+<div class="ab-shell" id="app" hidden>
+  <aside class="ab-side">
+    <div class="ab-side__brand">
+      <i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6"/></svg></i>
+      <b>ПОЛИФОРМ<small>панель управления</small></b>
+    </div>
+    <nav class="ab-nav" id="nav">
+      <button type="button" data-view="products" class="is-active">Каталог</button>
+      <button type="button" data-view="orders">Заявки <span class="ab-badge" data-orders-badge hidden>0</span></button>
+      <button type="button" data-view="categories">Категории и цвета</button>
+      <button type="button" data-view="texts">Тексты сайта</button>
+      <button type="button" data-view="contacts">Контакты и SEO</button>
+      <button type="button" data-view="users" data-admin-only>Пользователи</button>
+      <button type="button" data-view="service">Резервная копия</button>
+    </nav>
+    <div class="ab-side__foot">
+      <div id="who" class="ab-mono" style="margin-bottom:6px"></div>
+      <div class="ab-row">
+        <a class="ab-btn ab-btn--sm" href="index.php" target="_blank" rel="noopener">Открыть сайт</a>
+        <button class="ab-btn ab-btn--sm" type="button" id="logout">Выйти</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="ab-main">
+    <div class="ab-head">
+      <div class="ab-grow">
+        <h1 id="view-title">Каталог</h1>
+        <p id="view-sub"></p>
+      </div>
+      <div class="ab-row" id="view-actions"></div>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="ab-toast" id="toast" role="status"></div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

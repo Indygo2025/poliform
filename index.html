@@ -3,35 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Полиформ — производство пластмассовых плит, полос, труб и профилей</title>
-<meta name="description" content="ООО «ПОЛИФОРМ КОМПАНИ», Смоленская область — производство пластмассовых плит, листов, полос, труб и профилей, строительных изделий из пластмасс. Оптовые поставки для стройбаз и дистрибьюторов.">
+<title>Полиформ — пластиковые изделия собственного производства: лотки и миски, опт и розница</title>
+<meta name="description" content="ООО «ПОЛИФОРМ КОМПАНИ», Смоленская область — собственное производство пластиковых изделий: лотки и туалеты для кошек 36×26 и 33,5×25 см, миски 200 мл и двойные 2×200 мл. Опт от 1 бокса и розница, фасовка от 20 до 600 шт.">
 <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#e7e5e0">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Полиформ — производство пластмассовых плит, полос, труб и профилей">
-<meta property="og:description" content="Оптовое производство пластмассовой плиты, листов, плёнки, труб и профилей. Смоленская область.">
-<meta property="og:image" content="images/hero.svg">
+<meta property="og:title" content="Полиформ — пластиковые изделия собственного производства">
+<meta property="og:description" content="Лотки и туалеты для кошек, миски одинарные и двойные. Опт от 1 бокса и розница. Собственное производство в Смоленской области.">
+<meta property="og:image" content="images/products/1430471-0.jpg">
 <meta property="og:locale" content="ru_RU">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/plastic-live.css">
+<link rel="stylesheet" href="css/shop.css">
 </head>
 <body>
 
 <div class="progress" role="presentation"></div>
-
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <div class="ticker-group">
-      <span><b>ПЛИТА</b> ЛИСТ ПЛЁНКА</span><span><b>ПОЛОСА</b> ПРОФИЛЬ</span><span><b>ТРУБА</b> СТРОЙИЗДЕЛИЯ</span><span><b>22.21</b> ОСНОВНОЙ ОКВЭД</span><span><b>22.22</b> ПЛЁНКА В РУЛОНАХ</span><span><b>22.23</b> СТРОИТЕЛЬНЫЕ ИЗДЕЛИЯ</span><span><b>22.29.2</b> КРУПНОГАБАРИТНЫЕ</span>
-    </div>
-    <div class="ticker-group">
-      <span><b>ПЛИТА</b> ЛИСТ ПЛЁНКА</span><span><b>ПОЛОСА</b> ПРОФИЛЬ</span><span><b>ТРУБА</b> СТРОЙИЗДЕЛИЯ</span><span><b>22.21</b> ОСНОВНОЙ ОКВЭД</span><span><b>22.22</b> ПЛЁНКА В РУЛОНАХ</span><span><b>22.23</b> СТРОИТЕЛЬНЫЕ ИЗДЕЛИЯ</span><span><b>22.29.2</b> КРУПНОГАБАРИТНЫЕ</span>
-    </div>
-  </div>
-</div>
 
 <header class="header">
   <div class="container header-inner">
@@ -41,346 +31,124 @@
       </span>
       <span class="logo-text">
         <span class="logo-name">ПОЛИФОРМ</span>
-        <span class="logo-sub">производство · опт</span>
+        <span class="logo-sub">пластиковые изделия · опт и розница</span>
       </span>
     </a>
     <button class="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
     <nav class="nav" id="nav">
       <a href="index.html" class="active">Главная</a>
-      <a href="products.html">Продукция</a>
+      <a href="products.html">Каталог</a>
       <a href="about.html">О компании</a>
-      <a href="#contacts">Контакты</a>
+      <a href="cart.html">Заявка</a>
     </nav>
-    <!-- ЗАМЕНИТЕ: актуальный телефон подтверждён клиентом -->
+    <a class="cart-btn" href="cart.html" aria-label="Корзина">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" aria-hidden="true"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/></svg>
+      Корзина <span class="cart-btn__count">0</span>
+    </a>
     <div class="header-tel">
       <b>+7 (900) 000-00-00</b>
-      <span>опт · заявки</span>
+      <span>заявки · опт</span>
     </div>
   </div>
 </header>
+
+<div class="pricing-bar">
+  <div class="container">
+    <span class="pricing-bar__label">Режим цен</span>
+    <div class="pricing-switch" data-mode-switch role="group" aria-label="Режим цены: розница или опт">
+      <button type="button" data-mode="ret" aria-pressed="true">Розница · от 1 шт.</button>
+      <button type="button" data-mode="opt" aria-pressed="false">Опт · от 1 бокса</button>
+    </div>
+    <p class="pricing-bar__note">Розничный режим: <b>шаг = 1 шт.</b> Цена за 1 шт. Оптовая цена — в переключателе.</p>
+  </div>
+</div>
 
 <main>
 
 <section class="hero">
   <div class="container hero-grid">
     <div>
-      <span class="eyebrow">Оптовое производство · Смоленская обл.</span>
+      <span class="eyebrow">Собственное производство · Смоленская обл.</span>
       <h1>
-        <span class="row">Полиформ — пластмасса</span>
-        <span class="row"><span class="mark mark--tight">в промышленных объёмах</span></span>
+        <span class="row">Пластиковые изделия</span>
+        <span class="row"><span class="mark mark--tight">которые мы делаем сами</span></span>
       </h1>
-      <p class="hero-lead">Плиты, листы, полосы, плёнка, трубы и профили собственного производства. Партии под типоразмеры заказчика, стабильные характеристики от партии к партии, полный пакет документов для стройбаз и дистрибьюторов.</p>
+      <p class="hero-lead">Лотки и туалеты для кошек, миски одинарные и двойные из плотного пластика. Каждая позиция отлита на собственной форме: от 33,5×25 см до 36×26 см, от 200 мл до 2×200 мл. Продаём оптом от одного бокса и в розницу поштучно.</p>
       <div class="hero-actions">
-        <a class="btn btn-signal" href="#catalog">Каталог продукции</a>
-        <a class="btn btn-ghost" href="#contacts">Запросить КП и цены</a>
+        <a class="btn btn-signal" href="products.html">Открыть каталог</a>
+        <a class="btn btn-ghost" href="#how">Как оформить заказ</a>
       </div>
-      <div class="hero-facts">
-        <div class="hero-fact"><b>7</b><span>направлений</span></div>
-        <div class="hero-fact"><b>22.21</b><span>основной ОКВЭД</span></div>
-        <div class="hero-fact"><b>6</b><span>человек в штате</span></div>
-        <div class="hero-fact"><b>ЦОД</b><span>Смоленская обл.</span></div>
+      <div class="hero-facts" data-home-kpi>
+        <div class="hero-fact"><b>12</b><span>артикулов в каталоге</span></div>
+        <div class="hero-fact"><b>4</b><span>категории изделий</span></div>
+        <div class="hero-fact"><b>27</b><span>₽ за шт. — мин. опт</span></div>
+        <div class="hero-fact"><b>20–600</b><span>шт. в боксе</span></div>
       </div>
     </div>
-    <figure class="hero-visual hero-visual--photo">
-      <img src="images/hero-sm.jpg" srcset="images/hero-sm.jpg 700w, images/hero.jpg 1400w" sizes="(max-width: 900px) 92vw, 560px" alt="Изделия собственного производства: плита, труба, угловой профиль, рулон плёнки, гранулят." width="1400" height="781" decoding="async">
-    </figure>
-  </div>
-</section>
-
-<section class="kpi-strip">
-  <div class="container">
-    <div class="kpi-row">
-      <div class="kpi" data-reveal><b data-count="2004" data-suffix="">2004</b><span>начало производства</span></div>
-      <div class="kpi" data-reveal><b data-count="7" data-suffix="">7</b><span>направлений в ЕГРЮЛ</span></div>
-      <div class="kpi" data-reveal><b data-count="6" data-suffix="">6</b><span>человек в штате</span></div>
-      <div class="kpi" data-reveal><b data-count="58.1" data-suffix=" млн ₽">58.1 млн ₽</b><span>выручка за 2025 год</span></div>
+    <div class="hero-visual">
+      <img src="images/products/1430475-0.jpg" alt="Лоток для кошек 36×25×9 см с сеткой, зелёный" width="1000" height="1333" fetchpriority="high">
+      <figcaption>Арт. 1430475 · 36×25×9 см</figcaption>
     </div>
   </div>
 </section>
 
-<section id="primenenie" class="section-alt">
+<section id="catalog">
   <div class="container">
     <div class="sec-head" data-reveal>
       <div>
-        <span class="eyebrow">Применение</span>
-        <h2 class="sec-title">Где это <em>работает</em></h2>
-        <p class="sec-sub">Наша продукция — это профили и плиты, которые уходят в конкретные конструкции. Ниже — типовые задачи.</p>
+        <span class="eyebrow">Ассортимент</span>
+        <h2 class="sec-title">Четыре <em>производственные линейки</em></h2>
+        <p class="sec-sub">Каждая категория — своя пресс-форма и своя фасовка. Внутри категории позиции отличаются размером, высотой борта и цветом, поэтому удобнее выбирать по артикулу.</p>
       </div>
-      <p class="sec-note">Перечень не финальный. Если ваша задача не в списке — напишите, оценим производственную возможность.</p>
     </div>
-
-    <div class="use-grid">
-      <article class="use-card" data-reveal>
-        <div class="use-fig photo-tray"><img src="images/photo/vorota-sm.jpg" data-zoom="images/photo/vorota.jpg" tabindex="0" srcset="images/photo/vorota-sm.jpg 760w, images/photo/vorota.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 380px" alt="Роллетные ворота из профильных планок" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="use-body">
-          <h3>Роллетные ворота</h3>
-          <p>Профильные планки в сборе: полотно, направляющие, короб. Собирается под проём заказчика.</p>
-          <em>профили · 22.21</em>
-        </div>
-      </article>
-
-      <article class="use-card" data-reveal>
-        <div class="use-fig photo-tray"><img src="images/photo/zabor-sm.jpg" data-zoom="images/photo/zabor.jpg" tabindex="0" srcset="images/photo/zabor-sm.jpg 760w, images/photo/zabor.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 380px" alt="Модульный забор из профилей" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="use-body">
-          <h3>Заборы и ограждения</h3>
-          <p>Стойки, поперечины, штакетник. Один профиль под разные комплекты — меньше позиций на складе базы.</p>
-          <em>профили · 22.21</em>
-        </div>
-      </article>
-
-      <article class="use-card" data-reveal>
-        <div class="use-fig photo-tray"><img src="images/photo/kanaly-sm.jpg" data-zoom="images/photo/kanaly.jpg" tabindex="0" srcset="images/photo/kanaly-sm.jpg 760w, images/photo/kanaly.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 380px" alt="Кабель-каналы, лотки и гофры из пластмассы" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="use-body">
-          <h3>Кабельные трассы</h3>
-          <p>Кабель-каналы, лотки, гофры. Прокладка по стенам и потолкам, в том числе в сырых зонах.</p>
-          <em>профили · трубы · 22.21</em>
-        </div>
-      </article>
-
-      <article class="use-card" data-reveal>
-        <div class="use-fig photo-tray"><img src="images/photo/krepezh-sm.jpg" data-zoom="images/photo/krepezh.jpg" tabindex="0" srcset="images/photo/krepezh-sm.jpg 760w, images/photo/krepezh.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 380px" alt="Крепёж и комплектующие к профильным системам" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="use-body">
-          <h3>Крепёж и комплектующие</h3>
-          <p>Метизы, клипсы, уплотнители под наши профильные системы — чтобы заказчик получил готовый узел, а не набор деталей.</p>
-          <em>по согласованию</em>
-        </div>
-      </article>
-
-      <article class="use-card" data-reveal>
-        <div class="use-fig photo-tray"><img src="images/photo/upakovka-sm.jpg" data-zoom="images/photo/upakovka.jpg" tabindex="0" srcset="images/photo/upakovka-sm.jpg 760w, images/photo/upakovka.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 380px" alt="Паллетная обмотка и транспортная упаковка" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="use-body">
-          <h3>Транспортная упаковка</h3>
-          <p>Паллетная обмотка, пакетирование, маркировка партий под отгрузку — чтобы груз дошёл без потерь формы.</p>
-          <em>упаковка · по согласованию</em>
-        </div>
-      </article>
-
-      <article class="use-card" data-reveal>
-        <div class="use-fig photo-tray"><img src="images/photo/emkosti-sm.jpg" data-zoom="images/photo/emkosti.jpg" tabindex="0" srcset="images/photo/emkosti-sm.jpg 760w, images/photo/emkosti.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 380px" alt="Пластиковые ёмкости и баки" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="use-body">
-          <h3>Ёмкости и баки</h3>
-          <p>Изготовление ёмкостей по размерам заказчика. Один из частых запросов на крупногабаритные изделия.</p>
-          <em>крупногабаритные · 22.29.2</em>
-        </div>
-      </article>
-    </div>
+    <div class="cat-grid" data-home-cats></div>
   </div>
 </section>
 
-<section id="catalog" class="section-alt">
+<section class="section-alt">
   <div class="container">
     <div class="sec-head" data-reveal>
       <div>
-        <span class="eyebrow">Каталог</span>
-        <h2 class="sec-title">Семь <em>направлений</em></h2>
-        <p class="sec-sub">Каждое направление подтверждено кодами ОКВЭД в ЕГРЮЛ. Конкретные марки, размеры и наличие — по запросу.</p>
+        <span class="eyebrow">Витрина</span>
+        <h2 class="sec-title">Популярные <em>позиции</em></h2>
+        <p class="sec-sub">Цены переключаются вместе с режимом в шапке. В оптовом режиме шаг количества равен боксу — добавить можно только целое число коробов.</p>
       </div>
-      <p class="sec-note">Конкретные типоразмеры, плотности и полимеры не опубликованы: пришлём под вашу спецификацию. Специальные изделия и упаковка — по согласованию.</p>
+      <a class="btn btn-ghost" href="products.html">Весь каталог · 12 позиций</a>
     </div>
-
-    <div class="cards">
-      <article class="card" data-reveal>
-        <div class="card-figure">
-          <span class="card-code">22.21</span>
-          <img src="images/sheets.svg" alt="Листы и плиты из пластмассы" loading="lazy">
-        </div>
-        <div class="card-body">
-          <h3>Листы и плиты</h3>
-          <p>Гладкие и технические листы, плиты по вашей толщине и формату. Режём под размер или отгружаем листами.</p>
-          <ul class="card-specs"><li>формат под заказ</li><li>толщина по ТЗ</li></ul>
-          <a class="card-link" href="products.html#sheets">Подробнее →</a>
-        </div>
-      </article>
-
-      <article class="card" data-reveal>
-        <div class="card-figure">
-          <span class="card-code">22.22</span>
-          <img src="images/film.svg" alt="Плёночное полотно в рулоне и полосы" loading="lazy">
-        </div>
-        <div class="card-body">
-          <h3>Полосы и плёнка</h3>
-          <p>Плёнка и полотна в рулонах, полосы пластиковые — для упаковочных и технических задач.</p>
-          <ul class="card-specs"><li>рулоны</li><li>полосы</li></ul>
-          <a class="card-link" href="products.html#film">Подробнее →</a>
-        </div>
-      </article>
-
-      <article class="card" data-reveal>
-        <div class="card-figure">
-          <span class="card-code">22.21</span>
-          <img src="images/pipes.svg" alt="Пластмассовые трубы" loading="lazy">
-        </div>
-        <div class="card-body">
-          <h3>Трубы</h3>
-          <p>Пластмассовые трубы под вашу задачу: диаметр и длина под заказ, партиями.</p>
-          <ul class="card-specs"><li>диаметр по ТЗ</li><li>длина под заказ</li></ul>
-          <a class="card-link" href="products.html#pipes">Подробнее →</a>
-        </div>
-      </article>
-
-      <article class="card" data-reveal>
-        <div class="card-figure photo-tray">
-          <span class="card-code">22.21</span><img src="images/photo/profili-sm.jpg" data-zoom="images/photo/profili.jpg" tabindex="0" srcset="images/photo/profili-sm.jpg 760w, images/photo/profili.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 360px" alt="Экструзионные профили: полые и угловые, по вашему чертежу или типовой номенклатуре" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="card-body">
-          <h3>Профили</h3>
-          <p>Экструзионные профили: полые, угловые, по вашему чертежу или типовой номенклатуре.</p>
-          <ul class="card-specs"><li>по чертежу</li><li>типовые</li></ul>
-          <a class="card-link" href="products.html#profiles">Подробнее →</a>
-        </div>
-      </article>
-
-      <article class="card" data-reveal>
-        <div class="card-figure photo-tray">
-          <span class="card-code">22.23</span><img src="images/photo/stroitelnye-sm.jpg" data-zoom="images/photo/stroitelnye.jpg" tabindex="0" srcset="images/photo/stroitelnye-sm.jpg 760w, images/photo/stroitelnye.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 360px" alt="Строительные изделия из пластмасс для стройбаз и подрядчиков" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="card-body">
-          <h3>Строительные изделия</h3>
-          <p>Строительные изделия из пластмасс для стройбаз и подрядчиков. Номенклатура — по спецификации.</p>
-          <ul class="card-specs"><li>по спецификации</li><li>опт партиями</li></ul>
-          <a class="card-link" href="products.html#construction">Подробнее →</a>
-        </div>
-      </article>
-
-      <article class="card" data-reveal>
-        <div class="card-figure">
-          <span class="card-code">22.29.2</span>
-          <img src="images/packaging.svg" alt="Пластиковая упаковка и тара" loading="lazy">
-        </div>
-        <div class="card-body">
-          <h3>Упаковочные изделия</h3>
-          <p>Пластиковая упаковка и тара — по запросу. Номенклатура и типоразмеры уточняются индивидуально.</p>
-          <ul class="card-specs"><li>уточняется</li><li>под заказ</li></ul>
-          <a class="card-link" href="products.html#packaging">Подробнее →</a>
-        </div>
-      </article>
-
-      <article class="card" data-reveal>
-        <div class="card-figure photo-tray">
-          <span class="card-code">22.29.2</span><img src="images/photo/landshaft-sm.jpg" data-zoom="images/photo/landshaft.jpg" tabindex="0" srcset="images/photo/landshaft-sm.jpg 760w, images/photo/landshaft.jpg 1600w" sizes="(max-width: 720px) 92vw, (max-width: 1200px) 44vw, 360px" alt="Крупногабаритные изделия из пластмассы для стройки, ландшафта и производственных задач" loading="lazy" decoding="async" width="760" height="434"></div>
-        <div class="card-body">
-          <h3>Крупногабаритные изделия</h3>
-          <p>Крупногабаритные изделия из пластмассы — для стройки, ландшафта и производственных задач.</p>
-          <ul class="card-specs"><li>нестандартный габарит</li><li>по чертежу</li></ul>
-          <a class="card-link" href="products.html#bulk">Подробнее →</a>
-        </div>
-      </article>
-
-      <article class="card" data-reveal>
-        <div class="card-figure">
-          <span class="card-code">46.90</span>
-          <img src="images/logistics.svg" alt="Оптовая отгрузка партии" loading="lazy">
-        </div>
-        <div class="card-body">
-          <h3>Опт и дистрибуция</h3>
-          <p>Поставки стройбазам и дистрибьюторам: отгрузка партиями, документы для контрагентов.</p>
-          <ul class="card-specs"><li>ОСН</li><li>НДС</li><li>УПД</li></ul>
-          <a class="card-link" href="#contacts">Условия →</a>
-        </div>
-      </article>
-    </div>
+    <div class="shop-grid" data-home-grid></div>
   </div>
 </section>
 
-<section id="production">
+<section id="how">
   <div class="container">
     <div class="sec-head" data-reveal>
       <div>
-        <span class="eyebrow">Производство</span>
-        <h2 class="sec-title">От гранулята <em>до партии</em></h2>
-        <p class="sec-sub">Собственное производство в Смоленской области: пластификация, экструзия, калибровка, резка, упаковка.</p>
+        <span class="eyebrow">Опт и розница</span>
+        <h2 class="sec-title">Как устроена <em>продажа</em></h2>
+        <p class="sec-sub">Мы отгружаем и по одной штуке, и целыми боксами. Разница только в цене и кратности — сам порядок одинаковый.</p>
       </div>
-      <p class="sec-note">Площадка: с. Екимовичи, Рославльский р-н, Смоленская область. Выезд и отгрузка — по всей России.</p>
     </div>
-
-    <div class="steps" data-reveal>
-      <div class="step">
-        <div class="step-n">01</div>
-        <h3>Входной контроль сырья</h3>
-        <p>Проверяем гранулят на соответствие марки и ГОСТ. Работаем с вторичным сырьём — по вашему требованию.</p>
+    <div class="steps">
+      <div class="block--tint" data-reveal>
+        <span class="step-num">1</span>
+        <h3>Выберите режим</h3>
+        <p>Переключатель в шапке меняет все цены на сайте: <b>розница</b> — шаг 1 шт., <b>опт</b> — шаг равен фасовке бокса. Выбор сохраняется при переходе между страницами.</p>
       </div>
-      <div class="step">
-        <div class="step-n">02</div>
-        <h3>Пластификация и экструзия</h3>
-        <p>Готовим расплав, выдавливаем заготовку через калибровочную оснастку под ваш профиль.</p>
+      <div class="block--tint" data-reveal>
+        <span class="step-num">2</span>
+        <h3>Соберите заказ</h3>
+        <p>Кладёте позиции в корзину в нужном режиме. Можно смешивать: например, пять боксов лотков и отдельно розничные миски — итог посчитается двумя строками.</p>
       </div>
-      <div class="step">
-        <div class="step-n">03</div>
-        <h3>Резка и упаковка</h3>
-        <p>Режем в размер, маркируем, пакуем и готовим отгрузочные документы.</p>
-      </div>
-      <div class="step">
-        <div class="step-n">04</div>
-        <h3>Отгрузка и документы</h3>
-        <p>Комплектуем заказ, выдаём УПД и спецификации. Постоянным клиентам — график и резерв.</p>
+      <div class="block--tint" data-reveal>
+        <span class="step-num">3</span>
+        <h3>Отправьте заявку</h3>
+        <p>В корзине заполняете имя и телефон. Менеджер подтверждает наличие, считает доставку и присылает счёт. Оплата — по договору или по счёту для юрлиц.</p>
       </div>
     </div>
 
-    <div class="photo-block" data-reveal>
-      <div class="photo-slot">
-        <div>
-          <b>Фото цеха и производственной линии</b>
-          <span>Сюда встанет реальное фото оборудования и склада готовой продукции. Ожидаем от клиента.</span>
-        </div>
-      </div>
-      <div class="reasons">
-        <div class="reason">
-          <span class="reason-ico"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 14 L7 9 L11 12 L18 4" stroke="#161616" stroke-width="2.4" stroke-linecap="square"/></svg></span>
-          <div><b>Серийные партии</b><span>Стабильные характеристики от партии к партии — для стройбаз и дистрибьюторов.</span></div>
-        </div>
-        <div class="reason">
-          <span class="reason-ico"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2 L18 6 V12 L10 18 L2 12 V6 Z" stroke="#161616" stroke-width="2.2" stroke-linejoin="round"/></svg></span>
-          <div><b>Изготовление по чертежу</b><span>Если типовой позиции нет — сделаем по вашему ТЗ или образцу.</span></div>
-        </div>
-        <div class="reason">
-          <span class="reason-ico"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 6 H17V17H3Z M3 6 L10 11 L17 6" stroke="#161616" stroke-width="2.2" stroke-linejoin="round"/></svg></span>
-          <div><b>Документы для бухгалтерии</b><span>Полный пакет закрывающих документов. Реквизиты в подвале каждой страницы.</span></div>
-        </div>
-        <div class="reason">
-          <span class="reason-ico"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 16 V8 H8 V16 M11 16 V4 H16 V16 M2 16 H18" stroke="#161616" stroke-width="2.2" stroke-linejoin="round"/></svg></span>
-          <div><b>Оптовые условия</b><span>Постоянным клиентам — отсрочка и график отгрузок. Малые партии — счёт за 1 день.</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="masonry" data-reveal>
-      <div class="shot shot-1"><b>Экструзионная линия</b><span>ФОТО 01 · 4:3</span></div>
-      <div class="shot shot-2"><b>Склад готовой продукции</b><span>ФОТО 02</span></div>
-      <div class="shot shot-3"><b>Входной контроль сырья</b><span>ФОТО 03</span></div>
-      <div class="shot shot-4"><b>Отгрузка партии · паллетная обмотка и маркировка</b><span>ФОТО 04 · 16:9</span></div>
-    </div>
-  </div>
-</section>
-
-<section id="optovye-usloviya" class="section-alt">
-  <div class="container">
-    <div class="sec-head" data-reveal>
-      <div>
-        <span class="eyebrow">Оптовым клиентам</span>
-        <h2 class="sec-title">Почему <em>стройбазы</em> и дистрибьюторы</h2>
-      </div>
-      <p class="sec-note">Коды ОКВЭД в подвале страницы — для службы безопасности и тендерных отделов.</p>
-    </div>
-
-    <div class="table-wrap" data-reveal>
-      <table>
-        <caption>Условия работы</caption>
-        <thead>
-          <tr><th>Параметр</th><th>Значение</th></tr>
-        </thead>
-        <tbody>
-          <tr><td data-label="Параметр">Минимальная партия</td><td data-label="Значение">Подбираем под объём закупки — от небольшой партии</td></tr>
-          <tr><td data-label="Параметр">Номенклатура</td><td data-label="Значение">Типовая по образцам + изготовление по вашему чертежу</td></tr>
-          <tr><td data-label="Параметр">Отгрузка</td><td data-label="Значение">Самовывоз со склада в Екимовичах, доставка по РФ</td></tr>
-          <tr><td data-label="Параметр">Документы</td><td data-label="Значение">УПД, счёт, спецификация, сертификаты на сырьё</td></tr>
-          <tr><td data-label="Параметр">Сроки</td><td data-label="Значение">Счёт за 1 день, отгрузка по графику</td></tr>
-          <tr><td data-label="Параметр">Налоги</td><td data-label="Значение">ОСН, НДС 20%</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="opening-note" style="margin-top:18px" data-reveal>
-      <div class="opening"><b>Стройбазам</b><span>Стабильная номенклатура, которую можно держать на складе без обрывов поставки.</span></div>
-      <div class="opening"><b>Дистрибьюторам</b><span>Изготовление по вашему ТЗ — работаем как производственный подрядчик.</span></div>
-      <div class="opening"><b>Проектировщикам</b><span>Можно согласовать профиль по чертежу до запуска партии.</span></div>
+    <div class="block--tint" style="margin-top:34px" data-reveal>
+      <h3>Почему опт считается боксами</h3>
+      <p style="color:var(--ink-2);line-height:1.6;margin-bottom:0">Изделия отгружаются в гофрокоробах: лотки — по 20–60 шт., миски — по 300–600 шт. Оптовая цена действует от одного полного бокса, поэтому количество в оптовом режиме автоматически округляется вверх до кратного фасовке. Так вы всегда получаете ровно закрытую партию без «неполных коробок» на складе.</p>
     </div>
   </div>
 </section>
@@ -390,31 +158,24 @@
     <div class="sec-head" data-reveal>
       <div>
         <span class="eyebrow">Контакты</span>
-        <h2 class="sec-title">Запрос <em>цен и партий</em></h2>
-        <p class="sec-sub">Пришлите спецификацию или перечень позиций с размерами и объёмом — ответим с ценами, сроками и условиями отгрузки.</p>
+        <h2 class="sec-title">Заявка <em>на партию</em></h2>
+        <p class="sec-sub">Пришлите перечень артикулов с количеством в боксах — ответим по наличию, срокам и стоимости доставки.</p>
       </div>
-      <p class="sec-note">Форма намеренно не используется: запрос уходит напрямую менеджеру, без посредников и без хранения ваших данных на стороне сайта.</p>
     </div>
 
     <div class="contact-grid">
       <div class="contact-card" data-reveal>
         <h3>Отдел продаж</h3>
         <dl class="contact-list">
-          <!-- ЗАМЕНИТЕ: актуальный телефон подтверждён клиентом -->
           <div class="contact-row"><dt>Телефон</dt><dd><a href="tel:+79000000000">+7 (900) 000-00-00</a></dd></div>
-          <!-- ЗАМЕНИТЕ: актуальный телефон подтверждён клиентом -->
           <div class="contact-row"><dt>Заявки в Telegram</dt><dd><a href="https://t.me/poliform" rel="nofollow noopener" target="_blank">@poliform</a></dd></div>
-          <!-- ЗАМЕНИТЕ: актуальная почта подтверждена клиентом -->
           <div class="contact-row"><dt>E-mail</dt><dd><a href="mailto:sales@poliform.ru">sales@poliform.ru</a></dd></div>
           <div class="contact-row"><dt>Часы работы</dt><dd>Пн–Пт, 09:00–18:00 (МСК)</dd></div>
           <div class="contact-row"><dt>Адрес</dt><dd>216533, Смоленская обл., м.о. Рославльский, с. Екимовичи, 1-й Советский пер., д. 14А</dd></div>
         </dl>
         <div class="contact-actions">
-          <a class="btn btn-signal" href="mailto:sales@poliform.ru?subject=%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D1%86%D0%B5%D0%BD%20%D0%B8%20%D0%BE%D1%82%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8%20%D0%9F%D0%BE%D0%BB%D0%B8%D1%84%D0%BE%D1%80%D0%BC%20%E2%80%94%20%D0%9F%D0%BE%D0%BB%D0%B8%D1%84%D0%BE%D1%80%D0%BC-%D0%9A%D0%9E%D0%9C%D0%9F%D0%90%D0%9D%D0%98">Запросить КП</a>
+          <a class="btn btn-signal" href="cart.html#order">Оформить заявку</a>
           <a class="btn btn-ghost btn-sm" href="https://t.me/poliform" rel="nofollow noopener" target="_blank">Написать в Telegram</a>
-        </div>
-        <div class="map-slot">
-          <span>Здесь карта с точкой на производстве.<br>Подключим Яндекс.Карту или схему проезда.</span>
         </div>
       </div>
 
@@ -429,22 +190,7 @@
           <dt>Юр. адрес</dt><dd>216533, Смоленская обл.,<br>с. Екимовичи, 1-й Советский<br>пер., д. 14А</dd>
           <dt>Руководитель</dt><dd>Васильев В. В.</dd>
         </dl>
-        <p class="warn">Данные сверены с ЕГРЮЛ. Номенклатура и параметры продукции публикуются по запросу — актуальный типоразмерный ряд подтверждайте у менеджера.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <div class="cta" data-reveal>
-      <div>
-        <h2>Нужен расчёт под вашу закупку?</h2>
-        <p>Пришлите перечень позиций и объём в месяц. Посчитаем партию, предложим формат отгрузки и зафиксируем цену.</p>
-      </div>
-      <div class="cta-actions">
-        <a class="btn" href="mailto:sales@poliform.ru?subject=%D0%9E%D0%BF%D1%82%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%BF%D0%B0%D1%80%D1%82%D0%B8%D1%8F%20%D0%9F%D0%BE%D0%BB%D0%B8%D1%84%D0%BE%D1%80%D0%BC%20%E2%80%94%20%D0%9F%D0%BE%D0%BB%D0%B8%D1%84%D0%BE%D1%80%D0%BC-%D0%9A%D0%9E%D0%9C%D0%9F%D0%90%D0%9D%D0%98">Оптовая партия</a>
-        <a class="btn btn-ghost" href="tel:+79000000000">Позвонить в отдел продаж</a>
+        <p class="warn">Изделия не подлежат сертификации, изготовлены из пластика, страна производства — Россия. Наличие по конкретному артикулу и цвету подтверждает менеджер.</p>
       </div>
     </div>
   </div>
@@ -458,17 +204,17 @@
       <div>
         <a class="logo" href="index.html">
           <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6" stroke-linejoin="miter"/></svg></span>
-          <span class="logo-text"><span class="logo-name">ПОЛИФОРМ</span><span class="logo-sub">производство · опт</span></span>
+          <span class="logo-text"><span class="logo-name">ПОЛИФОРМ</span><span class="logo-sub">пластиковые изделия · опт и розница</span></span>
         </a>
-        <p class="footer-about">Производство пластмассовых плит, полос, труб и профилей в Смоленской области. Оптовые поставки по России.</p>
+        <p class="footer-about">Собственное производство пластиковых изделий: лотки и туалеты для кошек, миски одинарные и двойные. Опт от одного бокса и розница поштучно.</p>
       </div>
       <div>
         <h4>Разделы</h4>
         <div class="footer-links">
           <a href="index.html">Главная</a>
-          <a href="products.html">Продукция</a>
+          <a href="products.html">Каталог</a>
+          <a href="cart.html">Корзина и заявка</a>
           <a href="about.html">О компании</a>
-          <a href="#contacts">Контакты</a>
         </div>
       </div>
       <div>
@@ -482,7 +228,7 @@
     </div>
     <div class="footer-bottom">
       <span>© ООО «ПОЛИФОРМ КОМПАНИ» · ОГРН 1126725000698</span>
-      <span>ОКВЭД 22.21 · 22.22 · 22.23 · 22.29</span>
+      <span>12 артикулов · 4 категории</span>
       <span>Сделано без CMS</span>
     </div>
   </div>
@@ -496,7 +242,7 @@
   "alternateName": "Полиформ",
   "url": "https://poliform.pages.dev/",
   "logo": "https://poliform.pages.dev/images/favicon.svg",
-  "description": "Производство пластмассовых плит, полос, труб и профилей, строительных изделий из пластмасс. Оптовые поставки.",
+  "description": "Собственное производство пластиковых изделий: лотки и туалеты для кошек, миски одинарные и двойные. Опт от одного бокса и розница.",
   "address": {
     "@type": "PostalAddress",
     "postalCode": "216533",
@@ -511,6 +257,6 @@
 </script>
 <script src="js/main.js"></script>
 <script src="js/plastic-live.js"></script>
-<script src="js/lightbox.js"></script>
+<script src="js/shop.js"></script>
 </body>
 </html>

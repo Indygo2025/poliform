@@ -3,106 +3,122 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>О компании — Полиформ | Производство в Смоленской области</title>
-<meta name="description" content="ООО «ПОЛИФОРМ КОМПАНИ» — производство пластмассовых плит, полос, труб и профилей в Смоленской области. История, производственная площадка, документы и условия работы.">
+<title>О компании — Полиформ | Собственное производство пластиковых изделий</title>
+<meta name="description" content="ООО «ПОЛИФОРМ КОМПАНИ», Смоленская область — собственное производство пластиковых изделий: лотки и туалеты для кошек, миски одинарные и двойные. Опт от одного бокса и розница.">
 <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#e7e5e0">
 <meta property="og:type" content="website">
 <meta property="og:title" content="О компании — Полиформ">
-<meta property="og:description" content="Производственная площадка в Смоленской области: плиты, полосы, плёнка, трубы и профили из пластмассы.">
-<meta property="og:image" content="images/hero.svg">
+<meta property="og:description" content="Производственная площадка в Смоленской области: пластиковые изделия собственного производства.">
+<meta property="og:image" content="images/products/1430475-0.jpg">
+<meta property="og:locale" content="ru_RU">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/plastic-live.css">
+<link rel="stylesheet" href="css/shop.css">
 </head>
 <body>
 
 <div class="progress" role="presentation"></div>
 
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <div class="ticker-group">
-      <span><b>ПЛИТА</b> ЛИСТ ПЛЁНКА</span><span><b>ПОЛОСА</b> ПРОФИЛЬ</span><span><b>ТРУБА</b> СТРОЙИЗДЕЛИЯ</span><span><b>22.21</b> ОСНОВНОЙ ОКВЭД</span><span><b>22.22</b> ПЛЁНКА В РУЛОНАХ</span><span><b>22.23</b> СТРОИТЕЛЬНЫЕ ИЗДЕЛИЯ</span><span><b>22.29.2</b> КРУПНОГАБАРИТНЫЕ</span>
-    </div>
-    <div class="ticker-group">
-      <span><b>ПЛИТА</b> ЛИСТ ПЛЁНКА</span><span><b>ПОЛОСА</b> ПРОФИЛЬ</span><span><b>ТРУБА</b> СТРОЙИЗДЕЛИЯ</span><span><b>22.21</b> ОСНОВНОЙ ОКВЭД</span><span><b>22.22</b> ПЛЁНКА В РУЛОНАХ</span><span><b>22.23</b> СТРОИТЕЛЬНЫЕ ИЗДЕЛИЯ</span><span><b>22.29.2</b> КРУПНОГАБАРИТНЫЕ</span>
-    </div>
-  </div>
-</div>
-
 <header class="header">
   <div class="container header-inner">
     <a class="logo" href="index.html">
-      <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6" stroke-linejoin="miter"/></svg></span>
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6" stroke-linejoin="miter"/></svg>
+      </span>
       <span class="logo-text">
         <span class="logo-name">ПОЛИФОРМ</span>
-        <span class="logo-sub">производство · опт</span>
+        <span class="logo-sub">пластиковые изделия · опт и розница</span>
       </span>
     </a>
     <button class="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
     <nav class="nav" id="nav">
       <a href="index.html">Главная</a>
-      <a href="products.html">Продукция</a>
+      <a href="products.html">Каталог</a>
       <a href="about.html" class="active">О компании</a>
-      <a href="index.html#contacts">Контакты</a>
+      <a href="cart.html">Заявка</a>
     </nav>
+    <a class="cart-btn" href="cart.html" aria-label="Корзина">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" aria-hidden="true"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/></svg>
+      Корзина <span class="cart-btn__count">0</span>
+    </a>
     <div class="header-tel">
       <b>+7 (900) 000-00-00</b>
-      <span>опт · заявки</span>
+      <span>заявки · опт</span>
     </div>
   </div>
 </header>
+
+<div class="pricing-bar">
+  <div class="container">
+    <span class="pricing-bar__label">Режим цен</span>
+    <div class="pricing-switch" data-mode-switch role="group" aria-label="Режим цены: розница или опт">
+      <button type="button" data-mode="ret" aria-pressed="true">Розница · от 1 шт.</button>
+      <button type="button" data-mode="opt" aria-pressed="false">Опт · от 1 бокса</button>
+    </div>
+    <p class="pricing-bar__note">Розничный режим: <b>шаг = 1 шт.</b> Цена за 1 шт. Оптовая цена — в переключателе.</p>
+  </div>
+</div>
 
 <main>
 
 <div class="page-hero">
   <div class="container">
-    <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> / О компании</nav>
-    <span class="eyebrow">ООО «ПОЛИФОРМ КОМПАНИ»</span>
-    <h1>Производство<br>в Смоленской области</h1>
-    <p>Пластмассовые плиты, полосы, трубы и профили. Своя производственная площадка в Екимовичах, прямые отгрузки оптом и изготовление по чертежу.</p>
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <a href="index.html">Главная</a> / <span>О компании</span>
+    </nav>
+    <span class="eyebrow">Производитель</span>
+    <h1>Мы делаем пластик, <br>который <em>работает каждый день</em></h1>
+    <p class="hero-lead">Полиформ — производство пластмассовых изделий в Смоленской области. Мы не перепродаём готовую посуду: лотки, туалеты и миски отливаются на собственных пресс-формах из пластика, поэтому размеры, толщина стенок и цвет повторяются от партии к партии.</p>
   </div>
 </div>
 
 <section>
-  <div class="container two-col">
-    <div class="prose" data-reveal>
-      <h2>Кто мы</h2>
-      <p>ООО «ПОЛИФОРМ КОМПАНИ» — производитель пластмассовой продукции из Смоленской области. Основной вид деятельности по ЕГРЮЛ — 22.21, производство пластмассовых плит, полос, труб и профилей. Дополнительно зафиксированы производство строительных изделий из пластмасс, плёночных и полотняных изделий в рулонах, прочих изделий из пластмасс, включая крупногабаритные.</p>
-      <p>Работаем в оптовом формате: стройбазы, дистрибьюторы, подрядчики. Типовой номенклатуры «в наличии со склада» у нас нет — мы производим под заказ под вашу спецификацию. Это позволяет попадать в задачу по размеру и объёму, а не продавать то, что не нужно рынку.</p>
-      <h2>Как мы работаем</h2>
-      <ul>
-        <li>Принимаем спецификацию в любом формате: перечень позиций, чертёж или образец</li>
-        <li>Считаем стоимость партии и срок, подбираем формат отгрузки</li>
-        <li>Изготавливаем и маркируем партию</li>
-        <li>Отгружаем со склада в Екимовичах или организуем доставку</li>
-        <li>Передаём закрывающие документы для бухгалтерии</li>
-      </ul>
+  <div class="container">
+    <div class="sec-head" data-reveal>
+      <div>
+        <span class="eyebrow">Что именно мы производим</span>
+        <h2 class="sec-title">Ассортимент <em>из одной компетенции</em></h2>
+        <p class="sec-sub">Весь каталог — это изделия из пластика с понятной геометрией: ёмкости с бортами и съёмной сеткой, компактные формы для небольших помещений и посуда для корма и воды. Ничего лишнего в номенклатуре нет.</p>
+      </div>
     </div>
-
-    <div data-reveal>
-      <div class="wrap" style="padding:26px;margin-bottom:20px">
-        <h3 style="font-size:1.1rem;margin-bottom:14px">Компания в цифрах</h3>
-        <div class="facts-list">
-          <div><span>ОГРН</span><b>1126725000698</b></div>
-          <div><span>ИНН / КПП</span><b>6725018221 / 672501001</b></div>
-          <div><span>Основной ОКВЭД</span><b>22.21</b></div>
-          <div><span>Регистрация</span><b>31.08.2012</b></div>
-          <div><span>Налоги</span><b>ОСН · НДС 20%</b></div>
-          <div><span>Штат</span><b>6 человек</b></div>
+    <div class="cards">
+      <article class="card" data-reveal>
+        <div class="card-body">
+          <h3>Лотки и туалеты прямоугольные</h3>
+          <p>Средние и глубокие лотки для кошек: со съёмной сеткой и высоким бортом. Габариты 36×26 см с высотой 6,5 см и 36×25 см с высотой 9 см. Сетка поднимает наполнитель над поддоном на 0,8 см — лапы остаются сухими, а расход наполнителя снижается.</p>
+          <ul class="card-specs">
+            <li>36×26×6,5 см</li>
+            <li>36×25×9 см</li>
+            <li>Бокс 20–24 шт.</li>
+          </ul>
         </div>
-      </div>
-      <div class="photo-slot" style="min-height:340px">
-        <div>
-          <b>Фото производственной площадки</b>
-          <span>Цех, склад готовой продукции, парк оборудования. Ожидаем от клиента.</span>
+      </article>
+      <article class="card" data-reveal>
+        <div class="card-body">
+          <h3>Лотки округлые компактные</h3>
+          <p>Меньший формат 33,5×25×6 см со скруглёнными стенками — помещается под раковину, в нишу или на балконе. Двухцветное исполнение, съёмная сетка с тем же зазором 0,8 см. Хорошо продаётся в комплекте с мисками.</p>
+          <ul class="card-specs">
+            <li>33,5×25×6 см</li>
+            <li>Скруглённая форма</li>
+            <li>Бокс 50 шт.</li>
+          </ul>
         </div>
-      </div>
-      <div class="wrap" style="padding:14px;border-radius:var(--r)">
-        <div class="photo-frame"><img src="images/photo/stroitelnye-sm.jpg" data-zoom="images/photo/stroitelnye.jpg" tabindex="0" srcset="images/photo/stroitelnye-sm.jpg 760w, images/photo/stroitelnye.jpg 1600w" sizes="(max-width: 720px) 92vw, 560px" alt="Строительные изделия из пластмасс для стройбаз и подрядчиков" loading="lazy" decoding="async" width="760" height="434"></div>
-      </div>
+      </article>
+      <article class="card" data-reveal>
+        <div class="card-body">
+          <h3>Миски одинарные и двойные</h3>
+          <p>Миска «Нулевка» 200 мл, 13,5×12,5×3 см — овальная, устойчивая, допускает мытьё в посудомоечной машине. Двойная миска на 2×200 мл с полукруглым основанием разделяет корм и воду. Подходят для кошек, мелких собак, грызунов и птиц.</p>
+          <ul class="card-specs">
+            <li>200 мл и 2×200 мл</li>
+            <li>Бокс 300–600 шт.</li>
+            <li>Моется в посудомойке</li>
+          </ul>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -111,50 +127,56 @@
   <div class="container">
     <div class="sec-head" data-reveal>
       <div>
-        <span class="eyebrow">История</span>
-        <h2 class="sec-title">Два десятилетия <em>в пластмассе</em></h2>
-        <p class="sec-sub">Производственный опыт команды восходит к 2004 году.</p>
+        <span class="eyebrow">Производственный цикл</span>
+        <h2 class="sec-title">От гранулы <em>до бокса</em></h2>
+        <p class="sec-sub">Цикл короткий и повторяемый: изделие отливается, контролируется по геометрии, упаковывается в гофрокороб и уходит на отгрузку.</p>
       </div>
-      <p class="sec-note">Формулировка об опыте с 2004 года — предварительная, требует подтверждения владельца перед публикацией. История юридически отдельных лиц — не совпадение названий, а преемственность дела и команды.</p>
     </div>
-
-    <div class="prose" data-reveal>
-      <p>Производство пластмассовой продукции в Екимовичах ведётся с 2004 года. Первоначально оно шло под другим юридическим лицом — ООО «Полиформ», зарегистрированным в Десногорске в 2004 году. В 2012 году производство продолжило работу под брендом ООО «Полиформ Компани» в Екимовичах.</p>
-      <p>За это время компания прошла путь от небольшого участка до площадки, которая сегодня закрывает семь направлений производства пластмассовой продукции и работает в оптовом формате с отгрузкой по России.</p>
-    </div>
-
-    <div class="steps" style="margin-top:26px" data-reveal>
-      <div class="step">
-        <div class="step-n">2004</div>
-        <h3>Старт производства</h3>
-        <p>ООО «Полиформ», Десногорск. Основной код — производство пластмассовых плит, полос, труб и профилей.</p>
+    <div class="steps">
+      <div class="block--tint" data-reveal>
+        <span class="step-num">1</span>
+        <h3>Пластик</h3>
+        <p>Сырьё в форме гранул. Материал без посторонних запахов, подходит для изделий, которые ежедневно контактируют с питомцем и водой.</p>
       </div>
-      <div class="step">
-        <div class="step-n">2012</div>
-        <h3>Продолжение дела</h3>
-        <p>ООО «Полиформ Компани», Екимовичи. Расширение номенклатуры: плёнка, стройизделия, крупногабаритные позиции.</p>
+      <div class="block--tint" data-reveal>
+        <span class="step-num">2</span>
+        <h3>Литьё</h3>
+        <p>Изделие отливается на собственной пресс-форме. Геометрия фиксирована: те же габариты, толщина стенок и посадка сетки в каждой партии.</p>
       </div>
-      <div class="step">
-        <div class="step-n">Сегодня</div>
-        <h3>7 направлений</h3>
-        <p>Оптовые поставки стройбазам и дистрибьюторам, изготовление по чертежу, работа по всей России.</p>
+      <div class="block--tint" data-reveal>
+        <span class="step-num">3</span>
+        <h3>Контроль</h3>
+        <p>Проверяем размеры, плотность пластика, отсутствие постороннего запаха и гладкость поверхности, чтобы изделие не впитывало запахи и легко мочилось.</p>
       </div>
-      <div class="step">
-        <div class="step-n">Вперед</div>
-        <h3>По вашей спецификации</h3>
-        <p>Расширяем номенклатуру под реальные запросы клиентов, а не под склад.</p>
+      <div class="block--tint" data-reveal>
+        <span class="step-num">4</span>
+        <h3>Фасовка</h3>
+        <p>Готовое изделие фасуется по 1 шт. и укладывается в гофрокороб: 20–60 шт. для лотков, 300–600 шт. для мисок. Бокс — это и есть минимальная оптовая партия.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section-alt">
-  <div class="container">
-    <div class="masonry" data-reveal>
-      <div class="shot shot-1"><b>Производственная площадка в Екимовичах</b><span>ФОТО 01 · 4:3</span></div>
-      <div class="shot shot-2"><b>Экструзионная линия</b><span>ФОТО 02</span></div>
-      <div class="shot shot-3"><b>Склад готовой продукции</b><span>ФОТО 03</span></div>
-      <div class="shot shot-4"><b>Контроль качества и маркировка партий</b><span>ФОТО 04 · 16:9</span></div>
+<section>
+  <div class="container two-col">
+    <div data-reveal>
+      <span class="eyebrow">Почему это собственный товар</span>
+      <h2 class="sec-title">Форма, <em>а не перепродажа</em></h2>
+      <div class="prose">
+        <p>Каждая позиция в каталоге — результат отливки по своей пресс-форме. Для лотков это прямоугольный корпус с бортом и посадочные места под съёмную сетку; для округлых — отдельная форма со скруглённой стенкой; для мисок — тонкостенная чаша на устойчивом основании. Разные конструкции требуют разных форм, поэтому их нельзя назвать одним изделием в разных размерах.</p>
+        <p>Это видно по упаковке: лотки едут боксами по 20–60 шт., миски — по 300–600 шт. Такой разброс фасовки характерен только для изделий, сделанных под конкретную геометрию и конкретный габарит короба, а не для готовой посуды, набранной в случайные упаковки.</p>
+        <p>Пластик выбран так, чтобы изделия можно было мыть под водой и в посудомоечной машине: поверхность не впитывает запахи и не требует специальных средств.</p>
+      </div>
+    </div>
+    <div data-reveal>
+      <ul class="facts-list">
+        <li><b>Страна производства</b><span>Россия, Смоленская область, с. Екимовичи</li>
+        <li><b>Материал</b><span>Пластик</span></li>
+        <li><b>Сертификация</b><span>Не подлежит сертификации</span></li>
+        <li><b>Фасовка</b><span>По 1 шт., в боксе от 20 до 600 шт.</span></li>
+        <li><b>Продажа</b><span>Опт от одного бокса и розница поштучно</span></li>
+        <li><b>Основной ОКВЭД</b><span>22.21</span></li>
+      </ul>
     </div>
   </div>
 </section>
@@ -163,37 +185,16 @@
   <div class="container">
     <div class="sec-head" data-reveal>
       <div>
-        <span class="eyebrow">Контроль качества</span>
-        <h2 class="sec-title">Что мы <em>проверяем</em></h2>
+        <span class="eyebrow">Склад</span>
+        <h2 class="sec-title">Фотографии <em>производства и изделий</em></h2>
+        <p class="sec-sub">Снимки цеха, склада и готовой партии пока не размещены. Ниже — заготовки под реальные фотографии, которые заменит клиент.</p>
       </div>
-      <p class="sec-note">Конкретные протоколы и перечень лабораторных испытаний уточняйте у менеджера — показываем то, что реально проходит производство.</p>
     </div>
-
-    <div class="cards">
-      <article class="card" data-reveal>
-        <div class="card-body">
-          <h3>Сырьё</h3>
-          <p>Проверяем гранулят на соответствие заявленной марки: визуальный контроль, проверка по сертификатам поставщика, отсев поступающих партий.</p>
-        </div>
-      </article>
-      <article class="card" data-reveal>
-        <div class="card-body">
-          <h3>Геометрия</h3>
-          <p>Контролируем геометрию изделия: размеры сечения, толщину, соответствие чертежу или образцу до отгрузки партии.</p>
-        </div>
-      </article>
-      <article class="card" data-reveal>
-        <div class="card-body">
-          <h3>Повторяемость</h3>
-          <p>Следим, чтобы характеристики серии не «плыли» от партии к партии — это критично для стройбаз и дистрибьюторов.</p>
-        </div>
-      </article>
-      <article class="card" data-reveal>
-        <div class="card-body">
-          <h3>Маркировка</h3>
-          <p>Маркируем партию: что изготовлено, когда и по какому заказу. Партия не должна попасть на склад вперемешку с другой.</p>
-        </div>
-      </article>
+    <div class="masonry">
+      <div class="photo-slot"><span>Цех: термопластавтосование</span></div>
+      <div class="photo-slot"><span>Склад: готовая партия в боксах</span></div>
+      <div class="photo-slot"><span>Контроль геометрии изделия</span></div>
+      <div class="photo-slot"><span>Отгрузка: паллеты с лотками</span></div>
     </div>
   </div>
 </section>
@@ -202,28 +203,38 @@
   <div class="container">
     <div class="sec-head" data-reveal>
       <div>
-        <span class="eyebrow">География</span>
-        <h2 class="sec-title">Доставка <em>по России</em></h2>
+        <span class="eyebrow">Реквизиты</span>
+        <h2 class="sec-title">Документы <em>и контакты</em></h2>
+        <p class="sec-sub">Данные сверены с ЕГРЮЛ. Работаем с юридическими лицами и частными покупателями, оплата по счёту или по договору.</p>
       </div>
-      <p class="sec-note">Отгрузка со склада в Екимовичах или транспортной компанией до вашего склада.</p>
     </div>
-
-    <div class="two-col">
-      <div class="prose" data-reveal>
-        <ul>
-          <li>Самовывоз со склада в Екимовичах — для клиентов в Смоленской и соседних областях</li>
-          <li>Доставка транспортной компанией — по всей России</li>
-          <li>Крупногабаритные изделия — согласовываем логистику заранее, с учётом габаритов</li>
-          <li>Регулярные отгрузки — фиксируем график для постоянных клиентов</li>
-        </ul>
+    <div class="contact-grid">
+      <div class="contact-card" data-reveal>
+        <h3>Отдел продаж</h3>
+        <dl class="contact-list">
+          <div class="contact-row"><dt>Телефон</dt><dd><a href="tel:+79000000000">+7 (900) 000-00-00</a></dd></div>
+          <div class="contact-row"><dt>Заявки в Telegram</dt><dd><a href="https://t.me/poliform" rel="nofollow noopener" target="_blank">@poliform</a></dd></div>
+          <div class="contact-row"><dt>E-mail</dt><dd><a href="mailto:sales@poliform.ru">sales@poliform.ru</a></dd></div>
+          <div class="contact-row"><dt>Часы работы</dt><dd>Пн–Пт, 09:00–18:00 (МСК)</dd></div>
+          <div class="contact-row"><dt>Адрес</dt><dd>216533, Смоленская обл., м.о. Рославльский, с. Екимовичи, 1-й Советский пер., д. 14А</dd></div>
+        </dl>
+        <div class="contact-actions">
+          <a class="btn btn-signal" href="products.html">Смотреть каталог</a>
+          <a class="btn btn-ghost btn-sm" href="cart.html#order">Оформить заявку</a>
+        </div>
       </div>
-      <div data-reveal>
-        <div class="map-slot" style="margin-top:0;min-height:260px">
-          <span>Карта со схемой проезда<br>и отметкой производственной площадки.<br>Подключим Яндекс.Карту или 2ГИС.</span>
-        </div>
-        <div class="wrap" style="padding:14px;margin-top:20px">
-          <img src="images/logistics.svg" alt="Оптовая отгрузка партии пластмассовой продукции" loading="lazy" style="width:100%;display:block;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--e2),inset 0 1px 0 #fff">
-        </div>
+      <div class="requisites" data-reveal>
+        <h3>Реквизиты</h3>
+        <dl>
+          <dt>Полное</dt><dd>ООО «ПОЛИФОРМ КОМПАНИ»</dd>
+          <dt>ОГРН</dt><dd>1126725000698</dd>
+          <dt>ИНН</dt><dd>6725018221</dd>
+          <dt>КПП</dt><dd>672501001</dd>
+          <dt>ОКВЭД</dt><dd>22.21</dd>
+          <dt>Юр. адрес</dt><dd>216533, Смоленская обл.,<br>с. Екимовичи, 1-й Советский<br>пер., д. 14А</dd>
+          <dt>Руководитель</dt><dd>Васильев В. В.</dd>
+        </dl>
+        <p class="warn">Изделия не подлежат сертификации. Характеристики в каталоге соответствуют собственной продукции; наличие по конкретному артикулу и цвету подтверждает менеджер.</p>
       </div>
     </div>
   </div>
@@ -233,12 +244,12 @@
   <div class="container">
     <div class="cta" data-reveal>
       <div>
-        <h2>Приедем на площадку?</h2>
-        <p>Покажем производство, цех и склад готовой продукции. Договоримся по времени заранее.</p>
+        <h2>Нужна партия под ваш объём?</h2>
+        <p>Пришлите перечень артикулов с количеством в боксах — посчитаем партию, предложим формат отгрузки и зафиксируем цену.</p>
       </div>
       <div class="cta-actions">
-        <a class="btn" href="mailto:sales@poliform.ru?subject=%D0%92%D0%B8%D0%B7%D0%B8%D1%82%20%D0%BD%D0%B0%20%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE%20%E2%80%94%20%D0%9F%D0%BE%D0%BB%D0%B8%D1%84%D0%BE%D1%80%D0%BC">Записаться на визит</a>
-        <a class="btn btn-ghost" href="tel:+79000000000">Позвонить</a>
+        <a class="btn" href="cart.html#order">Оптовая партия</a>
+        <a class="btn btn-ghost" href="tel:+79000000000">Позвонить в отдел продаж</a>
       </div>
     </div>
   </div>
@@ -252,17 +263,17 @@
       <div>
         <a class="logo" href="index.html">
           <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6" stroke-linejoin="miter"/></svg></span>
-          <span class="logo-text"><span class="logo-name">ПОЛИФОРМ</span><span class="logo-sub">производство · опт</span></span>
+          <span class="logo-text"><span class="logo-name">ПОЛИФОРМ</span><span class="logo-sub">пластиковые изделия · опт и розница</span></span>
         </a>
-        <p class="footer-about">Производство пластмассовых плит, полос, труб и профилей в Смоленской области. Оптовые поставки по России.</p>
+        <p class="footer-about">Собственное производство пластиковых изделий: лотки и туалеты для кошек, миски одинарные и двойные. Опт от одного бокса и розница поштучно.</p>
       </div>
       <div>
         <h4>Разделы</h4>
         <div class="footer-links">
           <a href="index.html">Главная</a>
-          <a href="products.html">Продукция</a>
+          <a href="products.html">Каталог</a>
+          <a href="cart.html">Корзина и заявка</a>
           <a href="about.html">О компании</a>
-          <a href="index.html#contacts">Контакты</a>
         </div>
       </div>
       <div>
@@ -276,7 +287,7 @@
     </div>
     <div class="footer-bottom">
       <span>© ООО «ПОЛИФОРМ КОМПАНИ» · ОГРН 1126725000698</span>
-      <span>ОКВЭД 22.21 · 22.22 · 22.23 · 22.29</span>
+      <span>12 артикулов · 4 категории</span>
       <span>Сделано без CMS</span>
     </div>
   </div>
@@ -284,6 +295,6 @@
 
 <script src="js/main.js"></script>
 <script src="js/plastic-live.js"></script>
-<script src="js/lightbox.js"></script>
+<script src="js/shop.js"></script>
 </body>
 </html>
