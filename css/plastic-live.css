@@ -60,34 +60,24 @@
 /* Блок преимуществ в фактах героя */
 .hero-fact { position: relative; }
 
-/* ---------- Защёлки: деталь щёлкается на место ---------- */
+/* ---------- Защёлки по краям плашки убраны ----------
+   Раньше здесь были жёлтые «палочки» 9×24px по краям выделенного слова
+   (::before слева, ::after справа). На тексте они читались как мусор, поэтому
+   псевдоэлементы отключены: плашка остаётся, а подъём при наведении — нет. */
 .sec-title em::before, .sec-title em::after,
-.hero h1 .mark::before, .hero h1 .mark::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 9px; height: 24px;
-  margin-top: -12px;
-  border-radius: 3px;
-  background: linear-gradient(180deg, #fff3b4 0%, var(--signal) 45%, var(--signal-2) 100%);
-  border: 1px solid rgba(217,160,0,.65);
-  box-shadow: var(--hard-sm), inset 0 1px 0 rgba(255,255,255,.9);
-  transition: transform .45s var(--snap), opacity .35s;
-  pointer-events: none;
-}
-.sec-title em::before, .hero h1 .mark::before { left: -6px; transform: rotate(-8deg); }
-.sec-title em::after,  .hero h1 .mark::after  { right: -6px; transform: rotate(8deg); }
-.sec-title em:hover::before, .hero h1 .mark:hover::before { transform: translate(-3px, -4px) rotate(-18deg); }
-.sec-title em:hover::after,  .hero h1 .mark:hover::after  { transform: translate(3px, -4px) rotate(18deg); }
+.hero h1 .mark::before, .hero h1 .mark::after { content: none; }
 
-/* ---------- Физика деталей: пружина вместо линейной анимации ---------- */
-/* Защёлки приезжают вместе с блоком и щёлкают при появлении */
-.has-js [data-reveal] .sec-title em::before { opacity: 0; transform: translate(-18px, -8px) rotate(-32deg); }
-.has-js [data-reveal] .sec-title em::after  { opacity: 0; transform: translate(18px, -8px) rotate(32deg); }
-.has-js [data-reveal].revealed .sec-title em::before,
-.has-js [data-reveal].revealed .sec-title em::after { opacity: 1; transition-delay: .2s; }
-.has-js [data-reveal].revealed .sec-title em::before { transform: translate(0, 0) rotate(-8deg); }
-.has-js [data-reveal].revealed .sec-title em::after  { transform: translate(0, 0) rotate(8deg); }
+/* Плашка целиком поднимается и загорается, как в заголовке героя */
+.sec-title em {
+  transition: transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s;
+}
+.sec-title em:hover {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow: 0 18px 40px rgba(16,22,26,.24), 0 0 34px rgba(255,212,0,.4),
+              inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* Правила появления защёлок удалены вместе с самими защёлками */
 
 /* ---------- Физика деталей: пружина вместо линейной анимации ---------- */
 .reason, .opening, .shot, .step, .wrap, .contact-card { transition-timing-function: var(--snap); }
