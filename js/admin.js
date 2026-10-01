@@ -201,6 +201,21 @@
   }
 
   function bindLogin() {
+    var eye = $('#lg-eye');
+    var pass = $('#lg-pass');
+    if (eye && pass) {
+      eye.addEventListener('click', function () {
+        var shown = pass.type === 'text';
+        pass.type = shown ? 'password' : 'text';
+        eye.setAttribute('aria-pressed', shown ? 'false' : 'true');
+        eye.setAttribute('aria-label', shown ? 'Показать пароль' : 'Скрыть пароль');
+        eye.querySelector('.ab-eye-open').hidden = !shown;
+        eye.querySelector('.ab-eye-off').hidden = shown;
+        var at = pass.value.length;
+        pass.focus();
+        try { pass.setSelectionRange(at, at); } catch (err) {}
+      });
+    }
     $('#login-form').addEventListener('submit', function (e) {
       e.preventDefault();
       var box = $('#login-msg');

@@ -85,6 +85,29 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   width: 100%;
 }
 .ab-field textarea { min-height: 90px; resize: vertical; line-height: 1.45; }
+.ab-pass { position: relative; display: block; }
+.ab-pass input { padding-right: 42px; }
+.ab-pass__eye {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ab-r-sm);
+  background: transparent;
+  color: var(--ab-ink-3);
+  cursor: pointer;
+  transition: color .15s, background .15s;
+}
+.ab-pass__eye:hover { color: var(--ab-ink); background: rgba(148, 163, 172, .16); }
+.ab-pass__eye:focus-visible { outline: 2px solid #94a3ac; outline-offset: 1px; }
+.ab-pass__eye svg { display: block; }
 .ab-field input:focus, .ab-field select:focus, .ab-field textarea:focus {
   border-color: #94a3ac;
   box-shadow: 0 0 0 3px rgba(148, 163, 172, .18);
