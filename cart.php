@@ -92,7 +92,7 @@ pl_breadcrumbs_jsonld($base, ['Главная' => 'index.php', 'Корзина �
 
       <aside class="cart-summary" data-cart-summary>
         <h3>Итог по заказу</h3>
-        <div class="sum-note">Добавьте позиции из каталога.</div>
+        <div class="sum-note" data-order-lead><?= e(blk($d['order'], 'lead', 'Добавьте позиции из каталога.')) ?></div>
       </aside>
     </div>
   </div>

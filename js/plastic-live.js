@@ -13,7 +13,8 @@
 
   /* ---------- Свет следует за курсором по глянцевой поверхности ---------- */
   var lit = '.card, .use-card, .kpi, .reason, .opening, .step, .wrap, .contact-card, ' +
-            '.requisites, .shot, .card-figure, .use-fig, .cta, .hero-visual';
+            '.requisites, .shot, .card-figure, .use-fig, .cta, .hero-visual, ' +
+            '.pcard, .cat-card, .block--tint, .cart-summary, .product-price-box';
 
   if (finePointer) {
     var pending = null;

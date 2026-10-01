@@ -119,6 +119,16 @@ function initSchema(PDO $db): void {
         last_attempt  TEXT NOT NULL DEFAULT '',
         locked_until  TEXT
     )");
+
+    ensureColumn($db, 'products', 'onHome', 'INTEGER NOT NULL DEFAULT 0');
+}
+
+/** Идемпотентное добавление колонки — для баз, созданных до этой правки. */
+function ensureColumn(PDO $db, string $table, string $column, string $definition): void {
+    foreach ($db->query("PRAGMA table_info($table)")->fetchAll() as $c) {
+        if ($c['name'] === $column) return;
+    }
+    $db->exec("ALTER TABLE $table ADD COLUMN $column $definition");
 }
 
 /* --------------------------------------------------------------- сид из JSON */
@@ -203,13 +213,35 @@ function seedFromJson(PDO $db): void {
         }
 
         seedSettings($db, $json);
-        dbCreateUser($db, 'admin', 'poliform2026', 'admin');
+        dbCreateUser($db, 'admin', initialAdminPassword(), 'admin');
 
         $db->commit();
     } catch (Throwable $e) {
         $db->rollBack();
         throw $e;
     }
+}
+
+/**
+ * Пароль первого администратора при первичном заполнении базы.
+ * Задаётся переменной окружения POLIFORM_ADMIN_PASSWORD.
+ * Если она не задана — генерируется случайный и печатается в консоль один раз,
+ * чтобы в исходном коде не лежал готовый пароль.
+ */
+function initialAdminPassword(): string {
+    $fromEnv = getenv('POLIFORM_ADMIN_PASSWORD');
+    if (is_string($fromEnv) && trim($fromEnv) !== '') return trim($fromEnv);
+
+    $alphabet = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    $pass = '';
+    for ($i = 0; $i < 16; $i++) $pass .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+
+    fwrite(STDERR, "\n=== Создан администратор admin ===\n"
+        . "Пароль (сохраните его): " . $pass . "\n"
+        . "Задайте свой через переменную окружения POLIFORM_ADMIN_PASSWORD.\n"
+        . "=========================================\n\n");
+
+    return $pass;
 }
 
 function seedSettings(PDO $db, array $json): void {
@@ -249,7 +281,57 @@ function seedSettings(PDO $db, array $json): void {
             'heroLead'    => 'Лотки и туалеты для кошек, миски одинарные и двойные из плотного пластика. Каждая позиция отлита на собственной форме.',
             'heroVisualSku' => '1430475',
             'homeAbout'   => 'Полиформ — производство пластмассовых изделий в Смоленской области. Лотки, туалеты и миски отливаются на собственных пресс-формах, поэтому размеры и толщина стенок повторяются от партии к партии.',
+            'tagline'     => 'пластиковые изделия · опт и розница',
             'footerAbout' => 'Собственное производство пластиковых изделий: лотки и туалеты для кошек, миски одинарные и двойные. Опт от одного бокса и розница поштучно.',
+            'howToOrder'  => 'Мы отгружаем и по одной штуке, и целыми боксами. Разница только в цене и кратности — сам порядок одинаковый.',
+        ],
+        'home' => [
+            'heroEyebrow'   => 'Собственное производство · Смоленская обл.',
+            'heroH1a'       => 'Пластиковые изделия',
+            'heroH1b'       => 'которые мы делаем сами',
+            'heroBtn1'      => 'Открыть каталог',
+            'heroBtn2'      => 'Как оформить заказ',
+            'kpi1'          => 'артикулов в каталоге',
+            'kpi2'          => 'категории изделий',
+            'kpi3'          => '₽ за шт. — мин. опт',
+            'kpi4'          => 'шт. в боксе',
+            'heroAlt'       => 'Пластиковое изделие собственного производства',
+
+            'catEyebrow'    => 'Ассортимент',
+            'catTitleA'     => 'Производственные',
+            'catTitleB'     => 'линейки',
+            'catSub'        => 'Каждая категория — своя пресс-форма и своя фасовка. Внутри категории позиции отличаются размером, высотой борта и цветом, поэтому удобнее выбирать по артикулу.',
+
+            'popEyebrow'    => 'Витрина',
+            'popTitleA'     => 'Популярные',
+            'popTitleB'     => 'позиции',
+            'popSub'        => 'Цены переключаются вместе с режимом в шапке. В оптовом режиме шаг количества равен боксу — добавить можно только целое число коробов.',
+            'popBtnAll'     => 'Весь каталог',
+
+            'howEyebrow'    => 'Опт и розница',
+            'howTitleA'     => 'Как устроена',
+            'howTitleB'     => 'продажа',
+            'howSub'        => 'Мы отгружаем и по одной штуке, и целыми боксами. Разница только в цене и кратности — сам порядок одинаковый.',
+            'step1Title'    => 'Выберите режим',
+            'step1Text'     => 'Переключатель в шапке меняет все цены на сайте: розница — шаг 1 шт., опт — шаг равен фасовке бокса. Выбор сохраняется при переходе между страницами.',
+            'step2Title'    => 'Соберите заказ',
+            'step2Text'     => 'Кладёте позиции в корзину в нужном режиме. Можно смешивать: например, пять боксов лотков и отдельно розничные миски — итог посчитается двумя строками.',
+            'step3Title'    => 'Отправьте заявку',
+            'step3Text'     => 'В корзине заполните имя и телефон. Заявка попадает менеджеру, он подтверждает наличие, считает доставку и присылает счёт. Оплата — по договору или по счёту для юрлиц.',
+            'boxesTitle'    => 'Почему опт считается боксами',
+            'boxesText'     => 'Изделия отгружаются в гофрокоробах: лотки — по 20–60 шт., миски — по 300–600 шт. Оптовая цена действует от одного полного бокса, поэтому количество в оптовом режиме автоматически округляется вверх до кратного фасовке. Так вы всегда получаете ровно закрытую партию без «неполных коробок» на складе.',
+
+            'ctaEyebrow'    => 'Контакты',
+            'ctaTitleA'     => 'Заявка',
+            'ctaTitleB'     => 'на партию',
+            'ctaSub'        => 'Пришлите перечень артикулов с количеством в боксах — ответим по наличию, срокам и стоимости доставки.',
+            'ctaBtn1'       => 'Оформить заявку',
+            'ctaBtn2'       => 'Написать в Telegram',
+
+            'aboutEyebrow'  => 'О производстве',
+            'aboutTitleA'   => 'Собственное производство',
+            'aboutTitleB'   => 'в Смоленской области',
+            'aboutBtn'      => 'Подробнее о компании',
         ],
     ];
 
@@ -364,6 +446,7 @@ function dbAllProducts(PDO $db): array {
         $r['features'] = json_decode((string)$r['features'], true) ?: [];
         $r['images']   = json_decode((string)$r['images'], true) ?: [];
         $r['inStock']  = (int)$r['inStock'] === 1;
+   $r['onHome']   = (int)$r['onHome'] === 1;
         $r['priceRetail'] = (float)$r['priceRetail'];
         $r['priceOpt']    = (float)$r['priceOpt'];
         $r['packCount']   = (int)$r['packCount'];
@@ -392,11 +475,11 @@ function dbSaveProduct(PDO $db, array $p): void {
 
     $size = (array)($p['size'] ?? []);
 
-    $sql = "INSERT INTO products
+$sql = "INSERT INTO products
         (sku,title,shortTitle,categoryId,art,form,sizeL,sizeW,sizeH,gridGap,color,colorHex,
          packCount,packNote,weightG,priceRetail,priceOpt,volumeMl,material,country,cert,
-         description,features,images,inStock,stockNote,sima,pos,updated)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+         description,features,images,inStock,stockNote,sima,pos,onHome,updated)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ON CONFLICT(sku) DO UPDATE SET
          title=excluded.title, shortTitle=excluded.shortTitle, categoryId=excluded.categoryId,
          art=excluded.art, form=excluded.form, sizeL=excluded.sizeL, sizeW=excluded.sizeW,
@@ -406,7 +489,7 @@ function dbSaveProduct(PDO $db, array $p): void {
          material=excluded.material, country=excluded.country, cert=excluded.cert,
          description=excluded.description, features=excluded.features, images=excluded.images,
          inStock=excluded.inStock, stockNote=excluded.stockNote, sima=excluded.sima,
-         pos=excluded.pos, updated=excluded.updated";
+         pos=excluded.pos, onHome=excluded.onHome, updated=excluded.updated";
 
     $st = $db->prepare($sql);
     $st->execute([
@@ -438,6 +521,7 @@ function dbSaveProduct(PDO $db, array $p): void {
         (string)($p['stockNote'] ?? ''),
         (string)($p['sima'] ?? ''),
         (int)($p['pos'] ?? 0),
+        !empty($p['onHome']) ? 1 : 0,
         $now,
     ]);
 }
@@ -622,6 +706,7 @@ function dbCatalog(PDO $db): array {
             'description' => $p['description'],
             'features'    => $p['features'],
             'inStock'     => (bool)$p['inStock'],
+            'onHome'      => (bool)$p['onHome'],
             'stockNote'   => $p['stockNote'],
             'sima'        => $p['sima'],
         ];

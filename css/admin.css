@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --ab-bg: #eef2f4;
   --ab-panel: #ffffff;
   --ab-line: rgba(16, 22, 26, .13);
@@ -28,6 +28,7 @@ body {
 a { color: inherit; }
 button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
+[hidden] { display: none !important; }
 .ab-hidden { display: none !important; }
 .ab-muted { color: var(--ab-ink-3); }
 .ab-mono { font-family: var(--ab-mono); }
@@ -36,7 +37,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-right { margin-left: auto; }
 .ab-center { text-align: center; }
 
-/* ------------------------------------------------------------------ вход */
+/* ------------------------------------------------------------------ РІС…РѕРґ */
 
 .ab-login {
   min-height: 100vh;
@@ -70,7 +71,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-login h1 { font-size: 1.25rem; margin: 0 0 4px; }
 .ab-login p { margin: 0 0 20px; color: var(--ab-ink-3); font-size: .88rem; }
 
-/* ---------------------------------------------------------------- формы */
+/* ---------------------------------------------------------------- С„РѕСЂРјС‹ */
 
 .ab-field { display: grid; gap: 5px; margin-bottom: 14px; }
 .ab-field > label { font-size: .76rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ab-ink-3); }
@@ -92,6 +93,37 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; }
 .ab-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 14px; }
 
+.ab-hint {
+  margin: 6px 0 0;
+  font-size: .78rem;
+  line-height: 1.45;
+  color: #7a8792;
+}
+
+.ab-star {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--ab-line);
+  border-radius: 50%;
+  background: #fff;
+  color: #b9c4cc;
+  font-size: .8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.ab-star:hover { border-color: #d4b106; color: #d4b106; }
+.ab-star.is-on {
+  background: #fff6cf;
+  border-color: #e0bd20;
+  color: #a8870a;
+}
+
+.ab-nm { display: flex; align-items: flex-start; gap: 9px; }
+.ab-nm > div { min-width: 0; }
+
 .ab-btn {
   appearance: none;
   border: 1px solid var(--ab-line);
@@ -107,6 +139,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-btn:active { transform: translateY(1px); }
 .ab-btn--primary { background: var(--ab-ink); color: #fff; border-color: var(--ab-ink); }
 .ab-btn--primary:hover { background: #222e35; }
+.ab-btn.is-added { background: rgba(15, 122, 90, .12); border-color: rgba(15, 122, 90, .45); color: var(--ab-ok); }
 .ab-btn--danger { color: var(--ab-accent); border-color: rgba(214, 58, 47, .4); }
 .ab-btn--danger:hover { background: rgba(214, 58, 47, .08); }
 .ab-btn--ok { color: var(--ab-ok); border-color: rgba(15, 122, 90, .4); }
@@ -115,7 +148,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-btn--icon { padding: 6px 9px; }
 .ab-btn[disabled] { opacity: .45; cursor: not-allowed; }
 
-/* ---------------------------------------------------------------- корпус */
+/* ---------------------------------------------------------------- РєРѕСЂРїСѓСЃ */
 
 .ab-shell { display: grid; grid-template-columns: var(--ab-side) minmax(0, 1fr); min-height: 100vh; }
 
@@ -174,7 +207,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-head h1 { font-size: 1.5rem; margin: 0; }
 .ab-head p { margin: 2px 0 0; color: var(--ab-ink-3); font-size: .88rem; }
 
-/* ---------------------------------------------------------------- панели */
+/* ---------------------------------------------------------------- РїР°РЅРµР»Рё */
 
 .ab-panel {
   background: var(--ab-panel);
@@ -193,7 +226,14 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-panel__body { padding: 16px; }
 .ab-panel__body--flush { padding: 0; }
 
-/* ---------------------------------------------------------------- таблица */
+.ab-subhead {
+  font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--ab-ink-3); margin: 22px 0 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--ab-line);
+}
+.ab-panel__body > .ab-subhead:first-child { margin-top: 0; }
+
+/* ---------------------------------------------------------------- С‚Р°Р±Р»РёС†Р° */
 
 .ab-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
 .ab-table th, .ab-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--ab-line); vertical-align: middle; }
@@ -201,7 +241,30 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-table tr:last-child td { border-bottom: 0; }
 .ab-table tbody tr:hover { background: #f7fafb; }
 .ab-table img { width: 52px; height: 52px; object-fit: contain; background: var(--ab-bg); border-radius: var(--ab-r-sm); border: 1px solid var(--ab-line); display: block; }
+
+.ab-th--sort { cursor: pointer; user-select: none; white-space: nowrap; }
+.ab-th--sort:hover { color: var(--ab-ink); background: #f1f6f8; }
+.ab-th--sort:focus-visible { outline: 2px solid var(--ab-accent); outline-offset: -2px; }
+.ab-th--sort .ab-sort { display: inline-block; margin-left: 5px; color: var(--ab-ink-3); opacity: .55; font-size: .9em; }
+.ab-th--sort:hover .ab-sort { opacity: .9; }
+.ab-th--sort.is-active { color: var(--ab-accent); }
+.ab-th--sort.is-active .ab-sort { opacity: 1; }
 .ab-scroll { max-height: 68vh; overflow: auto; }
+
+/* ---------------------------------------------------------------- С„РёР»СЊС‚СЂС‹ */
+
+.ab-filters {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--ab-line);
+  background: #fafcfd;
+}
+.ab-filters .ab-field { margin-bottom: 10px; }
+.ab-filters .ab-grid-2,
+.ab-filters .ab-grid-3,
+.ab-filters .ab-grid-4 { margin-bottom: 0; }
+.ab-field--wide { max-width: 640px; }
+.ab-filters .ab-row { padding-top: 2px; }
+.ab-filters .ab-row .ab-muted { font-size: .82rem; }
 
 .ab-tag {
   display: inline-block;
@@ -220,7 +283,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-tag--spam { background: #eceff1; color: var(--ab-ink-3); }
 .ab-tag--off { background: #eceff1; color: var(--ab-ink-3); }
 
-/* ------------------------------------------------------------ сообщения */
+/* ------------------------------------------------------------ СЃРѕРѕР±С‰РµРЅРёСЏ */
 
 .ab-msg {
   padding: 10px 14px;
@@ -246,7 +309,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-toast.is-on { opacity: 1; transform: translateY(0); }
 .ab-toast--err { background: var(--ab-accent); }
 
-/* ---------------------------------------------------------------- товар */
+/* ---------------------------------------------------------------- С‚РѕРІР°СЂ */
 
 .ab-editor { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
 .ab-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
@@ -339,4 +402,5 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   .ab-nav { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; }
   .ab-main { padding: 18px 14px 50px; }
   .ab-grid-2, .ab-grid-3, .ab-grid-4 { grid-template-columns: 1fr; }
+  .ab-field--wide { max-width: none; }
 }

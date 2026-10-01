@@ -216,6 +216,31 @@ section { padding: 74px 0; }
   box-shadow: inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(16,22,26,.06);
 }
 
+/* ---------- Блок «О производстве» на главной ---------- */
+.about-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-areas: "head text" "head btn";
+  gap: 18px 40px;
+  align-items: start;
+  padding: 30px 32px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fdfefe, #f4f7f9);
+  box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 12px 28px rgba(16,22,26,.06);
+}
+.about-band > div { grid-area: head; }
+.about-band > p  { grid-area: text; margin: 0; color: var(--ink-2); line-height: 1.6; }
+.about-band > .btn { grid-area: btn; justify-self: start; }
+
+@media (max-width: 900px) {
+  .about-band {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "text" "btn";
+    padding: 24px 22px;
+  }
+}
+
 /* ---------- Поверхности: базовая «литьёвая» панель ---------- */
 .wrap {
   border: 1px solid var(--line);

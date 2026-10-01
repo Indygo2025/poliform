@@ -54,6 +54,16 @@ function clientIp(): string {
     return (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
 }
 
+/**
+ * Перевыпускает ID сессии (защита от session fixation), отправляя клиенту
+ * ровно один cookie. Без header_remove() в ответе оказываются два разных
+ * Set-Cookie: один от session_start(), второй от session_regenerate_id().
+ */
+function rotateSessionId(): void {
+    header_remove('Set-Cookie');
+    session_regenerate_id(true);
+}
+
 /** CSRF-токен в сессии; проверяется для всех изменяющих запросов. */
 function csrfToken(): string {
     if (empty($_SESSION['pl_csrf'])) {
@@ -65,7 +75,7 @@ function csrfToken(): string {
 function checkCsrf(): void {
     $sent = (string)($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
     $want = (string)($_SESSION['pl_csrf'] ?? '');
-    if ($want === '' || !hash_equals($want, $sent)) fail('Сессия устарела — обновите страницу', 419);
+    if ($want === '' || !hash_equals($want, $sent)) fail('Сессия устарела — обновите страницу', 403);
 }
 
 function cleanPhone(string $p): string {
@@ -78,9 +88,15 @@ function validPhone(string $p): bool {
 
 /* ----------------------------------------------------------------- вход */
 
+/** Публичное представление пользователя — без password_hash и прочих служебных полей. */
+function publicUser(array $u): array {
+    return ['username' => $u['username'], 'role' => $u['role']];
+}
+
 function currentUser(): ?array {
     if (empty($_SESSION['pl_user'])) return null;
-    return dbGetUser(db(), (string)$_SESSION['pl_user']);
+    $u = dbGetUser(db(), (string)$_SESSION['pl_user']);
+    return $u ? publicUser($u) : null;
 }
 
 function login(array $in): array {
@@ -102,7 +118,7 @@ function login(array $in): array {
     }
 
     dbClearLogin($db, $username);
-    session_regenerate_id(true);
+    rotateSessionId();
     $_SESSION['pl_user'] = $username;
     unset($_SESSION['pl_csrf']);
     return ['user' => ['username' => $user['username'], 'role' => $user['role']], 'csrf' => csrfToken()];
@@ -450,7 +466,7 @@ $in     = input();
 
 try {
     switch ($action) {
-        case 'login':        login($in); break;
+        case 'login':        success(login($in)); break;
         case 'logout':       logout(); success(); break;
         case 'session':      success(['user' => currentUser(), 'csrf' => csrfToken()]); break;
 
