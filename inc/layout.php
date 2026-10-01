@@ -9,6 +9,16 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../db.php';
 
+/**
+ * Подключение файла с меткой времени изменения.
+ * Без метки браузер годами держит старый CSS/JS и показывает неактуальную вёрстку.
+ */
+function pl_asset(string $path): string {
+    $file = dirname(__DIR__) . '/' . ltrim($path, '/');
+    $v    = is_file($file) ? (string)filemtime($file) : '1';
+    return $path . '?v=' . $v;
+}
+
 function pl_boot(): array {
     $db = db();
     $s  = dbAllSettings($db);
@@ -99,9 +109,9 @@ if ($ogTitle === '') $ogTitle = trim((string)($d['blocks']['heroTitle'] ?? ''));
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/plastic-live.css">
-<link rel="stylesheet" href="css/shop.css">
+<link rel="stylesheet" href="<?= pl_asset('css/style.css') ?>">
+<link rel="stylesheet" href="<?= pl_asset('css/plastic-live.css') ?>">
+<link rel="stylesheet" href="<?= pl_asset('css/shop.css') ?>">
 </head>
 <body>
 
@@ -210,10 +220,10 @@ function pl_footer(array $d): void {
   </div>
 </footer>
 
-<script src="js/main.js"></script>
-<script src="js/plastic-live.js"></script>
-<script src="js/shop.js"></script>
-<script src="js/home.js"></script>
+<script src="<?= pl_asset('js/main.js') ?>"></script>
+<script src="<?= pl_asset('js/plastic-live.js') ?>"></script>
+<script src="<?= pl_asset('js/shop.js') ?>"></script>
+<script src="<?= pl_asset('js/home.js') ?>"></script>
 </body>
 </html>
 <?php
