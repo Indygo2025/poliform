@@ -147,6 +147,13 @@ function requireAdmin(): array {
     return $u;
 }
 
+/** Только авторизация, без CSRF. Для скачивания файлов обычной ссылкой:
+ *  там нельзя приложить заголовок X-CSRF-Token, поэтому checkCsrf() всегда
+ *  отвечал 403. Оба этих действия — GET без изменения состояния. */
+function requireAdminRead(): array {
+    return requireAuth('admin');
+}
+
 /* -------------------------------------------------------------- товары */
 
 function productsPayload(): array {
@@ -155,6 +162,7 @@ function productsPayload(): array {
         'products'   => dbAllProducts($db),
         'categories' => dbAllCategories($db),
         'colors'     => dbAllColors($db),
+        'nextSku'    => dbNextSku($db),
     ];
 }
 
@@ -162,7 +170,8 @@ function productSave(array $in): void {
     requireAdmin();
     $p = (array)($in['product'] ?? []);
     $sku = trim((string)($p['sku'] ?? ''));
-    if ($sku === '') fail('Артикул обязателен');
+    if ($sku === '') $sku = dbNextSku(db());
+    $p['sku'] = $sku;
 
     if (!isset($p['pos']) || (int)$p['pos'] <= 0) {
         $p['pos'] = dbNextPos(db());
@@ -412,7 +421,7 @@ function catalogPublic(): void {
 }
 
 function exportJson(): void {
-    requireAdmin();
+    requireAdminRead();
     header('Content-Disposition: attachment; filename="products.json"');
     echo json_encode(dbCatalog(db()), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     exit;
@@ -450,7 +459,7 @@ function makeThumb(string $src, string $dest, int $maxW): void {
 }
 
 function backupDb(): void {
-    requireAdmin();
+    requireAdminRead();
     $file = getenv('SITE_DB') ?: (__DIR__ . '/site.db');
     if (!is_file($file)) fail('Файл базы не найден');
     header('Content-Disposition: attachment; filename="poliform-' . date('Ymd-His') . '.sqlite"');

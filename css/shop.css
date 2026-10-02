@@ -83,36 +83,6 @@
   display: block;
   transform: none;
 }
-.hero-carousel:not(.hero-carousel--multi) .hero-carousel__cap { position: static; }
-
-.hero-carousel__cap {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 12px;
-  border-radius: var(--r-sm);
-  background: rgba(255, 255, 255, .92);
-  backdrop-filter: blur(3px);
-  font-family: var(--font-mono);
-  font-size: .7rem;
-  letter-spacing: .04em;
-  color: var(--ink-2);
-  text-align: center;
-  pointer-events: none;
-}
-.hero-carousel--multi .hero-carousel__cap { bottom: 46px; }
-.hero-carousel__name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.hero-carousel__dims { color: var(--ink-3); }
-
 .hero-carousel__nav {
   position: absolute;
   top: 50%;
@@ -160,31 +130,8 @@
 .hero-carousel__dot:hover { background: rgba(16, 22, 26, .45); }
 .hero-carousel__dot.is-active { background: var(--ink); transform: scale(1.25); }
 
-.hero-carousel__link {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 4;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .92);
-  border: 1px solid var(--shop-line);
-  font-family: var(--font-mono);
-  font-size: .68rem;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-  text-decoration: none;
-  opacity: 0;
-  transition: opacity .2s, background .2s;
-}
-.hero-carousel:hover .hero-carousel__link,
-.hero-carousel:focus-within .hero-carousel__link { opacity: 1; }
-.hero-carousel__link:hover { background: #fff; color: var(--ink); }
-
 @media (hover: none) {
   .hero-carousel__nav { opacity: 1; }
-  .hero-carousel__link { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-carousel__slide { transition: none; }
@@ -982,6 +929,13 @@
   .pcard__body { padding: 13px 12px 15px; }
   .price-now b { font-size: 1.3rem; }
   .pcard__add { font-size: .78rem; padding: 9px 8px; }
+
+  /* В карточке от 150px счётчик (34+60+34) и кнопка не помещались в ряд: переносим
+     кнопку под счётчик и растягиваем её на всю ширину карточки */
+  .pcard__qty { flex-direction: column; align-items: stretch; }
+  .pcard__qty .qty { width: 100%; }
+  .pcard__qty .qty button { width: 38px; height: 38px; flex: 0 0 auto; }
+  .pcard__qty .qty input { flex: 1 1 auto; width: auto; min-width: 0; }
 
   /* Кнопка корзины в шапке: только иконка со счётчиком, иначе не помещалась в 296px */
   .cart-btn { padding: 9px 11px; gap: 6px; }

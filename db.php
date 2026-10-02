@@ -121,6 +121,29 @@ function initSchema(PDO $db): void {
     )");
 
     ensureColumn($db, 'products', 'onHome', 'INTEGER NOT NULL DEFAULT 0');
+    backfillColorHexes($db);
+}
+
+/**
+ * Досоставляет HEX справочнику цветов из data/products.json.
+ * База заполняется сидом один раз, поэтому если позже добавить hex
+ * в colorOptions, в уже созданной базе он так и останется пустым.
+ */
+function backfillColorHexes(PDO $db): void {
+    $file = __DIR__ . '/data/products.json';
+    if (!is_file($file)) return;
+
+    $json = json_decode((string)file_get_contents($file), true);
+    if (!is_array($json)) return;
+
+    $st = $db->prepare("UPDATE product_colors SET hex = ? WHERE hex = '' AND name = ?");
+    foreach (($json['colorOptions'] ?? []) as $co) {
+        if (!is_array($co)) continue;
+        $name = (string)($co['name'] ?? '');
+        $hex  = (string)($co['hex'] ?? '');
+        if ($name === '' || $hex === '') continue;
+        $st->execute([$hex, $name]);
+    }
 }
 
 /** Идемпотентное добавление колонки — для баз, созданных до этой правки. */
@@ -269,7 +292,7 @@ function seedSettings(PDO $db, array $json): void {
             'title'       => 'ПОЛИФОРМ — пластиковые изделия для питомцев',
             'description' => 'Лотки и туалеты для кошек, миски одинарные и двойные собственного производства. Опт от одного бокса и розница поштучно.',
             'keywords'    => 'лоток для кошек, туалет для кошек, миска для кошек, пластиковые изделия, опт',
-            'ogImage'     => 'images/products/1430475-0.jpg',
+            'ogImage'     => 'images/products/100004-0.jpg',
         ],
         'order' => [
             'lead'    => 'Стоимость доставки рассчитывает менеджер. Наличие по цвету подтверждаем после заявки.',
@@ -279,7 +302,7 @@ function seedSettings(PDO $db, array $json): void {
         'blocks' => [
             'heroTitle'   => 'Пластиковые изделия для питомцев',
             'heroLead'    => 'Лотки и туалеты для кошек, миски одинарные и двойные из плотного пластика. Каждая позиция отлита на собственной форме.',
-            'heroVisualSku' => '1430475',
+            'heroVisualSku' => '100004',
             'homeAbout'   => 'Полиформ — производство пластмассовых изделий в Смоленской области. Лотки, туалеты и миски отливаются на собственных пресс-формах, поэтому размеры и толщина стенок повторяются от партии к партии.',
             'tagline'     => 'пластиковые изделия · опт и розница',
             'footerAbout' => 'Собственное производство пластиковых изделий: лотки и туалеты для кошек, миски одинарные и двойные. Опт от одного бокса и розница поштучно.',
@@ -550,6 +573,27 @@ function dbMoveProduct(PDO $db, string $sku, string $dir): bool {
     $st->execute([(int)$b['pos'], $a['sku']]);
     $st->execute([(int)$a['pos'], $b['sku']]);
     return true;
+}
+
+/* ------------------------------------------------------------ артикулы */
+
+/**
+ * Схема артикулов: префикс 1000 и шесть цифр, то есть 100001, 100002, …
+ * Артикул проставляется автоматически, вручную не задаётся.
+ */
+const SKU_PREFIX = '1000';
+const SKU_WIDTH  = 6;
+
+/** Первый номер, который ещё не занят. */
+function dbNextSku(PDO $db): string {
+    $max = 0;
+    foreach ($db->query('SELECT sku FROM products') as $r) {
+        $sku = (string)$r['sku'];
+        if (strncmp($sku, SKU_PREFIX, strlen(SKU_PREFIX)) !== 0) continue;
+        $n = (int)substr($sku, strlen(SKU_PREFIX));
+        if ($n > $max) $max = $n;
+    }
+    return SKU_PREFIX . str_pad((string)($max + 1), SKU_WIDTH - strlen(SKU_PREFIX), '0', STR_PAD_LEFT);
 }
 
 /* ------------------------------------------------------------ категории */
