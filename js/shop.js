@@ -977,7 +977,29 @@
 
   function loadJson(url) {
     return fetch(url, { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function (e) {
+        /* Расширения и политики браузера часто режут именно fetch, считая его
+           способом отслеживания. Обычный XHR через такие правила проходит. */
+        return loadJsonXhr(url).catch(function () { throw e; });
+      });
+  }
+
+  function loadJsonXhr(url) {
+    return new Promise(function (resolve, reject) {
+      var x = new XMLHttpRequest();
+      x.open('GET', url, true);
+      x.timeout = 15000;
+      x.onload = function () {
+        if (x.status >= 200 && x.status < 300) {
+          try { resolve(JSON.parse(x.responseText)); }
+          catch (err) { reject(new Error('не удалось разобрать JSON')); }
+        } else reject(new Error('HTTP ' + x.status));
+      };
+      x.onerror = function () { reject(new Error('сеть недоступна')); };
+      x.ontimeout = function () { reject(new Error('превышено время ожидания')); };
+      x.send();
+    });
   }
 
   function init() {
