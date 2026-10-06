@@ -1,5 +1,5 @@
 {
-    "generated": "2026-10-06T21:11:18+03:00",
+    "generated": "2026-10-06T21:24:00+03:00",
     "source": "database",
     "categories": [
         {
@@ -673,7 +673,7 @@
             "sima": "https://www.sima-land.ru/1430463/"
         },
         {
-            "sku": "3856260845",
+            "sku": "100013",
             "title": "Лоток для кошек с сеткой, 36×25,5×9 см, глубокий, серый",
             "shortTitle": "Лоток с сеткой 36×25,5×9",
             "categoryId": "lotki",
@@ -697,14 +697,14 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/3856260845-0.jpg",
-                "images/products/3856260845-1.jpg",
-                "images/products/3856260845-2.jpg"
+                "images/products/100013-0.jpg",
+                "images/products/100013-1.jpg",
+                "images/products/100013-2.jpg"
             ],
             "thumbs": [
-                "images/products/3856260845-0-t.jpg",
-                "images/products/3856260845-1-t.jpg",
-                "images/products/3856260845-2-t.jpg"
+                "images/products/100013-0-t.jpg",
+                "images/products/100013-1-t.jpg",
+                "images/products/100013-2-t.jpg"
             ],
             "description": "Прямоугольный лоток открытого типа из пластика. Глубокий борт 9 см удерживает наполнитель внутри, а съёмная решётка позволяет убирать отходы без замены всего наполнителя. Поверхность гладкая, острых краёв нет. Габариты 36×25,5×9 см, вес 380 г. Подойдёт для взрослых кошек средних пород.",
             "features": [
@@ -720,7 +720,7 @@
             "sima": "https://www.ozon.ru/product/lotok-dlya-koshek-s-setkoy-36x25x9-sm-glubokiy-seryy-3856260845/"
         },
         {
-            "sku": "3856353169",
+            "sku": "100014",
             "title": "Лоток для кошек с сеткой, 36×26×6,5 см, красный",
             "shortTitle": "Лоток с сеткой 36×26×6,5",
             "categoryId": "lotki",
@@ -744,14 +744,14 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/3856353169-0.jpg",
-                "images/products/3856353169-1.jpg",
-                "images/products/3856353169-2.jpg"
+                "images/products/100014-0.jpg",
+                "images/products/100014-1.jpg",
+                "images/products/100014-2.jpg"
             ],
             "thumbs": [
-                "images/products/3856353169-0-t.jpg",
-                "images/products/3856353169-1-t.jpg",
-                "images/products/3856353169-2-t.jpg"
+                "images/products/100014-0-t.jpg",
+                "images/products/100014-1-t.jpg",
+                "images/products/100014-2-t.jpg"
             ],
             "description": "Лоток с низким бортом для кошек, которым не нравятся высокие стенки. Габариты 36,5×26×6,5 см, красный пластик, вес 353 г. Съёмная решётка снимается для очистки и возврата наполнителя. Прямоугольная форма удобно встаёт в угол или между мебелью.",
             "features": [
@@ -767,7 +767,7 @@
             "sima": "https://www.ozon.ru/product/lotok-dlya-koshek-s-setkoy-36x26x6-5-sm-krasnyy-3856353169/"
         },
         {
-            "sku": "2795976737",
+            "sku": "100015",
             "title": "Лоток для кошек большой, с сеткой, 36×25×9 см, глубокий",
             "shortTitle": "Лоток большой 36×25×9",
             "categoryId": "lotki",
@@ -791,14 +791,14 @@
             "country": "Китай",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/2795976737-0.jpg",
-                "images/products/2795976737-1.jpg",
-                "images/products/2795976737-2.jpg"
+                "images/products/100015-0.jpg",
+                "images/products/100015-1.jpg",
+                "images/products/100015-2.jpg"
             ],
             "thumbs": [
-                "images/products/2795976737-0-t.jpg",
-                "images/products/2795976737-1-t.jpg",
-                "images/products/2795976737-2-t.jpg"
+                "images/products/100015-0-t.jpg",
+                "images/products/100015-1-t.jpg",
+                "images/products/100015-2-t.jpg"
             ],
             "description": "Белый прямоугольный лоток с решёткой, глубокий — борт 9 см. Габариты 36×25×9 см, вес 375 г. Решётка сверху снимается: достаточно приподнять её, чтобы заменить наполнитель. Гладкий пластик легко моется.",
             "features": [
@@ -814,7 +814,7 @@
             "sima": "https://www.ozon.ru/product/lotok-dlya-koshek-bolshoy-s-setkoy-36x25x9-sm-glubokiy-2795976737/"
         },
         {
-            "sku": "3152309856",
+            "sku": "100016",
             "title": "Лоток для кошек большой, 43×33×12,5 см, с сеткой, с бортом",
             "shortTitle": "Лоток большой 43×33×12,5",
             "categoryId": "lotki",
@@ -838,14 +838,14 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/3152309856-0.jpg",
-                "images/products/3152309856-1.jpg",
-                "images/products/3152309856-2.jpg"
+                "images/products/100016-0.jpg",
+                "images/products/100016-1.jpg",
+                "images/products/100016-2.jpg"
             ],
             "thumbs": [
-                "images/products/3152309856-0-t.jpg",
-                "images/products/3152309856-1-t.jpg",
-                "images/products/3152309856-2-t.jpg"
+                "images/products/100016-0-t.jpg",
+                "images/products/100016-1-t.jpg",
+                "images/products/100016-2-t.jpg"
             ],
             "description": "Самый крупный лоток из группы: габариты 43×33×12,5 см. Высокий борт 12,5 см удерживает наполнитель, когда кошка активно закапывает. Пластик бело-серого цвета, вес 671 г. Сверху решётка, по периметру бортик.",
             "features": [
