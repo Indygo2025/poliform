@@ -30,6 +30,7 @@ site.db-shm
 site.db.bak-*
 *.sqlite
 *.sqlite3
+*.zip
 
 # Локальное окружение и служебные файлы
 php-server.pid
