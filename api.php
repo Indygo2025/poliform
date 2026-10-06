@@ -147,6 +147,13 @@ function requireAdmin(): array {
     return $u;
 }
 
+/** Только авторизация, без CSRF. Для скачивания файлов обычной ссылкой:
+ *  там нельзя приложить заголовок X-CSRF-Token, поэтому checkCsrf() всегда
+ *  отвечал 403. Оба этих действия — GET без изменения состояния. */
+function requireAdminRead(): array {
+    return requireAuth('admin');
+}
+
 /* -------------------------------------------------------------- товары */
 
 function productsPayload(): array {
@@ -155,6 +162,7 @@ function productsPayload(): array {
         'products'   => dbAllProducts($db),
         'categories' => dbAllCategories($db),
         'colors'     => dbAllColors($db),
+        'nextSku'    => dbNextSku($db),
     ];
 }
 
@@ -162,7 +170,8 @@ function productSave(array $in): void {
     requireAdmin();
     $p = (array)($in['product'] ?? []);
     $sku = trim((string)($p['sku'] ?? ''));
-    if ($sku === '') fail('Артикул обязателен');
+    if ($sku === '') $sku = dbNextSku(db());
+    $p['sku'] = $sku;
 
     if (!isset($p['pos']) || (int)$p['pos'] <= 0) {
         $p['pos'] = dbNextPos(db());
@@ -187,6 +196,53 @@ function productMove(array $in): void {
     $ok = dbMoveProduct(db(), (string)($in['sku'] ?? ''), (string)($in['dir'] ?? 'up'));
     if (!$ok) fail('Двигать нечего');
     success();
+}
+
+/** Смена артикула в критических случаях. Защита от дублей. */
+function productRename(array $in): void {
+    requireAdmin();
+    $old = trim((string)($in['sku'] ?? ''));
+    $new = trim((string)($in['to'] ?? ''));
+    if ($old === '' || $new === '') fail('Укажите старый и новый артикул');
+    if (!preg_match('~^[0-9A-Za-zА-Яа-яЁё._-]{1,40}$~u', $new)) {
+        fail('Новый артикул: от 1 до 40 символов, буквы, цифры и ._-');
+    }
+    if ($old === $new) { success(['from' => $old, 'to' => $new]); return; }
+
+    $db = db();
+    $q = $db->prepare('SELECT 1 FROM products WHERE sku = ?');
+    $q->execute([$new]);
+    if ($q->fetch()) fail('Артикул «' . $new . '» уже занят другим товаром — выберите другой');
+    $q->execute([$old]);
+    if (!$q->fetch()) fail('Товар с артикулом «' . $old . '» не найден');
+
+    /* переименование файлов фото и путей, если имя файла начинается со старого артикула */
+    $dir = __DIR__ . '/images/products';
+    foreach (glob($dir . '/' . preg_quote($old, '/') . '-*', GLOB_NOSORT) ?: [] as $f) {
+        $base = basename($f);
+        if (preg_match('~^' . preg_quote($old, '/') . '-(\d+(-t)?)\.(jpg|jpeg|png|webp)$~i', $base)) {
+            $to = $dir . '/' . $new . '-' . preg_replace('~^' . preg_quote($old, '/') . '-~', '', $base);
+            if (file_exists($to)) @unlink($to);
+            if (!@rename($f, $to)) fail('Не удалось переименовать файл ' . $base);
+        }
+    }
+
+    $row = $db->prepare('SELECT images FROM products WHERE sku = ?');
+    $row->execute([$old]);
+    $images = json_decode((string)$row->fetch()['images'], true);
+    if (is_array($images)) {
+        foreach ($images as $i => $src) {
+            if (preg_match('~^images/products/' . preg_quote($old, '/') . '-~', (string)$src)) {
+                $images[$i] = preg_replace('~^images/products/' . preg_quote($old, '/') . '-~', 'images/products/' . $new . '-', (string)$src);
+            }
+        }
+        $db->prepare('UPDATE products SET images = ?, updated = ? WHERE sku = ?')
+           ->execute([json_encode(array_values($images), JSON_UNESCAPED_UNICODE), date('Y-m-d H:i:s'), $old]);
+    }
+
+    $db->prepare('UPDATE products SET sku = ?, updated = ? WHERE sku = ?')
+       ->execute([$new, date('Y-m-d H:i:s'), $old]);
+    success(['from' => $old, 'to' => $new]);
 }
 
 function categorySave(array $in): void {
@@ -412,7 +468,7 @@ function catalogPublic(): void {
 }
 
 function exportJson(): void {
-    requireAdmin();
+    requireAdminRead();
     header('Content-Disposition: attachment; filename="products.json"');
     echo json_encode(dbCatalog(db()), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     exit;
@@ -450,7 +506,7 @@ function makeThumb(string $src, string $dest, int $maxW): void {
 }
 
 function backupDb(): void {
-    requireAdmin();
+    requireAdminRead();
     $file = getenv('SITE_DB') ?: (__DIR__ . '/site.db');
     if (!is_file($file)) fail('Файл базы не найден');
     header('Content-Disposition: attachment; filename="poliform-' . date('Ymd-His') . '.sqlite"');
@@ -474,6 +530,7 @@ try {
         case 'product_save': productSave($in); break;
         case 'product_del':  productDelete($in); break;
         case 'product_move': productMove($in); break;
+          case 'product_rename': productRename($in); break;
         case 'cat_save':     categorySave($in); break;
         case 'cat_del':      categoryDelete($in); break;
         case 'color_save':   colorSave($in); break;

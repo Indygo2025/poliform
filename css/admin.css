@@ -85,6 +85,8 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   width: 100%;
 }
 .ab-field textarea { min-height: 90px; resize: vertical; line-height: 1.45; }
+.ab-rename { display: flex; gap: 8px; align-items: center; }
+.ab-rename__in { flex: 1; min-width: 0; }
 .ab-pass { position: relative; display: block; }
 .ab-pass input { padding-right: 42px; }
 .ab-pass__eye {
@@ -162,7 +164,6 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-btn:active { transform: translateY(1px); }
 .ab-btn--primary { background: var(--ab-ink); color: #fff; border-color: var(--ab-ink); }
 .ab-btn--primary:hover { background: #222e35; }
-.ab-btn.is-added { background: rgba(15, 122, 90, .12); border-color: rgba(15, 122, 90, .45); color: var(--ab-ok); }
 .ab-btn--danger { color: var(--ab-accent); border-color: rgba(214, 58, 47, .4); }
 .ab-btn--danger:hover { background: rgba(214, 58, 47, .08); }
 .ab-btn--ok { color: var(--ab-ok); border-color: rgba(15, 122, 90, .4); }
@@ -277,14 +278,22 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 /* ---------------------------------------------------------------- С„РёР»СЊС‚СЂС‹ */
 
 .ab-filters {
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--ab-line);
   background: #fafcfd;
 }
-.ab-filters .ab-field { margin-bottom: 10px; }
+
+/* Фильтры — плотная сетка: подпись мельче, поля ниже, рядов вдвое меньше */
+.ab-filters .ab-field { margin-bottom: 7px; gap: 3px; }
+.ab-filters .ab-field > label { font-size: .66rem; letter-spacing: .03em; }
+.ab-filters .ab-field input,
+.ab-filters .ab-field select {
+  padding: 6px 8px;
+  font-size: .85rem;
+}
 .ab-filters .ab-grid-2,
 .ab-filters .ab-grid-3,
-.ab-filters .ab-grid-4 { margin-bottom: 0; }
+.ab-filters .ab-grid-4 { margin-bottom: 0; gap: 0 8px; }
 .ab-field--wide { max-width: 640px; }
 .ab-filters .ab-row { padding-top: 2px; }
 .ab-filters .ab-row .ab-muted { font-size: .82rem; }
@@ -407,7 +416,51 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-list-edit__row { display: flex; gap: 8px; align-items: center; }
 .ab-list-edit__row input:first-child { flex: 2 1 0; }
 .ab-list-edit__row input:nth-child(2) { flex: 1 1 0; max-width: 110px; }
-.ab-color-dot { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--ab-line); flex: none; }
+.ab-color-dot {
+  display: inline-block;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--ab-line);
+  flex: none;
+}
+
+/* Кружок с образцом цвета справа от поля HEX */
+.ab-field--color { grid-template-columns: 1fr auto; align-items: center; }
+.ab-field--color > label { grid-column: 1 / -1; }
+.ab-field--color .ab-color-dot { width: 30px; height: 30px; cursor: pointer; }
+.ab-field--color .ab-color-dot.is-empty { background: repeating-linear-gradient(45deg, #f2f5f6, #f2f5f6 4px, #dde3e6 4px, #dde3e6 8px); }
+
+.ab-color-dot--sm { width: 18px; height: 18px; }
+.ab-color-dot.is-empty { background: repeating-linear-gradient(45deg, #f2f5f6, #f2f5f6 4px, #dde3e6 4px, #dde3e6 8px); }
+
+/* ---------- выбор цвета: кнопка + выпадающий список с образцами ----------
+   Список — в слое на body (position: fixed), координаты ставит colorPicker().
+   Иначе его обрезал overflow:hidden панели, внутри которой живёт карточка. */
+.ab-picker { position: relative; }
+.ab-picker__btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 7px 10px; font-size: .9rem; text-align: left; cursor: pointer;
+  background: var(--ab-panel); color: var(--ab-ink);
+  border: 1px solid var(--ab-line); border-radius: var(--ab-r-sm);
+}
+.ab-picker__btn:hover { border-color: rgba(16, 22, 26, .3); }
+.ab-picker__txt { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ab-picker__chev { color: var(--ab-ink-3); font-size: .75rem; line-height: 1; }
+.ab-picker__list {
+  display: none; position: fixed; z-index: 200;
+  margin: 0; padding: 4px; list-style: none;
+  overflow-y: auto; overscroll-behavior: contain;
+  background: var(--ab-panel); border: 1px solid var(--ab-line);
+  border-radius: var(--ab-r-sm); box-shadow: 0 12px 26px rgba(16, 22, 26, .17);
+}
+.ab-picker__list.is-open { display: block; }
+.ab-picker__opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 6px; font-size: .88rem; cursor: pointer;
+}
+.ab-picker__opt:hover, .ab-picker__opt:focus { background: #eef2f4; outline: none; }
+.ab-picker__opt.is-on { background: rgba(15, 122, 90, .11); font-weight: 600; }
+.ab-picker__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .ab-empty { text-align: center; padding: 40px 20px; color: var(--ab-ink-3); }
 .ab-empty b { display: block; color: var(--ab-ink); margin-bottom: 6px; font-size: 1.05rem; }

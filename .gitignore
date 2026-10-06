@@ -27,6 +27,7 @@ credentials.json
 site.db
 site.db-wal
 site.db-shm
+site.db.bak-*
 *.sqlite
 *.sqlite3
 

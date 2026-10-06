@@ -72,12 +72,42 @@
       opt.body = JSON.stringify(data);
     }
     return fetch(API + '?action=' + encodeURIComponent(action), opt)
-      .then(function (r) { return r.json().catch(function () { return { ok: false, error: 'HTTP ' + r.status }; }); })
+      .catch(function (e) {
+        /* Расширения и политики браузера часто режут именно fetch, считая
+           его способом отслеживания. Обычный XHR через такие правила проходит. */
+        return apiXhr(API + '?action=' + encodeURIComponent(action), opt).catch(function () { throw e; });
+      })
+      .then(function (r) {
+        /* fetch приходит объектом Response, apiXhr — готовым JSON. */
+        if (r && typeof r.json === 'function') {
+          return r.json().catch(function () { return { ok: false, error: 'HTTP ' + r.status }; });
+        }
+        return r;
+      })
       .then(function (j) {
         if (j && j.csrf) S.csrf = j.csrf;
         if (j && j.ok === false && r401(j)) return Promise.reject(j);
         return j;
       });
+  }
+
+  function apiXhr(url, opt) {
+    return new Promise(function (resolve, reject) {
+      var x = new XMLHttpRequest();
+      x.open('POST', url, true);
+      x.timeout = 20000;
+      x.responseType = 'json';
+      x.setRequestHeader('X-Requested-With', 'fetch');
+      if (S.csrf) x.setRequestHeader('X-CSRF-Token', S.csrf);
+      if (opt.body && !(opt.body instanceof FormData)) x.setRequestHeader('Content-Type', 'application/json');
+      x.onload = function () {
+        if (x.status >= 200 && x.status < 300 && x.response) resolve(x.response);
+        else reject(new Error('HTTP ' + x.status));
+      };
+      x.onerror = function () { reject(new Error('сеть недоступна')); };
+      x.ontimeout = function () { reject(new Error('превышено время ожидания')); };
+      x.send(opt.body);
+    });
   }
   var was401 = false;
   function r401(j) {
@@ -118,6 +148,7 @@
       if (opts.step) n.step = opts.step;
       if (opts.min != null) n.min = opts.min;
       if (opts.placeholder) n.placeholder = opts.placeholder;
+      if (opts.readonly) n.readOnly = true;
       if (opts.type === 'number' || opts.type === 'checkbox') n.value = num(value);
       else n.value = value == null ? '' : value;
     }
@@ -127,7 +158,150 @@
     w.appendChild(n);
     return w;
   }
-  function checkbox(label, name, checked) {
+  /* ---------- выбор цвета: список с образцами ----------
+       Нативный <select> не умеет рисовать кружок внутри варианта, поэтому
+       свой список на <ul role="listbox">. Значение лежит в скрытом
+       input[data-key], поэтому collect() подхватывает его как обычно.
+       Список живёт в слое на <body>: карточка товара лежит внутри
+       .ab-panel с overflow:hidden, и позиционированный список обрезался. */
+    var PICKERS = [];
+    document.addEventListener('mousedown', function (e) {
+      PICKERS = PICKERS.filter(function (p) { return document.body.contains(p.wrap); });
+      PICKERS.forEach(function (p) { if (!p.wrap.contains(e.target) && !p.list.contains(e.target)) p.close(); });
+    });
+    window.addEventListener('resize', function () { PICKERS.forEach(function (p) { p.close(); }); });
+    document.addEventListener('scroll', function () { PICKERS.forEach(function (p) { p.close(); }); }, true);
+
+    function colorPicker(label, name, value, items) {
+      var w = el('div', 'ab-field');
+      w.appendChild(el('label', null, label));
+
+      var wrap = el('div', 'ab-picker');
+      var btn = el('button', 'ab-picker__btn');
+      btn.type = 'button';
+      btn.setAttribute('aria-haspopup', 'listbox');
+      btn.setAttribute('aria-expanded', 'false');
+      var bDot = el('span', 'ab-color-dot ab-color-dot--sm');
+      var bTxt = el('span', 'ab-picker__txt');
+      btn.appendChild(bDot);
+      btn.appendChild(bTxt);
+      btn.appendChild(el('span', 'ab-picker__chev', '▾'));
+      var list = el('ul', 'ab-picker__list');
+      list.setAttribute('role', 'listbox');
+      wrap.appendChild(btn);
+      document.body.appendChild(list);
+
+      var hidden = el('input');
+      hidden.type = 'hidden';
+      hidden.name = name;
+      hidden.id = 'f-' + name.replace(/[^\w]/g, '-');
+      hidden.dataset.key = name;
+      hidden.value = value == null ? '' : value;
+
+      w.appendChild(wrap);
+      w.appendChild(hidden);
+
+      function tint(node, hex) {
+        node.classList.toggle('is-empty', !hex);
+        node.style.background = hex || '';
+      }
+
+      (items || []).forEach(function (o) {
+        var li = el('li', 'ab-picker__opt');
+        li.setAttribute('role', 'option');
+        li.tabIndex = -1;
+        li.dataset.value = o.value;
+        li.dataset.hex = o.hex || '';
+        var d = el('span', 'ab-color-dot ab-color-dot--sm');
+        tint(d, o.hex);
+        li.appendChild(d);
+        li.appendChild(el('span', 'ab-picker__name', o.label));
+        li.addEventListener('mousedown', function (ev) { ev.preventDefault(); });
+        li.addEventListener('click', function () { choose(o.value); });
+        list.appendChild(li);
+      });
+
+      function paint() {
+        var txt = '— не указан —';
+        $$('.ab-picker__opt', list).forEach(function (li) {
+          var on = li.dataset.value === hidden.value;
+          li.classList.toggle('is-on', on);
+          li.setAttribute('aria-selected', on ? 'true' : 'false');
+          if (on) {
+            txt = $('.ab-picker__name', li).textContent;
+            tint(bDot, li.dataset.hex);
+          }
+        });
+        if (!hidden.value) tint(bDot, '');
+        bTxt.textContent = txt;
+      }
+
+      function place() {
+        var r = btn.getBoundingClientRect();
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        var need = list.offsetHeight || 264;
+        var below = vh - r.bottom - 8;
+        var above = r.top - 8;
+        list.style.left = Math.round(r.left) + 'px';
+        list.style.minWidth = Math.round(r.width) + 'px';
+        list.style.maxWidth = Math.round(r.width) + 'px';
+        if (below < need && above > below) {
+          list.style.top = '';
+          list.style.bottom = Math.round(vh - r.top + 4) + 'px';
+          list.style.maxHeight = Math.max(120, Math.round(above)) + 'px';
+        } else {
+          list.style.bottom = '';
+          list.style.top = Math.round(r.bottom + 4) + 'px';
+          list.style.maxHeight = Math.max(120, Math.round(below)) + 'px';
+        }
+      }
+
+      function open() {
+        wrap.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+        list.classList.add('is-open');
+        place();
+      }
+      function close() {
+        wrap.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        list.classList.remove('is-open');
+      }
+      function choose(v) {
+        hidden.value = v;
+        paint();
+        close();
+        btn.focus();
+        hidden.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      btn.addEventListener('click', function () {
+        if (wrap.classList.contains('is-open')) close(); else open();
+      });
+      btn.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowDown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        open();
+        var on = $('.ab-picker__opt.is-on', list) || $('.ab-picker__opt', list);
+        if (on) on.focus();
+      });
+      list.addEventListener('keydown', function (e) {
+        var os = $$('.ab-picker__opt', list);
+        var i = os.indexOf(document.activeElement);
+        if (e.key === 'Escape') { close(); btn.focus(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); if (os[i + 1]) os[i + 1].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); if (os[i - 1]) os[i - 1].focus(); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (os[i]) choose(os[i].dataset.value); }
+        else return;
+        e.stopPropagation();
+      });
+
+      paint();
+      PICKERS.push({ wrap: wrap, list: list, close: close });
+      return { wrap: w, input: hidden, node: wrap, list: list };
+    }
+
+    function checkbox(label, name, checked) {
     var w = el('div', 'ab-field');
     var l = el('label', 'ab-row');
     var i = el('input');
@@ -244,6 +418,7 @@
       S.products = j.products || [];
       S.categories = j.categories || [];
       S.colors = j.colors || [];
+      S.nextSku = j.nextSku || '';
       return api('settings');
     }).then(function (j) {
       need(j);
@@ -304,10 +479,6 @@
     add.addEventListener('click', function () { editor(null); });
     actions.appendChild(add);
 
-    var exp = el('a', 'ab-btn', 'products.json');
-    exp.href = API + '?action=export';
-    actions.appendChild(exp);
-
     var panel = el('div', 'ab-panel');
     var body = el('div', 'ab-panel__body ab-panel__body--flush');
 
@@ -316,15 +487,10 @@
 
     var ALL = { value: '', label: '— все —' };
 
-    function fNum(label, name, placeholder) {
-      return field(label, name, '', { type: 'number', step: 'any', placeholder: placeholder || '' });
-    }
+    var search = field('Артикул или название', 'q', '', { placeholder: '100001 или лоток' });
 
-    var search = field('Артикул или название', 'q', '', { placeholder: 'например: 1430471 или лоток' });
-    search.classList.add('ab-field--wide');
-    fHost.appendChild(search);
-
-    var fr1 = grid(4);
+    var fr1 = grid(3);
+    fr1.appendChild(search);
     fr1.appendChild(field('Категория', 'categoryId', '', {
       type: 'select',
       options: [ALL].concat(S.categories.map(function (c) { return { value: String(c.id), label: c.name }; }))
@@ -333,25 +499,7 @@
       type: 'select',
       options: [ALL, { value: '1', label: 'в наличии' }, { value: '0', label: 'под заказ' }]
     }));
-    fr1.appendChild(field('Фото', 'photos', '', {
-      type: 'select',
-      options: [ALL, { value: 'yes', label: 'есть' }, { value: 'no', label: 'нет' }]
-    }));
-    fr1.appendChild(fNum('Фото не меньше', 'photoMin', 'кол-во'));
     fHost.appendChild(fr1);
-
-    var fr2 = grid(4);
-    fr2.appendChild(fNum('Розница от, ₽', 'priceRetailMin', 'от'));
-    fr2.appendChild(fNum('Розница до, ₽', 'priceRetailMax', 'до'));
-    fr2.appendChild(fNum('Опт от, ₽', 'priceOptMin', 'от'));
-    fr2.appendChild(fNum('Опт до, ₽', 'priceOptMax', 'до'));
-    fHost.appendChild(fr2);
-
-    var fr3 = grid(3);
-    fr3.appendChild(fNum('Бокс от, шт', 'packMin', 'от'));
-    fr3.appendChild(fNum('Бокс до, шт', 'packMax', 'до'));
-    fr3.appendChild(fNum('Фото не больше', 'photoMax', 'кол-во'));
-    fHost.appendChild(fr3);
 
     /* ---------- сортировка по колонкам ---------- */
     var sortKey = null;
@@ -401,9 +549,12 @@
       });
     }
 
-    [{ t: 'Фото', k: 'photo' }, { t: 'Артикул / название', k: 'title' }, { t: 'Категория', k: 'cat' },
+    var COLS = [{ t: 'Фото', k: 'photo' }, { t: 'Артикул / название', k: 'title' }, { t: 'Категория', k: 'cat' },
+     { t: 'Цвет', k: '' },
      { t: 'Розница', k: 'priceRetail' }, { t: 'Опт', k: 'priceOpt' }, { t: 'Бокс', k: 'packCount' },
-     { t: 'Статус', k: 'status' }, { t: '', k: '' }, { t: '', k: '' }, { t: 'В корзину', k: '' }].forEach(function (c) {
+     { t: 'Статус', k: 'status' }, { t: '', k: '' }, { t: '', k: '' }];
+
+    COLS.forEach(function (c) {
       var th = el('th');
       if (c.k) {
         th.classList.add('ab-th--sort');
@@ -494,6 +645,19 @@
       tr.appendChild(td);
 
       tr.appendChild(el('td', 'ab-muted', catName(p.categoryId)));
+
+      var cl = el('td');
+      var cdot = el('span', 'ab-color-dot');
+      var chex = String(p.colorHex || '');
+      var cok = /^#[0-9a-f]{6}$/i.test(chex);
+      cdot.classList.toggle('is-empty', !cok);
+      if (cok) cdot.style.background = chex;
+      cdot.title = p.color
+        ? p.color + (cok ? ' · ' + chex : ' · HEX не задан')
+        : 'Цвет не указан';
+      cl.appendChild(cdot);
+      tr.appendChild(cl);
+
       tr.appendChild(el('td', 'ab-mono', money(p.priceRetail)));
       tr.appendChild(el('td', 'ab-mono', money(p.priceOpt)));
       tr.appendChild(el('td', 'ab-mono', p.packCount + ' шт.'));
@@ -537,31 +701,11 @@
       act.appendChild(del);
       tr.appendChild(act);
 
-      /* --- в корзину (пишем в тот же localStorage, что и витрина) --- */
-      var ctd = el('td');
-      var add = el('button', 'ab-btn ab-btn--sm', 'В корзину');
-      add.type = 'button';
-      add.title = 'Добавить в корзину: ' + p.shortTitle + ' (' + p.sku + ')';
-      add.addEventListener('click', function () {
-        var r = cartAdd(p);
-        add.textContent = '✓ ' + (r.qty > 0 ? '+' + r.qty + ' шт.' : 'нет');
-        add.classList.add('is-added');
-        setTimeout(function () {
-          add.textContent = 'В корзину';
-          add.classList.remove('is-added');
-        }, 1600);
-        toast(r.msg + (r.warn ? ' · товар под заказ, проверьте сроки' : ''));
-        paintCartLink();
-      });
-      ctd.appendChild(add);
-      tr.appendChild(ctd);
-
       return tr;
     }
 
     /* ---------- корзина ---------- */
     var CART_KEY = 'poliform.cart';
-    var MODE_KEY = 'poliform.mode';
 
     function cartRead() {
       try {
@@ -572,27 +716,6 @@
 
     function cartCount() {
       return cartRead().reduce(function (a, it) { return a + (parseInt(it.qty, 10) || 0); }, 0);
-    }
-
-    function cartAdd(p) {
-      var mode = localStorage.getItem(MODE_KEY) === 'opt' ? 'opt' : 'ret';
-      var step = mode === 'opt' ? (parseFloat(p.packCount) || 1) : 1;
-      var cart = cartRead();
-      var found = null, i;
-      for (i = 0; i < cart.length; i++) {
-        if (cart[i].sku === p.sku && cart[i].mode === mode) found = cart[i];
-      }
-      if (found) {
-        var q = parseFloat(found.qty) || 0;
-        found.qty = mode === 'opt' ? Math.max(step, Math.round((q + step) / step) * step) : Math.max(1, Math.round(q + step));
-      } else {
-        cart.push({ sku: p.sku, mode: mode, qty: step });
-      }
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-
-      var msg = p.sku + ' — ' + (mode === 'opt' ? 'опт' : 'розница') + ', +' + step + ' шт. Всего в корзине: ' +
-        cart.reduce(function (a, it) { return a + (parseInt(it.qty, 10) || 0); }, 0) + ' шт.';
-      return { qty: step, msg: msg, warn: p.inStock === false };
     }
 
     function paintCartLink() {
@@ -615,40 +738,17 @@
       return f;
     }
 
-    function nval(v) { return v === '' ? null : parseFloat(String(v).replace(',', '.')); }
-
-    function match(p, f) {
-      if (f.q) {
-        var hay = [p.sku, p.shortTitle, p.title].join(' ').toLowerCase();
-        var words = f.q.toLowerCase().split(/\s+/).filter(Boolean);
-        if (!words.every(function (w) { return hay.indexOf(w) > -1; })) return false;
+function match(p, f) {
+        if (f.q) {
+          var hay = [p.sku, p.shortTitle, p.title].join(' ').toLowerCase();
+          var words = f.q.toLowerCase().split(/\s+/).filter(Boolean);
+          if (!words.every(function (w) { return hay.indexOf(w) > -1; })) return false;
+        }
+        if (f.categoryId && String(p.categoryId) !== f.categoryId) return false;
+        if (f.inStock === '1' && p.inStock === false) return false;
+        if (f.inStock === '0' && p.inStock !== false) return false;
+        return true;
       }
-      if (f.categoryId && String(p.categoryId) !== f.categoryId) return false;
-      if (f.inStock === '1' && p.inStock === false) return false;
-      if (f.inStock === '0' && p.inStock !== false) return false;
-      if (f.photos === 'yes' && !(p.images && p.images.length)) return false;
-      if (f.photos === 'no' && p.images && p.images.length) return false;
-
-      var nphoto = p.images ? p.images.length : 0;
-      var lo = nval(f.photoMin), hi = nval(f.photoMax);
-      if (lo !== null && nphoto < lo) return false;
-      if (hi !== null && nphoto > hi) return false;
-
-      var ranges = [
-        ['priceRetail', 'priceRetailMin', 'priceRetailMax'],
-        ['priceOpt', 'priceOptMin', 'priceOptMax'],
-        ['packCount', 'packMin', 'packMax']
-      ];
-      for (var i = 0; i < ranges.length; i++) {
-        var val = parseFloat(p[ranges[i][0]]) || 0;
-        var lo2 = nval(f[ranges[i][1]]);
-        var hi2 = nval(f[ranges[i][2]]);
-        if (lo2 !== null && val < lo2) return false;
-        if (hi2 !== null && val > hi2) return false;
-      }
-
-      return true;
-    }
 
     function applyFilters() {
       var f = readFilters();
@@ -660,7 +760,7 @@
       if (!list.length) {
         var tr = el('tr');
         var td = el('td', 'ab-muted', 'Ничего не найдено — измените условия фильтра.');
-td.colSpan = 10;
+td.colSpan = COLS.length;
         td.style.padding = '18px 12px';
         tr.appendChild(td);
         tb.appendChild(tr);
@@ -706,7 +806,7 @@ td.colSpan = 10;
 
     if (!p) {
       p = {
-        sku: '', title: '', shortTitle: '', categoryId: (S.categories[0] || {}).id || '',
+        sku: S.nextSku || '', title: '', shortTitle: '', categoryId: (S.categories[0] || {}).id || '',
         art: '', form: 'Прямоугольная', sizeL: 0, sizeW: 0, sizeH: 0, gridGap: 0,
         color: '', colorHex: '', packCount: 1, packNote: '', weightG: 0,
         priceRetail: 0, priceOpt: 0, volumeMl: 0, material: 'Пластик',
@@ -821,12 +921,49 @@ td.colSpan = 10;
     mBody.appendChild(el('p', 'ab-hint', 'На главной показывается только первое фото товара. Отметьте несколько товаров — они покажутся по очереди в карусели.'));
 
     var g1 = grid(2);
-    g1.appendChild(field('Артикул *', 'sku', draft.sku, { placeholder: '1430471' }));
+    g1.appendChild(field('Артикул', 'sku', draft.sku, { readonly: true }));
     g1.appendChild(field('Категория', 'categoryId', draft.categoryId, {
       type: 'select',
       options: S.categories.map(function (c) { return { value: c.id, label: c.name }; })
     }));
     mBody.appendChild(g1);
+
+    if (sku) {
+      var rn = el('div', 'ab-field');
+      rn.appendChild(el('label', null, 'Новый артикул (смена артикула)'));
+      var row = el('div', 'ab-rename');
+      var rin = el('input');
+      rin.className = 'ab-rename__in';
+      rin.placeholder = draft.sku;
+      rin.autocomplete = 'off';
+      row.appendChild(rin);
+      var rbtn = el('button', 'ab-btn ab-btn--sm ab-btn--danger', 'Сменить артикул');
+      rbtn.type = 'button';
+      rbtn.addEventListener('click', function () {
+        var to = rin.value.trim();
+        if (!to) { rin.focus(); toast('Введите новый артикул', true); return; }
+        if (!/^[0-9A-Za-zА-Яа-яЁё._-]{1,40}$/.test(to)) { rin.focus(); toast('Недопустимые символы в артикуле', true); return; }
+        if (to === draft.sku) { rin.focus(); toast('Новый артикул совпадает со старым', true); return; }
+        var dup = S.products.some(function (x) { return x.sku === to; });
+        if (dup) { rin.focus(); toast('Артикул «' + to + '» уже занят другим товаром', true); return; }
+        if (!confirm('Поменять артикул у товара «' + (p.shortTitle || p.sku) + '» на ' + to + '?\nТовар получит новый артикул, ссылки на него обновятся. Отменить нельзя.')) return;
+        rbtn.disabled = true;
+        rbtn.textContent = 'Меняю…';
+        api('product_rename', { sku: p.sku, to: to }).then(need).then(function () {
+          toast('Артикул сменён: ' + p.sku + ' → ' + to);
+          return loadAll();
+        }).then(function () {
+          go('products');
+        }).catch(function () {
+          rbtn.disabled = false;
+          rbtn.textContent = 'Сменить артикул';
+        });
+      });
+      row.appendChild(rbtn);
+      rn.appendChild(row);
+      rn.appendChild(el('p', 'ab-hint', 'Критическая операция: меняет артикул и переименовывает фото. Дубль артикула не допускается — сервер проверит повторно.'));
+      mBody.appendChild(rn);
+    }
 
     mBody.appendChild(field('Название (каталог)', 'shortTitle', draft.shortTitle, { placeholder: 'Лоток средний 36×26×6,5, с сеткой' }));
     mBody.appendChild(field('Полное название (SEO, карточка)', 'title', draft.title));
@@ -844,8 +981,40 @@ td.colSpan = 10;
     mBody.appendChild(g3);
 
     var g4 = grid(3);
-    g4.appendChild(field('Цвет', 'color', draft.color));
-    g4.appendChild(field('HEX цвета', 'colorHex', draft.colorHex, { placeholder: '#2E9C9B' }));
+    var colorItems = [{ value: '', label: '— не указан —', hex: '' }];
+    S.colors.forEach(function (c) {
+      colorItems.push({ value: c.name, label: c.name, hex: c.hex || '' });
+    });
+    if (draft.color && !colorItems.some(function (o) { return o.value === draft.color; })) {
+      colorItems.push({ value: draft.color, label: draft.color + ' — нет в справочнике', hex: '' });
+    }
+    var cPick = colorPicker('Цвет', 'color', draft.color, colorItems);
+    var hexWrap = field('HEX цвета', 'colorHex', draft.colorHex, { placeholder: '#2E9C9B' });
+    var cHex = hexWrap.querySelector('input');
+    hexWrap.classList.add('ab-field--color');
+    var swatch = el('span', 'ab-color-dot');
+    swatch.setAttribute('role', 'img');
+    hexWrap.appendChild(swatch);
+
+    function paintSwatch() {
+      var v = String(cHex.value || '').trim();
+      var ok = /^#[0-9a-f]{6}$/i.test(v);
+      swatch.classList.toggle('is-empty', !ok);
+      swatch.style.background = ok ? v : '';
+      swatch.title = ok ? 'Образец цвета: ' + v : 'HEX не заполнен или неверный — нужен вид #RRGGBB';
+    }
+    cHex.addEventListener('input', paintSwatch);
+    cPick.input.addEventListener('change', function () {
+      var m = S.colors.filter(function (c) { return c.name === cPick.input.value; })[0];
+      if (m && m.hex) {
+        cHex.value = m.hex;
+        cHex.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+    paintSwatch();
+
+    g4.appendChild(cPick.wrap);
+    g4.appendChild(hexWrap);
     g4.appendChild(field('Вес брутто, г', 'weightG', draft.weightG, { type: 'number', step: '1' }));
     mBody.appendChild(g4);
 
@@ -1374,8 +1543,8 @@ td.colSpan = 10;
     body.appendChild(field('Заголовок <title> для соцсетей', 'heroTitle', draft.heroTitle));
     body.appendChild(field('Подзаголовок на главной', 'heroLead', draft.heroLead, { type: 'textarea', rows: 3 }));
     var g = grid(2);
-    g.appendChild(field('Запасной артикул для главной', 'heroVisualSku', draft.heroVisualSku, { placeholder: '1430475' }));
-    g.appendChild(field('Подпись под фото', 'heroFigcaption', draft.heroFigcaption, { placeholder: 'Арт. 1430475 · 36×25×9 см' }));
+    g.appendChild(field('Запасной артикул для главной', 'heroVisualSku', draft.heroVisualSku, { placeholder: '100004' }));
+    g.appendChild(field('Подпись под фото', 'heroFigcaption', draft.heroFigcaption, { placeholder: 'Арт. 100004 · 36×25×9 см' }));
     body.appendChild(g);
     body.appendChild(el('p', 'ab-hint', 'Эти два поля нужны только если на главной нет ни одного товара, отмеченного галочкой «Показывать на главной». Карусель строится из отмеченных товаров и показывает первое фото каждого.'));
     body.appendChild(field('alt-текст для фото, если подпись пустая', 'heroAlt', h.heroAlt));

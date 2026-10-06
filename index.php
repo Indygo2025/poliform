@@ -13,25 +13,15 @@ $base = 'https://poliform.pages.dev/';
 $heroTitle = blk($b, 'heroTitle', 'Пластиковые изделия для питомцев');
 $heroLead  = blk($b, 'heroLead', 'Лотки и туалеты для кошек, миски одинарные и двойные из плотного пластика. Каждая позиция отлита на собственной форме: от 33,5×25 см до 36×26 см, от 200 мл до 2×200 мл. Продаём оптом от одного бокса и в розницу поштучно.');
 
-$heroSku = trim((string)($b['heroVisualSku'] ?? '1430475'));
+$heroSku = trim((string)($b['heroVisualSku'] ?? '100004'));
 
 /* Карусель главной: товары, отмеченные в админке галочкой «Показывать на главной».
    Показывается только первое фото карточки товара. */
-$heroDims = static function (array $p): string {
-    $out = [];
-    foreach (['sizeL', 'sizeW', 'sizeH'] as $k) {
-        $v = (float)($p[$k] ?? 0);
-        if ($v <= 0) continue;
-        $out[] = rtrim(rtrim(number_format($v, 1, ',', ''), '0'), ',');
-    }
-    return implode('×', $out);
-};
-$heroSlide = static function (array $p) use ($heroDims): array {
+$heroSlide = static function (array $p): array {
     return [
         'sku'  => (string)$p['sku'],
         'img'  => (string)($p['images'][0] ?? ''),
         'name' => (string)($p['shortTitle'] ?: $p['title']),
-        'dims' => trim($heroDims($p), '×'),
     ];
 };
 
@@ -61,9 +51,6 @@ if (!$slides) {
     }
 }
 $heroImg = $slides[0]['img'] ?? '';
-/* Подпись из настроек имеет смысл только для одиночного слайда:
-   в карусели подпись должна соответствовать текущему товару. */
-$heroCap = (count($slides) === 1 && !empty($b['heroFigcaption'])) ? (string)$b['heroFigcaption'] : '';
 $heroAlt = blk($h, 'heroAlt', 'Пластиковое изделие собственного производства');
 
 $title = (string)($seo['title'] ?? 'Полиформ');
@@ -103,9 +90,6 @@ pl_header($d, 'index');
       <div class="hero-carousel__track">
         <?php foreach ($slides as $i => $s): ?>
         <figure class="hero-carousel__slide<?= $i === 0 ? ' is-active' : '' ?>"
-                data-sku="<?= e($s['sku']) ?>"
-                data-name="<?= e($s['name']) ?>"
-                data-dims="<?= e($s['dims']) ?>"
                 <?= $i === 0 ? ' aria-hidden="false"' : ' aria-hidden="true"' ?>>
           <img src="<?= e($s['img']) ?>"
                alt="<?= e($s['name'] !== '' ? $s['name'] : $heroAlt) ?>"
@@ -114,13 +98,6 @@ pl_header($d, 'index');
         </figure>
         <?php endforeach; ?>
       </div>
-
-      <figcaption class="hero-carousel__cap">
-        <span class="hero-carousel__name"><?= e($heroCap !== '' ? $heroCap : $slides[0]['name']) ?></span>
-        <?php if ($heroCap === '' && $slides[0]['dims'] !== ''): ?>
-        <span class="hero-carousel__dims"><?= e($slides[0]['dims']) ?> см</span>
-        <?php endif; ?>
-      </figcaption>
 
       <?php if (count($slides) > 1): ?>
       <button class="hero-carousel__nav hero-carousel__nav--prev" type="button"
@@ -136,8 +113,6 @@ pl_header($d, 'index');
                 title="<?= e($s['sku']) ?>"></button>
         <?php endforeach; ?>
       </div>
-      <a class="hero-carousel__link" href="product.php?sku=<?= e(urlencode($slides[0]['sku'])) ?>"
-         data-carousel-link>Подробнее</a>
       <?php endif; ?>
     </div>
     <?php endif; ?>

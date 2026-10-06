@@ -178,6 +178,8 @@
     var badges = el('div', 'pcard__badges');
     if (p.inStock === false) badges.appendChild(el('span', 'pbadge pbadge--out', 'Под заказ'));
     else if (mode === OPT) badges.appendChild(el('span', 'pbadge pbadge--opt', 'Опт'));
+    if (mode === OPT && p.priceRetail > p.priceOpt && savePct(p) >= 1)
+      badges.appendChild(el('span', 'pbadge pbadge--disc', '−' + savePct(p) + '%'));
     badges.appendChild(el('span', 'pbadge pbadge--pack', 'Бокс ' + p.packCount + ' шт.'));
     media.appendChild(badges);
 
@@ -185,7 +187,55 @@
     sw.style.background = p.colorHex;
     sw.title = p.color;
     media.appendChild(sw);
-    card.appendChild(media);
+
+    /* Галерея на карточке: при наведении на фото появляются остальные фото.
+       Движение мыши по горизонтали или клик по миниатюре меняют главное фото. */
+    var ph = el('div', 'pcard__ph');
+    ph.appendChild(media);
+    var thumbs = p.thumbs && p.thumbs.length ? p.thumbs : null;
+    if (thumbs && thumbs.length > 1) {
+      var cur = 0;
+      var set = function (i) {
+        if (i === cur) return;
+        cur = i;
+        img.src = thumbs[i];
+        $$('.pcard__shot', ph).forEach(function (b, k) { b.classList.toggle('is-active', k === i); });
+      };
+      var shots = el('div', 'pcard__shots');
+      thumbs.forEach(function (t, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pcard__shot' + (i === 0 ? ' is-active' : '');
+        b.setAttribute('aria-label', 'Фото ' + (i + 1));
+        var ti = el('img');
+        ti.src = t;
+        ti.alt = '';
+        ti.loading = 'lazy';
+        b.appendChild(ti);
+        b.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          set(i);
+        });
+        shots.appendChild(b);
+      });
+      ph.appendChild(shots);
+      media.addEventListener('mouseenter', function () {
+        shots.classList.add('is-open');
+        set(0);
+      });
+      media.addEventListener('mousemove', function (e) {
+        var r = media.getBoundingClientRect();
+        var ratio = (e.clientX - r.left) / r.width;
+        var i = Math.max(0, Math.min(thumbs.length - 1, Math.floor(ratio * thumbs.length)));
+        set(i);
+      });
+      ph.addEventListener('mouseleave', function () {
+        shots.classList.remove('is-open');
+        set(0);
+      });
+    }
+    card.appendChild(ph);
 
     var body = el('div', 'pcard__body');
     body.appendChild(el('span', 'pcard__cat', catName(p.categoryId)));
@@ -211,7 +261,7 @@
 
     var unit = el('div', 'pcard__unit');
     if (mode === OPT) {
-      price.appendChild(el('div', 'price-was', 'Розница ' + money(p.priceRetail) + ' · выгода ' + savePct(p) + '%'));
+      if (p.priceRetail > p.priceOpt) price.appendChild(el('div', 'price-was', money(p.priceRetail)));
       unit.innerHTML = 'Опт от <b>1 бокса</b>: ' + p.packCount + ' шт. на <b>' + money(p.priceOpt * p.packCount) + '</b>';
     } else {
       unit.innerHTML = 'Фасовка по 1 шт., в боксе <b>' + p.packCount + ' шт.</b>';
@@ -492,8 +542,33 @@
     big.alt = p.title;
     main.appendChild(big);
     g.appendChild(main);
-    if (p.images.length > 1) {
-      var th = el('div', 'gallery__thumbs');
+
+    var nimg = p.images.length;
+    var gi = 0;
+    var thEl = null;
+    function showPhoto(i) {
+      if (i < 0) i = nimg - 1;
+      if (i >= nimg) i = 0;
+      gi = i;
+      big.src = p.images[i];
+      var cnt = g.querySelector('.gallery__count');
+      if (cnt) cnt.textContent = (i + 1) + ' / ' + nimg;
+      if (thEl) $$('button', thEl).forEach(function (x, k) { x.classList.toggle('is-active', k === i); });
+    }
+    if (nimg > 1) {
+      var navPrev = el('button', 'gallery__nav gallery__nav--prev', '‹');
+      navPrev.type = 'button';
+      navPrev.setAttribute('aria-label', 'Предыдущее фото');
+      navPrev.addEventListener('click', function () { showPhoto(gi - 1); });
+      main.appendChild(navPrev);
+      var navNext = el('button', 'gallery__nav gallery__nav--next', '›');
+      navNext.type = 'button';
+      navNext.setAttribute('aria-label', 'Следующее фото');
+      navNext.addEventListener('click', function () { showPhoto(gi + 1); });
+      main.appendChild(navNext);
+      main.appendChild(el('div', 'gallery__count', '1 / ' + nimg));
+
+      thEl = el('div', 'gallery__thumbs');
       p.images.forEach(function (src, i) {
         var btn = el('button', i === 0 ? 'is-active' : '');
         btn.type = 'button';
@@ -503,14 +578,11 @@
         im.alt = '';
         im.loading = 'lazy';
         btn.appendChild(im);
-        btn.addEventListener('click', function () {
-          big.src = src;
-          $$('button', th).forEach(function (x) { x.classList.remove('is-active'); });
-          btn.classList.add('is-active');
-        });
-        th.appendChild(btn);
+        btn.addEventListener('click', function () { showPhoto(i); });
+        btn.addEventListener('mouseenter', function () { showPhoto(i); });
+        thEl.appendChild(btn);
       });
-      g.appendChild(th);
+      g.appendChild(thEl);
     }
     layout.appendChild(g);
 
@@ -567,6 +639,9 @@
     cur.big = el('b', null, money(priceOf(p)));
     now.appendChild(cur.big);
     now.appendChild(el('span', null, '/ шт.'));
+    var disc = el('span', 'pbadge pbadge--disc');
+    disc.style.display = 'none';
+    now.appendChild(disc);
     box.appendChild(now);
 
     var was = el('div', 'price-was');
@@ -686,6 +761,15 @@
 
   function updatePrice(p, cur, box) {
     cur.big.textContent = money(cur.mode === OPT ? p.priceOpt : p.priceRetail);
+    var disc = box.querySelector('.price-now .pbadge--disc');
+    if (disc) {
+      if (cur.mode === OPT && p.priceRetail > p.priceOpt && savePct(p) >= 1) {
+        disc.textContent = '−' + savePct(p) + '%';
+        disc.style.display = '';
+      } else {
+        disc.style.display = 'none';
+      }
+    }
     var unit = box.querySelector('.pcard__unit');
     var was = box.querySelector('.price-was');
     var hint = box.querySelector('.ppb__note');
@@ -1011,6 +1095,48 @@
     initForm();
     renderAll();
     loadCatalog();
+    pinFilters();
+  }
+
+  /* Панель фильтров выше окна (стикер на ширине >1080px).
+     При скролле ВНИЗ панель едет с карточками и прилипает, когда низ
+     (кнопка «Сбросить фильтр») доходит до нижнего края окна; при скролле
+     ВВЕРХ поднимается и прилипает к верхней части окна под шапкой. */
+  function pinFilters() {
+    var f = $('[data-filters]');
+    if (!f) return;
+    var doc = document.documentElement;
+    var lastS = -1;
+    var ticking = false;
+
+    function stick(onTop) {
+      f.classList.toggle('pin-top', onTop);
+    }
+    function measure() {
+      doc.style.setProperty('--filters-h', f.offsetHeight + 'px');
+      doc.classList.add('js-sticky-filters');
+    }
+    function tick() {
+      ticking = false;
+      var s = Math.max(0, window.pageYOffset || window.scrollY || 0);
+      var delta = lastS >= 0 ? s - lastS : 0;
+      lastS = s;
+      if (delta < 0) stick(true);       /* скролл вверх: прилипаем к верху */
+      else if (delta > 0) stick(false); /* скролл вниз: прилипаем к низу */
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      if (window.requestAnimationFrame) requestAnimationFrame(tick);
+      else tick();
+    }
+    measure();
+    if (!pinFilters._watching) {
+      pinFilters._watching = true;
+      if (window.ResizeObserver) new ResizeObserver(measure).observe(f);
+      else window.addEventListener('resize', measure);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
   }
 
   function loadCatalog() {
@@ -1036,6 +1162,7 @@
         if (qs.get('cat') && categories.some(function (c) { return c.id === qs.get('cat'); })) state.cat = qs.get('cat');
         if (qs.get('color')) state.colors = [qs.get('color')];
         renderAll();
+        pinFilters();
       })
       .catch(function (err) {
         showCatalogError(err && err.message ? err.message : 'причина неизвестна');
