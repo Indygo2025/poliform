@@ -515,6 +515,69 @@ function backupDb(): void {
     exit;
 }
 
+/**
+ * Полная копия сайта одним ZIP-архивом: все файлы проекта + база site.db.
+ * Сначала принудительно списываем WAL в основной файл, чтобы копия базы была целостной.
+ */
+function backupFull(): void {
+    requireAdminRead();
+    $base = __DIR__;
+
+    /* Предыдущие копии, служебные файлы и мусор в архив не берём. */
+    $skipSegments = ['.git', '.github', 'node_modules'];
+    $skipNames = ['site.db-wal', 'site.db-shm'];
+    $skipPrefixes = ['site.db-bak-', '~$']; /* прежние бэкапы БД и временные файлы Office */
+
+    try {
+        db()->query('PRAGMA wal_checkpoint(TRUNCATE)');
+    } catch (Throwable $e) {
+        /* не критично — основная база всё равно попадает в архив */
+    }
+
+    $zipPath = (string)tempnam(sys_get_temp_dir(), 'plzip');
+    $zip = new ZipArchive();
+    if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        @unlink($zipPath);
+        fail('Не удалось создать архив', 500);
+    }
+
+    $it = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::LEAVES_ONLY
+    );
+
+    foreach ($it as $file) {
+        $path = (string)$file->getPathname();
+        $rel  = str_replace('\\', '/', substr($path, strlen($base) + 1));
+        if ($rel === '' || $rel === $zipPath) continue;
+
+        $skip = false;
+        foreach (explode('/', $rel) as $seg) {
+            if (in_array($seg, $skipSegments, true) || in_array($seg, $skipNames, true)) { $skip = true; break; }
+            foreach ($skipPrefixes as $p) if (str_starts_with($seg, $p)) { $skip = true; break; }
+            if ($skip) break;
+        }
+        if ($skip) continue;
+
+        $zip->addFile($path, $rel);
+    }
+
+    $count = (int)$zip->numFiles;
+    $zip->close();
+
+    if ($count === 0 || !is_file($zipPath)) {
+        @unlink($zipPath);
+        fail('Не удалось собрать архив', 500);
+    }
+
+    header('Content-Disposition: attachment; filename="poliform-site-' . date('Ymd-His') . '.zip"');
+    header('Content-Type: application/zip');
+    header('Content-Length: ' . (string)filesize($zipPath));
+    readfile($zipPath);
+    @unlink($zipPath);
+    exit;
+}
+
 /* --------------------------------------------------------------- роутер */
 
 $action = (string)($_GET['action'] ?? ($_POST['action'] ?? ''));
@@ -554,6 +617,7 @@ try {
         case 'photo_del':    photoDelete($in); break;
         case 'export':       exportJson(); break;
         case 'backup':       backupDb(); break;
+        case 'backup_full':  backupFull(); break;
 
         case 'catalog':      catalogPublic(); break;
 

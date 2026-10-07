@@ -533,6 +533,10 @@
     }
 
     var layout = el('div', 'product-layout');
+    var info   = el('div', 'product-info');
+    var head   = el('div', 'product-head');
+    var specs  = el('div', 'product-specs');
+    var buy    = el('div', 'product-buy');
 
     /* галерея */
     var g = el('div', 'gallery');
@@ -542,6 +546,17 @@
     big.alt = p.title;
     main.appendChild(big);
     g.appendChild(main);
+
+    /* зум фото по курсору, как на маркетплейсе */
+    if (window.matchMedia('(pointer: fine)').matches) {
+      main.addEventListener('mousemove', function (e) {
+        var r = main.getBoundingClientRect();
+        var px = ((e.clientX - r.left) / r.width) * 100;
+        var py = ((e.clientY - r.top) / r.height) * 100;
+        big.style.transformOrigin = px + '% ' + py + '%';
+      });
+      main.addEventListener('mouseleave', function () { big.style.transformOrigin = '50% 50%'; });
+    }
 
     var nimg = p.images.length;
     var gi = 0;
@@ -584,18 +599,16 @@
       });
       g.appendChild(thEl);
     }
-    layout.appendChild(g);
 
     /* инфо */
-    var info = el('div');
-    info.appendChild(el('h1', 'product-title', p.title));
+    head.appendChild(el('h1', 'product-title', p.title));
 
     var skuRow = el('div', 'product-sku');
     skuRow.innerHTML = 'Артикул <b>' + p.sku + '</b>';
     if (p.inStock === false) {
       skuRow.innerHTML += ' <span class="pbadge pbadge--out">Под заказ</span>';
     }
-    info.appendChild(skuRow);
+    head.appendChild(skuRow);
 
     /* цена */
     var box = el('div', 'product-price-box');
@@ -633,7 +646,6 @@
       });
       rows.appendChild(r);
     });
-    box.appendChild(rows);
 
     var now = el('div', 'price-now');
     cur.big = el('b', null, money(priceOf(p)));
@@ -642,13 +654,10 @@
     var disc = el('span', 'pbadge pbadge--disc');
     disc.style.display = 'none';
     now.appendChild(disc);
-    box.appendChild(now);
 
     var was = el('div', 'price-was');
-    box.appendChild(was);
     var unit = el('div', 'pcard__unit');
     unit.style.marginTop = '8px';
-    box.appendChild(unit);
 
     if (p.inStock !== false) {
       var actions = el('div', 'ppb__actions');
@@ -680,20 +689,45 @@
         setTimeout(function () { add.textContent = 'В корзину'; }, 1500);
       });
       actions.appendChild(add);
-      box.appendChild(actions);
     } else {
       var ask = el('a', 'btn btn-signal', 'Уточнить наличие');
       ask.href = 'cart.php#order';
-      box.appendChild(ask);
     }
 
+    /* правая колонка как на маркетплейсе: цена, покупка, продавец и доставка */
     var phint = el('div', 'ppb__note');
+    box.appendChild(now);
+    box.appendChild(was);
+    box.appendChild(unit);
+    box.appendChild(rows);
+    box.appendChild(pack);
+    if (p.inStock !== false) box.appendChild(actions); else box.appendChild(ask);
     box.appendChild(phint);
-    info.appendChild(box);
+    buy.appendChild(box);
+
+    var facts = el('div', 'buy-facts');
+    function fact(title, text) {
+      if (!text) return;
+      var r = el('div', 'buy-facts__row');
+      var b = el('div');
+      b.appendChild(el('div', 'buy-facts__t', title));
+      b.appendChild(el('div', 'buy-facts__d', text));
+      r.appendChild(b);
+      facts.appendChild(r);
+    }
+    var siteSet = settings.site || {};
+    var contSet = settings.contacts || {};
+    var ordSet  = settings.order || {};
+    fact('Доставка', ordSet.lead || 'Стоимость доставки рассчитывает менеджер.');
+    fact('Продавец', (siteSet.company || 'ООО «ПОЛИФОРМ КОМПАНИ»') + ' · собственное производство, ' + (siteSet.madeIn || 'Россия'));
+    fact('Оплата', 'По договору или по счёту для юрлиц.');
+    fact('График работы', [contSet.hours || '', contSet.phone || ''].filter(Boolean).join(' · '));
+    if (facts.childNodes.length) buy.appendChild(facts);
+
     updatePrice(p, cur, box);
 
     var desc = el('p', 'product-desc', p.description);
-    info.appendChild(desc);
+    head.appendChild(desc);
 
     var st = el('div', 'block block--tint');
     st.appendChild(el('h2', null, 'Характеристики'));
@@ -718,16 +752,38 @@
       tbl.appendChild(tr);
     });
     st.appendChild(tbl);
-    info.appendChild(st);
+    specs.appendChild(st);
 
     var fb = el('div', 'block block--tint');
     fb.appendChild(el('h2', null, 'Особенности'));
     var ul = el('ul', 'feature-list');
     p.features.forEach(function (f) { ul.appendChild(el('li', null, f)); });
     fb.appendChild(ul);
-    info.appendChild(fb);
+    specs.appendChild(fb);
 
+    /* короткие характеристики пунктиром — под названием, как на маркетплейсе */
+    var quick = el('div', 'quick-specs');
+    function qrow(key, val) {
+      if (!val) return;
+      var r = el('div', 'quick-specs__row');
+      r.appendChild(el('span', 'q-key', key));
+      r.appendChild(el('span', 'q-dots'));
+      r.appendChild(el('span', 'q-val', val));
+      quick.appendChild(r);
+    }
+    qrow('Габариты', dim(p));
+    if (p.color) qrow('Цвет', p.color);
+    if (p.volumeMl) qrow('Объём', p.volumeMl + ' мл');
+    qrow('Материал', p.material);
+    qrow('Фасовка', 'в боксе ' + p.packCount + ' шт.');
+    if (p.weightG) qrow('Вес брутто', p.weightG + ' г');
+
+    info.appendChild(head);
+    info.appendChild(quick);
+    info.appendChild(specs);
+    layout.appendChild(g);
     layout.appendChild(info);
+    layout.appendChild(buy);
     host.appendChild(layout);
 
     var ld = el('script');
@@ -775,11 +831,11 @@
     var hint = box.querySelector('.ppb__note');
     if (cur.mode === OPT) {
       unit.innerHTML = '<b>1 бокс</b> = ' + p.packCount + ' шт. на <b>' + money(p.priceOpt * p.packCount) + '</b>';
-      was.textContent = 'Розница ' + money(p.priceRetail) + ' · выгода ' + savePct(p) + '%';
+      was.innerHTML = '<span class="old-price">' + money(p.priceRetail) + ' ₽</span><span class="save">−' + savePct(p) + '%</span>';
       hint.textContent = 'Кратно боксу: шаг +' + p.packCount + ' шт. Минимум — 1 бокс.';
     } else {
       unit.innerHTML = '<b>1 шт.</b> — фасовка по 1 шт., в боксе ' + p.packCount + ' шт.';
-      was.textContent = 'Опт от 1 бокса — ' + money(p.priceOpt) + ' / шт. (выгода ' + savePct(p) + '%)';
+      was.innerHTML = 'Опт от 1 бокса — <b>' + money(p.priceOpt) + '</b> / шт.';
       hint.textContent = 'Оптовая цена действует от 1 бокса (' + p.packCount + ' шт.) — выберите режим «Опт» выше.';
     }
   }

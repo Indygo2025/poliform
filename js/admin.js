@@ -1905,15 +1905,25 @@ td.colSpan = COLS.length;
 
   function viewService() {
     var panel = el('div', 'ab-panel');
-    panel.appendChild(panelHead('Резервная копия', 'Храните копию вне сервера — в ней лежат товары, заявки и настройки'));
+    panel.appendChild(panelHead('Резервная копия', 'Полный архив сайта, база SQLite или каталог в JSON'));
     var body = el('div', 'ab-panel__body');
 
-    var dl = el('a', 'ab-btn ab-btn--primary', 'Скачать site.db');
+    body.appendChild(el('h3', null, 'Копия всего сайта (ZIP)'));
+    body.appendChild(el('p', 'ab-muted',
+      'Один архив со всеми файлами: PHP-страницы, вёрстка, скрипты, изображения и база site.db. ' +
+      'Для восстановления распакуйте архив на хостинг — сайт заработает как есть. Копии баз и .git в архив не входят.'));
+    var full = el('a', 'ab-btn ab-btn--primary', 'Скачать копию сайта (ZIP)');
+    full.href = API + '?action=backup_full';
+    body.appendChild(full);
+
+    body.appendChild(el('h3', null, 'База данных'));
+    body.appendChild(el('p', 'ab-muted', 'Файл site.db: товары, заявки, тексты, цены и настройки. Подходит для быстрой точечной замены.'));
+    var dl = el('a', 'ab-btn', 'Скачать site.db');
     dl.href = API + '?action=backup';
     body.appendChild(dl);
 
     body.appendChild(el('h3', null, 'Каталог в JSON'));
-    body.appendChild(el('p', 'ab-muted', 'Формат data/products.json — для резервной копии каталога без заявок.'));
+    body.appendChild(el('p', 'ab-muted', 'Формат data/products.json — каталог без заявок и настроек.'));
     var ex = el('a', 'ab-btn', 'Скачать products.json');
     ex.href = API + '?action=export';
     body.appendChild(ex);

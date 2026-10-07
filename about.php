@@ -19,16 +19,20 @@ pl_header($d, 'about');
 pl_breadcrumbs_jsonld($base, ['Главная' => 'index.php', 'О компании' => 'about.php']);
 ?>
 
-<div class="page-hero">
+<section class="page-top">
   <div class="container">
     <nav class="crumbs" aria-label="Хлебные крошки">
       <a href="index.php">Главная</a> / <span>О компании</span>
     </nav>
-    <span class="eyebrow">Производитель</span>
-    <h1>Мы делаем пластик,<br>который <em>работает каждый день</em></h1>
-    <p class="hero-lead"><?= e(blk($b, 'heroLead', 'Лотки и туалеты для кошек, миски одинарные и двойные из плотного пластика. Каждая позиция отлита на собственной форме.')) ?></p>
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">Производитель</span>
+        <h1 class="sec-title" style="font-size:clamp(1.8rem,4vw,2.6rem)">Мы делаем пластик, который <em>работает каждый день</em></h1>
+        <p class="sec-sub"><?= e(blk($b, 'heroLead', 'Лотки и туалеты для кошек, миски одинарные и двойные из плотного пластика. Каждая позиция отлита на собственной форме.')) ?></p>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 
 <section>
   <div class="container">

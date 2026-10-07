@@ -650,15 +650,87 @@ a.pcard__add:hover {
 .crumbs a { color: var(--ink-2); text-decoration: none; }
 .crumbs a:hover { color: var(--signal-deep); }
 
+/* Карточка в три колонки, как на маркетплейсе: фото · информация · покупка */
 .product-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 520px) minmax(0, 1fr);
-  gap: 40px;
+  grid-template-columns: minmax(360px, 540px) minmax(0, 1fr) minmax(270px, 306px);
+  gap: 34px;
   align-items: start;
   padding-bottom: 40px;
 }
+.product-head .product-desc { max-width: 760px; margin-top: 14px; }
+/* Покупка: цена за штуку, количество, кнопка «В корзину».
+   Блок закрепляется при прокрутке, как блок покупки на маркетплейсе. */
+.product-buy {
+  background: var(--shop-card);
+  border: 1px solid var(--shop-line);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  box-shadow: var(--e1);
+  position: sticky;
+  top: 132px;
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+}
+.product-buy .product-price-box { margin-top: 0; }
+/* Старая (розничная) цена и выгода при опте — крупнее и заметнее */
+.product-buy .price-was { font-size: 1rem; margin-top: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+.product-buy .old-price { color: #9aa0a6; text-decoration: line-through; }
+.product-buy .save {
+  color: #017a52;
+  font-weight: 700;
+  font-size: .76rem;
+  letter-spacing: .04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(1, 122, 82, .1);
+}
+.product-specs .block:first-child { margin-top: 0; }
+.product-specs .block { margin-bottom: 22px; }
+
+/* Мини-блоки правой колонки: доставка, продавец, оплата, график */
+.buy-facts { margin-top: 18px; border-top: 1px solid var(--shop-line); padding-top: 4px; }
+.buy-facts__row { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--shop-line); }
+.buy-facts__row:last-child { border-bottom: 0; padding-bottom: 2px; }
+.buy-facts__row > div { min-width: 0; }
+.buy-facts__row::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--signal);
+  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, .18);
+}
+.buy-facts__t { font-size: .8rem; font-weight: 700; color: #161616; margin-bottom: 3px; }
+.buy-facts__d { font-size: .82rem; line-height: 1.45; color: var(--ink-3); overflow-wrap: anywhere; }
 .gallery { position: sticky; top: 132px; }
+/* Миниатюры — горизонтальная лента под крупным фото */
 .product-layout .gallery { display: block; grid-template-columns: none; }
+/* Зум фото по наведению, как на маркетплейсе: точка приближения следует за курсором */
+.product-layout .gallery__main img { transition: transform .28s ease; will-change: transform; }
+@media (pointer: fine) {
+  .product-layout .gallery__main:hover img { transform: scale(1.4); }
+  .product-layout .gallery__main img { cursor: zoom-in; }
+}
+/* Запасная вёрстка без JS: миниатюры — обычные картинки */
+.product-layout .gallery__thumbs > img {
+  display: block;
+  width: 78px;
+  height: 78px;
+  padding: 4px;
+  border: 1px solid #d9dde0;
+  border-radius: 10px;
+  background: #f5f6f7;
+  object-fit: contain;
+}
+
+/* Короткие характеристики пунктиром под названием */
+.quick-specs { display: grid; gap: 9px; margin: 20px 0 6px; }
+.quick-specs__row { display: flex; align-items: baseline; gap: 8px; font-size: .92rem; }
+.quick-specs__row .q-key { color: var(--ink-3); flex: none; }
+.quick-specs__row .q-dots { flex: 1 1 auto; border-bottom: 1px dotted #c3c8cd; min-width: 12px; }
+.quick-specs__row .q-val { color: var(--ink); font-weight: 600; flex: none; text-align: right; }
 .gallery__main {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -1045,9 +1117,17 @@ a.pcard__add:hover {
   .filters { position: static; }
   .cart-layout { grid-template-columns: 1fr; }
   .cart-summary { position: static; }
+  /* Страница товара: фото слева, блок покупки справа, информация под ними */
+  .product-layout { grid-template-columns: minmax(280px, 44%) minmax(0, 1fr); gap: 26px; }
+  .product-layout .gallery { grid-column: 1; grid-row: 1; position: static; }
+  .product-buy { grid-column: 2; grid-row: 1; position: static; max-height: none; overflow: visible; }
+  .product-info { grid-column: 1 / -1; grid-row: 2; }
 }
 @media (max-width: 900px) {
   .product-layout { grid-template-columns: 1fr; gap: 28px; }
+  .product-layout .gallery,
+  .product-info,
+  .product-buy { grid-column: auto; grid-row: auto; }
   .gallery { position: static; max-width: 520px; }
   .pricing-bar__note { display: none; }
   .pricing-bar .container { gap: 12px; }
