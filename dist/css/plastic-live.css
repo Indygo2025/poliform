@@ -1,0 +1,262 @@
+/* ==========================================================================
+   ПОЛИФОРМ — слой «живая пластмасса»
+   Подключается после style.css: скользящий блик, защёлки,
+   пружинная физика деталей, 3D-сцена в герое и просмотр фото. Без зависимостей.
+   ========================================================================== */
+
+:root {
+  /* Световой указатель: JS ставит координаты курсора в процентах */
+  --px: 50%;
+  --py: 0%;
+
+  --spring: cubic-bezier(.34, 1.56, .64, 1);
+  --snap: cubic-bezier(.2, 1.35, .35, 1);
+
+  /* Геометрия штупа больше не используется — бобышки убраны */
+  --sheen-soft: radial-gradient(240px 240px at var(--px) var(--py),
+    rgba(255,255,255,.44) 0%, rgba(255,255,255,.12) 40%, rgba(255,255,255,0) 70%);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Блик: свет следует за курсором по глянцевой поверхности ---------- */
+.card, .use-card, .reason, .opening, .step, .wrap, .contact-card, .requisites { position: relative; }
+
+.card::after, .use-card::after, .reason::after, .opening::after,
+.step::after, .wrap::after, .contact-card::after, .requisites::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: var(--sheen-soft);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity .4s ease;
+}
+.card:hover::after, .use-card:hover::after, .reason:hover::after, .opening:hover::after,
+.step:hover::after, .wrap:hover::after, .contact-card:hover::after, .requisites:hover::after { opacity: 1; }
+
+/* Лотки под изделия: глянцевый слой смещается за курсором */
+.kpi::before, .shot::after, .use-fig::after, .card-figure::after, .cta::before {
+  transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(1.12);
+  transition: transform .4s var(--snap);
+}
+
+/* ---------- Углы карточек: только блик ---------- */
+/* Бобышки (штупы) убраны по просьбе: жёлтые точки на светлом пластике читались как грязь.
+   Остались блик, пружина деталей и объём в 3D-сцене. */
+
+/* Фото-слоты остаются чистыми рамками для реальных снимков */
+.photo-slot, .gallery-slot { position: relative; }
+
+/* Блок преимуществ в фактах героя */
+.hero-fact { position: relative; }
+
+/* ---------- Защёлки по краям плашки убраны ----------
+   Раньше здесь были жёлтые «палочки» 9×24px по краям выделенного слова
+   (::before слева, ::after справа). На тексте они читались как мусор, поэтому
+   псевдоэлементы отключены: плашка остаётся, а подъём при наведении — нет. */
+.sec-title em::before, .sec-title em::after,
+.hero h1 .mark::before, .hero h1 .mark::after { content: none; }
+
+/* Плашка целиком поднимается и загорается, как в заголовке героя */
+.sec-title em {
+  transition: transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s;
+}
+.sec-title em:hover {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow: 0 18px 40px rgba(16,22,26,.24), 0 0 34px rgba(255,212,0,.4),
+              inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* Правила появления защёлок удалены вместе с самими защёлками */
+
+/* ---------- Физика деталей: пружина вместо линейной анимации ---------- */
+.reason, .opening, .shot, .step, .wrap, .contact-card { transition-timing-function: var(--snap); }
+
+.btn { transition: transform .5s var(--spring), box-shadow .2s ease, background .2s, color .2s, border-color .2s; }
+.btn:active {
+  transform: translateY(3px) scale(.972);
+  box-shadow: var(--e1), inset 0 4px 10px rgba(0,0,0,.42);
+  transition-duration: .07s;
+}
+.card-specs li { transition: background .2s, transform .4s var(--snap); }
+.card:hover .card-specs li { transform: translateY(-3px); }
+.card:hover .card-specs li:nth-child(2) { transition-delay: .05s; }
+.card:hover .card-specs li:nth-child(3) { transition-delay: .1s; }
+
+/* ---------- Герой: фотография изделий ---------- */
+.hero-visual--photo { aspect-ratio: 2752 / 1536; min-height: 0; }
+/* Диагональный блик из style.css на фотографии смотрится дефектом */
+.hero-visual--photo::before { content: none; }
+.hero-visual--photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: none;
+}
+.hero-visual--photo:hover img { transform: scale(1.04); }
+
+/* Длинная жёлтая плашка в заголовке: уменьшенный кегль, чтобы встать в колонку */
+.hero h1 .mark--tight {
+  font-size: .62em;
+  padding: .16em .34em .24em;
+  border-radius: var(--r-sm);
+}
+
+
+/* ---------- Реальные фото вместо иллюстраций ---------- */
+/* Лоток под снимок: без блика, фото идёт в обрез по размеру рамки */
+.card .card-figure.photo-tray, .use-card .use-fig.photo-tray {
+  padding: 0;
+  background: #e9eef1;
+}
+.card .card-figure.photo-tray img { height: 196px; object-fit: cover; filter: none; }
+.use-card .use-fig.photo-tray img { height: 186px; object-fit: cover; filter: none; }
+.card:hover .card-figure.photo-tray img { transform: scale(1.05); filter: none; }
+.use-card:hover .use-fig.photo-tray img { transform: scale(1.05); }
+.card-figure.photo-tray::after, .use-fig.photo-tray::after { content: none; }
+
+/* Подсказка «открыть фото» */
+.photo-tray, .photo-frame { position: relative; cursor: zoom-in; }
+.photo-tray img, .photo-frame img { cursor: zoom-in; transition: transform .5s var(--snap); }
+.photo-tray::before, .photo-frame::before {
+  content: "";
+  position: absolute;
+  right: 10px; bottom: 10px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.92) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310161a' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M14 4h6v6'/%3E%3Cpath d='M20 4l-7 7'/%3E%3Cpath d='M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'/%3E%3C/svg%3E") center / 17px no-repeat;
+  box-shadow: 0 4px 10px rgba(16,22,26,.28);
+  opacity: 0;
+  transform: scale(.7);
+  transition: opacity .3s, transform .4s var(--snap);
+  pointer-events: none;
+  z-index: 4;
+}
+.photo-tray:hover::before, .photo-frame:hover::before { opacity: 1; transform: scale(1); }
+
+/* Рамка для фото внутри текстовых панелей (каталог на products.html, about.html) */
+.photo-frame {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #e9eef1;
+  box-shadow: var(--e2);
+}
+.photo-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.photo-frame::before { right: 14px; bottom: 14px; }
+
+/* ---------- Просмотр фото на весь экран ---------- */
+.pl-lb-open { overflow: hidden; }
+
+.pl-lb {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  animation: pl-lb-in .25s ease;
+}
+.pl-lb[hidden] { display: none; }
+@keyframes pl-lb-in { from { opacity: 0; } to { opacity: 1; } }
+
+.pl-lb__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(9,13,16,.93);
+  backdrop-filter: blur(6px);
+  border: 0;
+}
+
+.pl-lb__figure {
+  position: relative;
+  margin: 0;
+  max-width: min(1400px, 94vw);
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.pl-lb__img {
+  max-width: 100%;
+  max-height: 74vh;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #11171b;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.8);
+}
+.pl-lb__cap {
+  color: rgba(255,255,255,.86);
+  font-size: .92rem;
+  text-align: center;
+  max-width: 60ch;
+}
+.pl-lb__count {
+  position: relative;
+  margin: 0;
+  color: rgba(255,255,255,.55);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  letter-spacing: .08em;
+}
+.pl-lb__count:empty { display: none; }
+
+.pl-lb__btn {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 46px; height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 50%;
+  background: rgba(255,255,255,.10);
+  color: #fff;
+  cursor: pointer;
+  transition: background .2s, transform .3s var(--snap), border-color .2s;
+}
+.pl-lb__btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.pl-lb__btn:hover { background: var(--signal); border-color: var(--signal); color: #10161a; transform: scale(1.08); }
+.pl-lb__btn:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+
+.pl-lb__close { top: 18px; right: 18px; position: absolute; }
+.pl-lb__nav { top: 50%; margin-top: -23px; }
+.pl-lb__prev { left: 18px; }
+.pl-lb__next { right: 18px; }
+
+@media (max-width: 640px) {
+  .pl-lb { padding: 12px; }
+  .pl-lb__img { max-height: 68vh; }
+  .pl-lb__btn { width: 40px; height: 40px; }
+  .pl-lb__close { top: 10px; right: 10px; }
+  .pl-lb__prev { left: 8px; }
+  .pl-lb__next { right: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-lb { animation: none; }
+  .pl-lb__btn, .photo-tray img, .photo-tray::before { transition: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .card-specs li { transition: none !important; }
+}
