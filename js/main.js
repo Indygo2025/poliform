@@ -81,6 +81,7 @@
   var counters = document.querySelectorAll('[data-count]');
   function runCount(el) {
     var target = parseFloat(el.getAttribute('data-count'));
+    if (!isFinite(target)) return;
     var suffix = el.getAttribute('data-suffix') || '';
     var decimals = (String(target).split('.')[1] || '').length;
     if (reduceMotion) { el.textContent = target.toFixed(decimals) + suffix; return; }

@@ -328,6 +328,21 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-msg--err { background: rgba(214, 58, 47, .09); color: #98271f; border-color: rgba(214, 58, 47, .3); }
 .ab-msg--info { background: rgba(148, 163, 172, .14); color: var(--ab-ink-2); border-color: var(--ab-line); }
 
+/* --------------------------------- предупреждение о необработанных заявках */
+
+.ab-alert {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(214, 58, 47, .35);
+  border-radius: var(--ab-r);
+  background: linear-gradient(180deg, rgba(214, 58, 47, .10), rgba(214, 58, 47, .04));
+}
+.ab-alert__icon { display: flex; color: var(--ab-accent); }
+.ab-alert__text { flex: 1 1 260px; min-width: 0; }
+.ab-alert__text b { display: block; font-size: .98rem; }
+.ab-alert__text span { display: block; color: var(--ab-ink-2); font-size: .85rem; }
+
 .ab-toast {
   position: fixed; right: 20px; bottom: 20px; z-index: 90;
   background: #162026; color: #fff;

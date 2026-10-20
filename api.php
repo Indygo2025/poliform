@@ -24,6 +24,8 @@ header('X-Frame-Options: DENY');
 header('Referrer-Policy: same-origin');
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/lib/xlsx.php';
+require_once __DIR__ . '/inc/orders_mail.php';
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_MINUTES      = 5;
@@ -52,6 +54,13 @@ function input(): array {
 
 function clientIp(): string {
     return (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+}
+
+/** Длительность автоблокировки в минутах (настраивается админом, 1…1440). */
+function lockMinutes(): int {
+    $s = dbGetSetting(db(), 'security');
+    $m = is_array($s) ? (int)($s['lockMinutes'] ?? 0) : 0;
+    return ($m >= 1 && $m <= 1440) ? $m : LOCK_MINUTES;
 }
 
 /**
@@ -113,11 +122,18 @@ function login(array $in): array {
 
     $user = dbGetUser($db, $username);
     if (!$user || !password_verify($password, (string)$user['password_hash'])) {
-        $msg = dbFailLogin($db, $username, clientIp(), MAX_LOGIN_ATTEMPTS, LOCK_MINUTES);
+        $lockMin = lockMinutes();
+        $msg = dbFailLogin($db, $username, clientIp(), MAX_LOGIN_ATTEMPTS, $lockMin);
+        dbAudit($db, $username, 'login_fail', clientIp(), $msg !== null ? 'неудачные попытки исчерпаны' : 'неверный пароль');
+        if ($msg !== null) {
+            dbAudit($db, $username, 'lock', clientIp(), 'автоблокировка на ' . $lockMin . ' мин.');
+        }
         fail($msg ?? 'Неверный логин или пароль', 401);
     }
 
     dbClearLogin($db, $username);
+    dbTouchLastLogin($db, $username);
+    dbAudit($db, $username, 'login_ok', clientIp(), '');
     rotateSessionId();
     $_SESSION['pl_user'] = $username;
     unset($_SESSION['pl_csrf']);
@@ -125,6 +141,8 @@ function login(array $in): array {
 }
 
 function logout(): void {
+    $username = (string)($_SESSION['pl_user'] ?? '');
+    if ($username !== '') dbAudit(db(), $username, 'logout', clientIp(), '');
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $p = session_get_cookie_params();
@@ -300,7 +318,7 @@ function orderAdd(array $in): void {
         $kind = $hasOpt && $hasRet ? 'опт + розница' : ($hasOpt ? 'опт' : 'розница');
     }
 
-    $id = dbAddOrder($db, [
+    $order = [
         'name'    => mb_substr($name, 0, 120, 'UTF-8'),
         'phone'   => mb_substr($phone, 0, 40, 'UTF-8'),
         'email'   => mb_substr(trim((string)($in['email'] ?? '')), 0, 120, 'UTF-8'),
@@ -310,7 +328,15 @@ function orderAdd(array $in): void {
         'total'   => $total,
         'kind'    => $kind,
         'source'  => mb_substr(trim((string)($in['source'] ?? '')), 0, 60, 'UTF-8'),
-    ]);
+    ];
+
+    $id = dbAddOrder($db, $order);
+
+    /* Письмо о новой заявке. Ошибки SMTP уже записаны в lastStatus и журнал:
+       посетитель в любом случае получает подтверждение, заявка сохранена. */
+    $order['id']      = $id;
+    $order['created'] = date('Y-m-d H:i:s');
+    orderNoticeSend($db, $order);
 
     success(['id' => $id]);
 }
@@ -320,6 +346,22 @@ function ordersList(array $in): void {
     success([
         'orders' => dbOrders(db(), (string)($in['status'] ?? 'all')),
         'counts' => dbOrderCounts(db()),
+    ]);
+}
+
+/**
+ * Лёгкая проверка для живого уведомления в админке: нет ли новых заявок.
+ * Отдаёт счётчики и несколько последних «новых» записей.
+ */
+function ordersLatest(): void {
+    requireAuth();
+    $db = db();
+    $st = $db->prepare("SELECT id, name, phone, city, total, kind, created
+                        FROM orders WHERE status = 'new' ORDER BY id DESC LIMIT 10");
+    $st->execute();
+    success([
+        'counts' => dbOrderCounts($db),
+        'latest' => $st->fetchAll(),
     ]);
 }
 
@@ -339,6 +381,23 @@ function orderDelete(array $in): void {
     requireAdmin();
     dbDeleteOrder(db(), (int)($in['id'] ?? 0));
     success();
+}
+
+/**
+ * Кнопка «Отправить тестовое письмо»: проверяет SMTP и показывает, как будет
+ * выглядеть уведомление о заявке. Работает и при снятой галочке.
+ */
+function notifyTest(): void {
+    $user = requireAdmin();
+    $res  = orderNoticeTest(db());
+
+    if (!$res['sent']) {
+        fail($res['error'] !== '' ? $res['error'] : 'Письмо не отправлено', 500);
+    }
+
+    dbAudit(db(), (string)$user['username'], 'notify_test', clientIp(),
+        'получатель: ' . implode(', ', (array)($res['recipients'] ?? [])));
+    success(['settings' => dbAllSettings(db())]);
 }
 
 /* ----------------------------------------------------------- настройки */
@@ -367,7 +426,13 @@ function settingsSave(array $in): void {
 
 function usersList(): void {
     requireAdmin();
-    success(['users' => dbAllUsers(db()), 'attempts' => dbListLoginAttempts(db())]);
+    $sec = dbGetSetting(db(), 'security');
+    $lockMin = is_array($sec) ? (int)($sec['lockMinutes'] ?? 0) : 0;
+    success([
+        'users'       => dbAllUsers(db()),
+        'attempts'    => dbListLoginAttempts(db()),
+        'lockMinutes' => $lockMin >= 1 ? $lockMin : LOCK_MINUTES,
+    ]);
 }
 
 function userAdd(array $in): void {
@@ -387,6 +452,7 @@ function userUpdate(array $in): void {
     if (!empty($in['password'])) {
         if (strlen((string)$in['password']) < 6) fail('Пароль — минимум 6 символов');
         dbSetPassword(db(), $u, (string)$in['password']);
+        dbAudit(db(), $me['username'], 'password', clientIp(), 'смена пароля: ' . $u);
     }
     if (!empty($in['role'])) dbSetRole(db(), $u, (string)$in['role']);
     success(['users' => dbAllUsers(db())]);
@@ -401,9 +467,51 @@ function userDelete(array $in): void {
 }
 
 function userUnlock(array $in): void {
-    requireAdmin();
-    dbUnlockUser(db(), (string)($in['username'] ?? ''));
+    $me = requireAdmin();
+    $u = (string)($in['username'] ?? '');
+    dbUnlockUser(db(), $u);
+    if ($u !== '') dbAudit(db(), $me['username'], 'unlock', clientIp(), 'разблокирован: ' . $u);
     success(['attempts' => dbListLoginAttempts(db())]);
+}
+
+/** Ручная блокировка учётной записи на выбранное число минут (0 — снять). */
+function userBlock(array $in): void {
+    $me = requireAdmin();
+    $u = trim((string)($in['username'] ?? ''));
+    if ($u === '') fail('Не указан логин');
+    $min = (int)($in['minutes'] ?? 0);
+
+    if ($min <= 0) {
+        dbUnlockUser(db(), $u);
+        dbAudit(db(), $me['username'], 'unlock', clientIp(), 'разблокирован: ' . $u);
+        success(['attempts' => dbListLoginAttempts(db())]);
+    }
+    if ($min > 1440) fail('Максимум 1440 минут');
+    if (!dbGetUser(db(), $u)) fail('Пользователь не найден');
+
+    dbSetLock(db(), $u, $min, clientIp());
+    dbAudit(db(), $me['username'], 'block', clientIp(), 'заблокирован ' . $u . ' на ' . $min . ' мин.');
+    success(['attempts' => dbListLoginAttempts(db())]);
+}
+
+/** Журнал доступа: входы, выходы, неудачи, блокировки. */
+function auditList(array $in): void {
+    requireAdmin();
+    success(['entries' => dbAuditList(db(), [
+        'username' => trim((string)($in['username'] ?? '')),
+        'action'   => trim((string)($in['action'] ?? '')),
+        'limit'    => (int)($in['limit'] ?? 200),
+    ])]);
+}
+
+/** Настройка длительности автоблокировки. */
+function securitySave(array $in): void {
+    $me = requireAdmin();
+    $m = (int)($in['lockMinutes'] ?? 0);
+    if ($m < 1 || $m > 1440) fail('Длительность блокировки — от 1 до 1440 минут');
+    dbSetSetting(db(), 'security', ['lockMinutes' => $m]);
+    dbAudit(db(), $me['username'], 'security', clientIp(), 'автоблокировка ' . $m . ' мин.');
+    success(['lockMinutes' => $m]);
 }
 
 /* ---------------------------------------------------------------- фото */
@@ -534,11 +642,18 @@ function backupFull(): void {
         /* не критично — основная база всё равно попадает в архив */
     }
 
-    $zipPath = (string)tempnam(sys_get_temp_dir(), 'plzip');
-    $zip = new ZipArchive();
-    if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-        @unlink($zipPath);
-        fail('Не удалось создать архив', 500);
+    /* Если расширение zip доступно — используем ZipArchive, иначе свой архиватор. */
+    $useZip = class_exists('ZipArchive');
+    $zipPath = '';
+    $zip = null;
+    $entries = [];
+    if ($useZip) {
+        $zipPath = (string)tempnam(sys_get_temp_dir(), 'plzip');
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            @unlink($zipPath);
+            fail('Не удалось создать архив', 500);
+        }
     }
 
     $it = new RecursiveIteratorIterator(
@@ -549,7 +664,7 @@ function backupFull(): void {
     foreach ($it as $file) {
         $path = (string)$file->getPathname();
         $rel  = str_replace('\\', '/', substr($path, strlen($base) + 1));
-        if ($rel === '' || $rel === $zipPath) continue;
+        if ($rel === '' || ($zipPath !== '' && $rel === $zipPath)) continue;
 
         $skip = false;
         foreach (explode('/', $rel) as $seg) {
@@ -559,22 +674,118 @@ function backupFull(): void {
         }
         if ($skip) continue;
 
-        $zip->addFile($path, $rel);
+
+        if ($useZip) $zip->addFile($path, $rel);
+        else $entries[$rel] = (string)file_get_contents($path);
     }
 
-    $count = (int)$zip->numFiles;
-    $zip->close();
+    $fname = 'poliform-site-' . date('Ymd-His') . '.zip';
 
-    if ($count === 0 || !is_file($zipPath)) {
+    if ($useZip) {
+        $count = (int)$zip->numFiles;
+        $zip->close();
+        if ($count === 0 || !is_file($zipPath)) {
+            @unlink($zipPath);
+            fail('Не удалось собрать архив', 500);
+        }
+        header('Content-Disposition: attachment; filename="' . $fname . '"');
+        header('Content-Type: application/zip');
+        header('Content-Length: ' . (string)filesize($zipPath));
+        readfile($zipPath);
         @unlink($zipPath);
-        fail('Не удалось собрать архив', 500);
+        exit;
     }
 
-    header('Content-Disposition: attachment; filename="poliform-site-' . date('Ymd-His') . '.zip"');
+    if (!$entries) fail('Не удалось собрать архив', 500);
+    $bin = zipCreate($entries);
+    header('Content-Disposition: attachment; filename="' . $fname . '"');
     header('Content-Type: application/zip');
-    header('Content-Length: ' . (string)filesize($zipPath));
-    readfile($zipPath);
-    @unlink($zipPath);
+    header('Content-Length: ' . strlen($bin));
+    echo $bin;
+    exit;
+}
+
+/* --------------------------------------------------------------- отчёты */
+
+function orderStatusLabel(string $s): string {
+    return orderStatusName($s);
+}
+
+function orderKindLabel(string $k): string {
+    return ['opt' => 'Опт', 'retail' => 'Розница', 'mix' => 'Смешанный'][$k] ?? ($k !== '' ? $k : '—');
+}
+
+/** Собирает лист отчёта: строки (первая — заголовки) + метаданные. */
+function reportSheet(string $type, string $from = '', string $to = '', string $status = ''): array {
+    $db = db();
+
+    if ($type === 'sales') {
+        $data = dbReportSales(db(), $from, $to);
+        $rows = [['Артикул', 'Товар', 'Кол-во, шт', 'Розница, шт', 'Опт, шт', 'Сумма, ₽']];
+        $q = $qr = $qo = 0;
+        $sum = 0.0;
+        foreach ($data as $d) {
+            $rows[] = [$d['sku'], $d['title'], (int)$d['qty'], (int)$d['qtyRetail'], (int)$d['qtyOpt'], (float)$d['revenue']];
+            $q += (int)$d['qty']; $qr += (int)$d['qtyRetail']; $qo += (int)$d['qtyOpt'];
+            $sum += (float)$d['revenue'];
+        }
+        $rows[] = ['ИТОГО', '', $q, $qr, $qo, round($sum, 2)];
+        return ['name' => 'Продажи', 'file' => 'sales-' . date('Ymd') . '.xlsx', 'rows' => $rows];
+    }
+
+    if ($type === 'orders') {
+        $data = dbReportOrders($db, $from, $to, $status);
+        $rows = [['№', 'Дата', 'Клиент', 'Телефон', 'Город', 'Тип', 'Позиций', 'Сумма, ₽', 'Статус']];
+        $sum = 0.0;
+        foreach ($data as $o) {
+            $rows[] = [
+                (int)$o['id'], (string)$o['created'], (string)$o['name'], (string)$o['phone'],
+                (string)$o['city'], orderKindLabel((string)$o['kind']), count((array)$o['items']),
+                (float)$o['total'], orderStatusLabel((string)$o['status']),
+            ];
+            $sum += (float)$o['total'];
+        }
+        $rows[] = ['', '', '', '', '', '', 'ИТОГО', round($sum, 2), ''];
+        return ['name' => 'Заказы', 'file' => 'orders-' . date('Ymd') . '.xlsx', 'rows' => $rows];
+    }
+
+    $data = dbReportProducts($db);
+    $rows = [['Артикул', 'Название', 'Категория', 'Цвет', 'Цена розница, ₽', 'Цена опт, ₽', 'Наличие']];
+    foreach ($data as $p) {
+        $rows[] = [$p['sku'], $p['title'], $p['category'], $p['color'], $p['priceRetail'], $p['priceOpt'], $p['stock']];
+    }
+    return ['name' => 'Товары', 'file' => 'products-' . date('Ymd') . '.xlsx', 'rows' => $rows];
+}
+
+/** JSON-данные отчёта для предпросмотра в админке. */
+function reportData(array $in): void {
+    requireAuth();
+    $type   = (string)($in['type'] ?? 'products');
+    $from   = (string)($in['from'] ?? '');
+    $to     = (string)($in['to'] ?? '');
+    $status = (string)($in['status'] ?? '');
+    if (!in_array($type, ['products', 'sales', 'orders'], true)) $type = 'products';
+
+    $sheet = reportSheet($type, $from, $to, $status);
+    success(['name' => $sheet['name'], 'rows' => $sheet['rows']]);
+}
+
+/** Выгрузка отчёта в .xlsx обычной ссылкой (GET, без CSRF). */
+function reportExport(): void {
+    requireAuth();
+    $type   = (string)($_GET['type'] ?? 'products');
+    $from   = (string)($_GET['from'] ?? '');
+    $to     = (string)($_GET['to'] ?? '');
+    $status = (string)($_GET['status'] ?? '');
+    if (!in_array($type, ['products', 'sales', 'orders'], true)) $type = 'products';
+
+    $sheet = reportSheet($type, $from, $to, $status);
+    $bin = xlsxBuild([['name' => $sheet['name'], 'rows' => $sheet['rows']]]);
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $sheet['file'] . '"');
+    header('Content-Length: ' . strlen($bin));
+    echo $bin;
     exit;
 }
 
@@ -601,8 +812,10 @@ try {
 
         case 'order_add':    orderAdd($in); break;
         case 'orders':       ordersList($in); break;
+        case 'orders_latest': ordersLatest(); break;
         case 'order_save':   orderUpdate($in); break;
         case 'order_del':    orderDelete($in); break;
+        case 'notify_test':  notifyTest(); break;
 
         case 'settings':     settingsGet(); break;
         case 'settings_save': settingsSave($in); break;
@@ -612,9 +825,14 @@ try {
         case 'user_save':    userUpdate($in); break;
         case 'user_del':     userDelete($in); break;
         case 'user_unlock':  userUnlock($in); break;
+        case 'user_block':   userBlock($in); break;
+        case 'audit':        auditList($in); break;
+        case 'security_save': securitySave($in); break;
 
         case 'upload':       upload($in); break;
         case 'photo_del':    photoDelete($in); break;
+        case 'report_data':  reportData($in); break;
+        case 'report_export': reportExport(); break;
         case 'export':       exportJson(); break;
         case 'backup':       backupDb(); break;
         case 'backup_full':  backupFull(); break;

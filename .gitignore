@@ -22,6 +22,7 @@ node_modules/
 *.key
 secrets.json
 credentials.json
+Пароль.txt
 
 # Локальная база SQLite: пароли, контакты, заказы
 site.db
@@ -34,6 +35,9 @@ site.db.bak-*
 
 # Локальное окружение и служебные файлы
 php-server.pid
+
+# Журнал ежедневной рассылки заявок
+data/logs/
 
 # Исходные фотографии из Kartinki (43 МБ) не публикуем
 # Оптимизированные версии лежат в images/ и images/photo/

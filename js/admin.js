@@ -361,15 +361,124 @@
     $('#lg-user').focus();
   }
 
+  /* Флаг «скрыть предупреждение»: живёт до следующего входа в админку. */
+  var alertHidden = false;
+  /* Заявка, пришедшая уже во время работы в админке. */
+  var arrived = null;
+  /* Номера заявок, о которых мы уже знаем — повторно не уведомляем. */
+  var knownOrders = {};
+  var pollTimer = null;
+
+  /** Запоминает заявки, о которых уведомлять не нужно (уже видели). */
+  function markKnown(list) {
+    (list || []).forEach(function (o) { if (o && o.id) knownOrders[o.id] = true; });
+  }
+
+  /**
+   * Значок в меню и предупреждение о заявках.
+   * Если заявка пришла прямо сейчас — показываем её номер, клиента и сумму.
+   */
+  function syncOrdersUI() {
+    var n   = Number(S.counts.new || 0);
+    var wip = Number(S.counts.inwork || 0);
+    var all = Number(S.counts.all || 0);
+
+    var badge = $('[data-orders-badge]');
+    if (badge) {
+      badge.hidden = !n;
+      badge.textContent = n;
+    }
+
+    var box = $('#orders-alert');
+    if (!box) return;
+    /* Про только что пришедшую заявку сообщаем всегда, даже если предыдущее
+       предупреждение админ скрыл крестиком. */
+    if (!n || (alertHidden && !arrived)) { box.hidden = true; return; }
+
+    if (arrived) {
+      $('#orders-alert-title').textContent =
+        'Новая заявка №' + arrived.id + ' — ' + arrived.name + ' · ' + money(arrived.total);
+      $('#orders-alert-note').textContent =
+        'Пришла только что' + (arrived.city ? ', ' + arrived.city : '') + '. ' +
+        'Всего новых: ' + n + ', в работе: ' + wip + '.';
+      $('#orders-alert-go').textContent = 'Открыть заявку';
+    } else {
+      $('#orders-alert-title').textContent =
+        'Новых заявок: ' + n + ' — ' + (n === 1 ? 'её нужно обработать' : 'их нужно обработать');
+      $('#orders-alert-note').textContent =
+        'Раздел «Заявки»: в работе ' + wip + ' из ' + all + '. Раскройте строку, чтобы посмотреть состав и сменить статус.';
+      $('#orders-alert-go').textContent = 'Обработать';
+    }
+    box.hidden = false;
+  }
+
+  /** Открывает нужную вкладку заявок; с уведомления — сбрасывает «только что». */
+  function openOrdersTab(tab, resetArrived) {
+    S.orderTab = tab;
+    return api('orders', { status: tab }).then(need).then(function (j) {
+      S.orders = j.orders || [];
+      S.counts = j.counts || {};
+      markKnown(S.orders);
+      if (resetArrived) arrived = null;
+      syncOrdersUI();
+      go('orders');
+    });
+  }
+
+  function bindOrdersAlert() {
+    var goBtn = $('#orders-alert-go');
+    var hide  = $('#orders-alert-hide');
+
+    if (goBtn) goBtn.addEventListener('click', function () {
+      openOrdersTab('new', true).catch(function () { /* ошибка уже показана */ });
+    });
+
+    if (hide) hide.addEventListener('click', function () {
+      alertHidden = true;
+      arrived = null;
+      syncOrdersUI();
+    });
+  }
+
+  /**
+   * Проверяет новые заявки, пока админка открыта: раз в минуту и при возврате
+   * на вкладку браузера. Первый опрос только запоминает уже существующие.
+   */
+  function pollNewOrders(first) {
+    if (!S.user) return Promise.resolve();
+    return api('orders_latest').then(function (j) {
+      if (!j || j.ok !== true) return;
+      S.counts = j.counts || S.counts;
+
+      var list = j.latest || [];
+      var fresh = list.filter(function (o) { return o && !knownOrders[o.id]; });
+      markKnown(list);
+
+      if (!first && fresh.length) {
+        arrived = fresh[0];
+        alertHidden = false;
+        toast('Новая заявка №' + arrived.id + ' — ' + arrived.name + ' · ' + money(arrived.total));
+      }
+      syncOrdersUI();
+    }).catch(function () { /* тихо: следующий опрос попробует снова */ });
+  }
+
+  function startPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(function () { pollNewOrders(false); }, 60000);
+  }
+
   function showApp() {
     $('#login').hidden = true;
     $('#app').hidden = false;
     $$('#nav [data-admin-only]').forEach(function (b) { b.hidden = S.user.role !== 'admin'; });
     $('#who').textContent = S.user.username + ' · ' + (S.user.role === 'admin' ? 'админ' : 'оператор');
-    var badge = $('[data-orders-badge]');
-    var n = S.counts.new || 0;
-    badge.hidden = !n;
-    badge.textContent = n;
+    alertHidden = false;
+    arrived = null;
+    markKnown(S.orders);
+    syncOrdersUI();
+    pollNewOrders(true);
+    startPolling();
     var def = S.user.role === 'admin' ? 'products' : 'orders';
     go(S.view || def);
   }
@@ -446,15 +555,17 @@
   var TITLES = {
     products: ['Каталог', 'Товары, цены, фото и порядок вывода'],
     orders: ['Заявки', 'Обращения с сайта: опт, розница, уточнение наличия'],
+    reports: ['Отчёты', 'Выгрузка в Excel: товары, продажи, заказы'],
     categories: ['Категории и цвета', 'Справочники каталога'],
     texts: ['Тексты сайта', 'Главная, подвал и тексты страниц'],
     contacts: ['Контакты и SEO', 'Реквизиты, способы связи, метаданные'],
     users: ['Пользователи', 'Учётные записи администраторов и операторов'],
+    audit: ['Журнал доступа', 'Входы, выходы и блокировки учётных записей'],
     service: ['Резервная копия', 'Выгрузка базы и каталога']
   };
 
   function go(view) {
-    if (view === 'users' && S.user.role !== 'admin') return;
+    if ((view === 'users' || view === 'audit') && S.user.role !== 'admin') return;
     S.view = view;
     $$('#nav button').forEach(function (b) { b.classList.toggle('is-active', b.dataset.view === view); });
     S.edit = null;
@@ -466,7 +577,8 @@
     $('#view').innerHTML = '';
     ({
       products: viewProducts, orders: viewOrders, categories: viewCategories,
-      texts: viewTexts, contacts: viewContacts, users: viewUsers, service: viewService
+      texts: viewTexts, contacts: viewContacts, users: viewUsers, audit: viewAudit,
+      reports: viewReports, service: viewService
     }[view] || function () { })();
   }
 
@@ -478,6 +590,11 @@
     add.type = 'button';
     add.addEventListener('click', function () { editor(null); });
     actions.appendChild(add);
+
+    var exp = el('a', 'ab-btn', 'Отчёт по товарам (.xlsx)');
+    exp.href = API + '?action=report_export&type=products';
+    exp.title = 'Выгрузить каталог в Excel';
+    actions.appendChild(exp);
 
     var panel = el('div', 'ab-panel');
     var body = el('div', 'ab-panel__body ab-panel__body--flush');
@@ -656,6 +773,11 @@
         ? p.color + (cok ? ' · ' + chex : ' · HEX не задан')
         : 'Цвет не указан';
       cl.appendChild(cdot);
+      /* Видно с первого взгляда, что карточка связана с другими расцветками */
+      if (String(p.colorGroup || '').trim()) {
+        cdot.title += ' · группа расцветок: ' + p.colorGroup;
+        cl.appendChild(el('div', 'ab-muted', 'связан по цвету'));
+      }
       tr.appendChild(cl);
 
       tr.appendChild(el('td', 'ab-mono', money(p.priceRetail)));
@@ -798,17 +920,21 @@ td.colSpan = COLS.length;
   }
 
   /* ---------- редактор товара ---------- */
-  function editor(sku) {
+  /* prefill — заготовка новой карточки (используется кнопкой «сделать такую же
+     в другом цвете»): те же поля, но новый артикул и пустой цвет. */
+  function editor(sku, prefill) {
     S.edit = sku;
     S.dirty = false;
     var p = sku ? bySku(sku) : null;
     if (sku && !p) { toast('Товар не найден', true); return; }
 
+    if (!p && prefill) p = JSON.parse(JSON.stringify(prefill));
+
     if (!p) {
       p = {
         sku: S.nextSku || '', title: '', shortTitle: '', categoryId: (S.categories[0] || {}).id || '',
         art: '', form: 'Прямоугольная', sizeL: 0, sizeW: 0, sizeH: 0, gridGap: 0,
-        color: '', colorHex: '', packCount: 1, packNote: '', weightG: 0,
+        color: '', colorHex: '', colorGroup: '', packCount: 1, packNote: '', weightG: 0,
         priceRetail: 0, priceOpt: 0, volumeMl: 0, material: 'Пластик',
         country: 'Россия', cert: 'Не подлежит сертификации', description: '',
         features: [], images: [], inStock: true, stockNote: '', sima: '', pos: 0
@@ -1018,6 +1144,157 @@ td.colSpan = COLS.length;
     g4.appendChild(field('Вес брутто, г', 'weightG', draft.weightG, { type: 'number', step: '1' }));
     mBody.appendChild(g4);
 
+    /* Связка расцветок: одинаковое значение группы у нескольких карточек
+       означает «тот же товар в другом цвете». На витрине они связываются
+       блоком «Цвет» с фотографиями расцветок. */
+    mBody.appendChild(subHead('Связка расцветок — блок «Цвет» на карточке'));
+
+    var groups = [];
+    S.products.forEach(function (x) {
+      var g = String(x.colorGroup || '').trim();
+      if (g && groups.indexOf(g) < 0) groups.push(g);
+    });
+    var grpWrap = field('Группа цветов', 'colorGroup', draft.colorGroup, {
+      placeholder: 'например: lotok-36x26-s-setka'
+    });
+    var grpInput = grpWrap.querySelector('input');
+    var grpList = el('datalist');
+    var grpListId = 'groups-' + Math.random().toString(36).slice(2, 8);
+    grpList.id = grpListId;
+    groups.forEach(function (g) {
+      var o = el('option');
+      o.value = g;
+      grpList.appendChild(o);
+    });
+    grpInput.setAttribute('list', grpListId);
+    grpWrap.appendChild(grpList);
+    mBody.appendChild(grpWrap);
+
+    var grpHint = el('p', 'ab-hint');
+    function drawGroupHint() {
+      var g = String(draft.colorGroup || '').trim();
+      grpHint.innerHTML = '';
+      if (!g) {
+        grpHint.appendChild(document.createTextNode(
+          'Пусто — на карточке не будет блока «Цвет». Одинаковое значение (например, '
+          + '«lotok-36x26-s-setka») связывает эту карточку с другими расцветками того же товара.'));
+        return;
+      }
+      var sib = S.products.filter(function (x) {
+        return String(x.colorGroup || '').trim().toLowerCase() === g.toLowerCase() && x.sku !== draft.sku;
+      });
+      if (!sib.length) {
+        grpHint.appendChild(document.createTextNode(
+          'В группе «' + g + '» пока только эта карточка. Укажите такое же значение у других '
+          + 'расцветок — они появятся здесь и свяжутся на витрине.'));
+        return;
+      }
+      grpHint.appendChild(document.createTextNode('Связано (' + sib.length + '): '));
+      sib.forEach(function (x, i) {
+        if (i) grpHint.appendChild(document.createTextNode(', '));
+        var a = el('a', null, x.sku + (x.color ? ' · ' + x.color : ''));
+        a.href = '#';
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (S.dirty && !confirm('Есть несохранённые изменения. Перейти к другому товару?')) return;
+          editor(x.sku);
+        });
+        grpHint.appendChild(a);
+      });
+    }
+    drawGroupHint();
+    grpInput.addEventListener('input', function () {
+      draft.colorGroup = grpInput.value;
+      drawGroupHint();
+    });
+    mBody.appendChild(grpHint);
+
+    /* Быстрая связка: выбираем второй товар, группа подставляется обоим. */
+    var linkWrap = el('div', 'ab-field');
+    linkWrap.appendChild(el('label', null, 'Связать с другим товаром'));
+    var linkRow = el('div', 'ab-row');
+    var linkSel = el('select');
+    var linkNone = el('option', null, '— выберите товар —');
+    linkNone.value = '';
+    linkSel.appendChild(linkNone);
+    S.products.forEach(function (x) {
+      if (x.sku === draft.sku) return;
+      var o = el('option', null,
+        x.sku + ' · ' + (x.shortTitle || x.title) + (x.color ? ' · ' + x.color : ''));
+      o.value = x.sku;
+      linkSel.appendChild(o);
+    });
+    var linkBtn = el('button', 'ab-btn ab-btn--sm', 'Связать по цвету');
+    linkBtn.type = 'button';
+    linkBtn.addEventListener('click', function () {
+      var mate = bySku(linkSel.value);
+      if (!mate) { toast('Выберите товар из списка', true); return; }
+      var oldG = String(draft.colorGroup || '').trim();
+      var g = oldG || String(mate.colorGroup || '').trim() || String(mate.sku);
+      draft.colorGroup = g;
+      grpInput.value = g;
+      var copy = JSON.parse(JSON.stringify(mate));
+      copy.colorGroup = g;
+      linkBtn.disabled = true;
+      /* Сначала сохраняем текущую карточку (она получит группу), затем парную. */
+      saveDraft(true)
+        .then(function () { return api('product_save', { product: copy }); })
+        .then(function () { return loadAll(); })
+        .then(function () {
+          toast('«' + (draft.shortTitle || draft.sku) + '» и «' + (copy.shortTitle || copy.sku) + '» связаны по цвету');
+          editor(draft.sku);
+        })
+        .catch(function (e) {
+          /* Сохранение не прошло — возвращаем поле как было, чтобы не показывать
+             несделку. */
+          linkBtn.disabled = false;
+          draft.colorGroup = oldG;
+          grpInput.value = oldG;
+          msgBox(errBox, e.message, 'err');
+        });
+    });
+    linkRow.appendChild(linkSel);
+    linkRow.appendChild(linkBtn);
+    linkWrap.appendChild(linkRow);
+    mBody.appendChild(linkWrap);
+    mBody.appendChild(el('p', 'ab-hint',
+      'Выберите товар — он и текущая карточка получат общую группу цветов. На витрине появится ' +
+      'блок «Цвет» с фотографиями расцветок, и покупатель сможет переключаться между ними. ' +
+      'Связать можно любое число расцветок: повторите для каждой.'));
+
+    /* Новая расцветка в два клика: карточка копируется и сразу связывается с этой. */
+    var dupWrap = el('div', 'ab-field');
+    var dupBtn = el('button', 'ab-btn ab-btn--sm', 'Сделать такую же в другом цвете');
+    dupBtn.type = 'button';
+    dupBtn.addEventListener('click', function () {
+      var oldG = String(draft.colorGroup || '').trim();
+      var g = oldG || String(draft.sku || '').trim();
+      if (!confirm('Создать ещё одну карточку этого же товара в другом цвете?\n\n' +
+        'Текущая карточка сохранится и получит группу «' + g + '». Новая откроется с тем же ' +
+        'названием, характеристиками, ценами и фото — останется выбрать цвет, поправить название ' +
+        'и заменить фотографии на снимки новой расцветки.')) return;
+      draft.colorGroup = g;
+      grpInput.value = g;
+      dupBtn.disabled = true;
+      saveDraft(true).then(function () {
+        var copy = JSON.parse(JSON.stringify(draft));
+        copy.sku = S.nextSku || '';
+        copy.color = '';
+        copy.colorHex = '';
+        copy.colorGroup = g;
+        copy.onHome = 0;
+        editor(null, copy);
+        toast('Новая карточка ' + copy.sku + ': выберите цвет и замените фото');
+      }).catch(function (e) {
+        dupBtn.disabled = false;
+        draft.colorGroup = oldG;
+        grpInput.value = oldG;
+        msgBox(errBox, e.message, 'err');
+      });
+    });
+    dupWrap.appendChild(dupBtn);
+    mBody.appendChild(dupWrap);
+
     var g5 = grid(3);
     g5.appendChild(field('Форма', 'form', draft.form));
     g5.appendChild(field('Конструкция', 'art', draft.art, { placeholder: 'Сетка' }));
@@ -1097,26 +1374,37 @@ td.colSpan = COLS.length;
     main.addEventListener('input', collect);
     main.addEventListener('change', collect);
 
+    /* Сохранение вынесено в функцию: тем же кодом пользуется кнопка
+       «Связать по цвету» и окно предпросмотра. */
+    function saveDraft(quiet) {
+      var bad = '';
+      if (!String(draft.sku || '').trim()) bad = 'Укажите артикул';
+      else if (!String(draft.shortTitle || '').trim()) bad = 'Укажите название для каталога';
+      else if (!(draft.priceOpt > 0) || !(draft.priceRetail > 0)) bad = 'Укажите обе цены';
+      /* Опт не может быть дороже розницы; равенство допускаем — у части позиций
+         скидки нет, и раньше такие карточки вообще нельзя было сохранить. */
+      else if (draft.priceOpt > draft.priceRetail) bad = 'Оптовая цена не может быть выше розничной';
+      else if (!(draft.packCount >= 1)) bad = 'Фасовка в боксе — минимум 1 шт.';
+      if (bad) return Promise.reject(new Error(bad));
+
+      msgBox(errBox, 'Сохраняем…', 'info');
+      return api('product_save', { product: draft }).then(need).then(function () {
+        S.dirty = false;
+        msgBox(errBox, 'Сохранено. Витрина обновится при следующей загрузке страницы.', 'ok');
+        if (!quiet) toast('Товар сохранён');
+        return loadAll();
+      });
+    }
+
     var acts = el('div', 'ab-sticky-actions');
     var save = el('button', 'ab-btn ab-btn--primary', 'Сохранить');
     save.type = 'button';
     save.addEventListener('click', function () {
-      if (!String(draft.sku || '').trim()) { msgBox(errBox, 'Укажите артикул', 'err'); return; }
-      if (!String(draft.shortTitle || '').trim()) { msgBox(errBox, 'Укажите название для каталога', 'err'); return; }
-      if (!(draft.priceOpt > 0) || !(draft.priceRetail > 0)) { msgBox(errBox, 'Укажите обе цены', 'err'); return; }
-      if (draft.priceOpt >= draft.priceRetail) { msgBox(errBox, 'Оптовая цена должна быть ниже розничной', 'err'); return; }
-      if (!(draft.packCount >= 1)) { msgBox(errBox, 'Фасовка в боксе — минимум 1 шт.', 'err'); return; }
-      msgBox(errBox, 'Сохраняем…', 'info');
       save.disabled = true;
-      api('product_save', { product: draft }).then(need).then(function () {
-        S.dirty = false;
-        msgBox(errBox, 'Сохранено. Витрина обновится при следующей загрузке страницы.', 'ok');
-        toast('Товар сохранён');
-        save.disabled = false;
-        return loadAll();
-      }).catch(function (e) {
-        save.disabled = false;
+      saveDraft(false).catch(function (e) {
         msgBox(errBox, e.message, 'err');
+      }).then(function () {
+        save.disabled = false;
       });
     });
     acts.appendChild(save);
@@ -1166,14 +1454,7 @@ td.colSpan = COLS.length;
     var refresh = el('button', 'ab-btn', 'Обновить');
     refresh.type = 'button';
     refresh.addEventListener('click', function () {
-      api('orders', { status: S.orderTab }).then(need).then(function (j) {
-        S.orders = j.orders || [];
-        S.counts = j.counts || {};
-        var b = $('[data-orders-badge]');
-        b.hidden = !S.counts.new;
-        b.textContent = S.counts.new;
-        go('orders');
-      });
+      openOrdersTab(S.orderTab, false);
     });
     actions.appendChild(refresh);
 
@@ -1186,12 +1467,7 @@ td.colSpan = COLS.length;
       var b = el('button', (S.orderTab === t.key ? 'is-active' : ''), t.label + ' · ' + n);
       b.type = 'button';
       b.addEventListener('click', function () {
-        S.orderTab = t.key;
-        api('orders', { status: t.key }).then(need).then(function (j) {
-          S.orders = j.orders || [];
-          S.counts = j.counts || {};
-          go('orders');
-        });
+        openOrdersTab(t.key, false);
       });
       tabs.appendChild(b);
     });
@@ -1259,11 +1535,7 @@ td.colSpan = COLS.length;
       if (!confirm('Удалить заявку #' + o.id + '?')) return;
       api('order_del', { id: o.id }).then(need).then(function () {
         toast('Заявка удалена');
-        return api('orders', { status: S.orderTab }).then(need).then(function (j) {
-          S.orders = j.orders || [];
-          S.counts = j.counts || {};
-          go('orders');
-        });
+        return openOrdersTab(S.orderTab, false);
       });
     });
     act.appendChild(del);
@@ -1317,11 +1589,7 @@ td.colSpan = COLS.length;
       sv.disabled = true;
       api('order_save', { id: o.id, status: sel.value, note: note.value }).then(need).then(function () {
         toast('Заявка #' + o.id + ' обновлена');
-        return api('orders', { status: S.orderTab }).then(need).then(function (j) {
-          S.orders = j.orders || [];
-          S.counts = j.counts || {};
-          go('orders');
-        });
+        return openOrdersTab(S.orderTab, false);
       });
     });
     form.appendChild(sel);
@@ -1754,7 +2022,7 @@ td.colSpan = COLS.length;
         var k = n.dataset.key;
         var g = GROUP[k] || 'contacts';
         byGroup[g] = byGroup[g] || {};
-        byGroup[g][k] = n.value;
+        byGroup[g][k] = n.type === 'checkbox' ? (n.checked ? '1' : '0') : n.value;
       });
       api('settings_save', { settings: byGroup }).then(need).then(function (j) {
         S.settings = j.settings;
@@ -1766,6 +2034,145 @@ td.colSpan = COLS.length;
 
     panel.appendChild(body);
     $('#view').appendChild(panel);
+
+    /* Уведомления меняют настройки сайта — раздел только для админа. */
+    if (S.user.role === 'admin') $('#view').appendChild(mailPanel());
+  }
+
+  /* ================================================================ уведомления о заявках */
+
+  function mailPanel() {
+    var m = S.settings.mail || {};
+
+    var panel = el('div', 'ab-panel');
+    panel.appendChild(panelHead('Уведомления о новых заявках',
+      'Письмо уходит сразу после оформления заявки на сайте'));
+    var body = el('div', 'ab-panel__body');
+
+    body.appendChild(el('p', 'ab-muted',
+      'Посетитель оформил заявку — на указанный ящик сразу приходит письмо: номер, клиент, ' +
+      'телефон, состав заказа и комментарий. Достаточно указать получателя и способ отправки.'));
+
+    var g1 = grid(2);
+    g1.appendChild(field('E-mail получателя', 'notifyEmail', m.notifyEmail, { placeholder: 'zakaz@poliform.ru' }));
+    g1.appendChild(field('Адрес отправителя', 'fromEmail', m.fromEmail, { placeholder: 'site@poliform.ru' }));
+    body.appendChild(g1);
+    body.appendChild(el('p', 'ab-hint',
+      'Получателей можно указать несколько через запятую. Если поле пустое, письмо уйдёт на ' +
+      'общий e-mail из блока «Контакты, реквизиты и SEO» выше.'));
+
+    var g2 = grid(2);
+    g2.appendChild(field('Имя отправителя', 'fromName', m.fromName, { placeholder: 'ПОЛИФОРМ' }));
+    g2.appendChild(field('Ссылка на админку в письме', 'adminUrl', m.adminUrl, { placeholder: 'https://poliform.ru/admin.php' }));
+    body.appendChild(g2);
+
+    body.appendChild(subHead('Способ отправки'));
+    var g0 = grid(2);
+    g0.appendChild(field('Отправлять письма', 'transport', m.transport, {
+      type: 'select',
+      options: [
+        { value: 'php',  label: 'Средствами сайта — без пароля и ящика' },
+        { value: 'smtp', label: 'Через почтовый сервер (SMTP) — надёжнее' }
+      ]
+    }));
+    body.appendChild(g0);
+    body.appendChild(el('p', 'ab-hint',
+      '«Средствами сайта» — письмо отправляет сам сервер, настройки SMTP ниже не нужны ' +
+      '(на хостинге обычно работает сразу, но с чужого адреса письма чаще попадают в спам). ' +
+      '«Через SMTP» — надёжнее, нужны логин и пароль приложения.'));
+
+    body.appendChild(subHead('Почтовый сервер (только для способа «через SMTP»)'));
+    var g3 = grid(3);
+    g3.appendChild(field('SMTP-хост', 'smtpHost', m.smtpHost, { placeholder: 'smtp.yandex.ru' }));
+    g3.appendChild(field('Порт', 'smtpPort', m.smtpPort, { placeholder: '587' }));
+    g3.appendChild(field('Шифрование', 'smtpSecure', m.smtpSecure, {
+      type: 'select',
+      options: [
+        { value: 'tls', label: 'STARTTLS — порт 587' },
+        { value: 'ssl', label: 'SSL — порт 465' },
+        { value: '', label: 'без шифрования' }
+      ]
+    }));
+    body.appendChild(g3);
+
+    var g4 = grid(2);
+    g4.appendChild(field('Логин SMTP', 'smtpUser', m.smtpUser, { placeholder: 'site@poliform.ru' }));
+    g4.appendChild(field('Пароль SMTP', 'smtpPass', m.smtpPass, { type: 'password' }));
+    body.appendChild(g4);
+    body.appendChild(el('p', 'ab-hint',
+      'Для Яндекс.Почты, Mail.ru и Gmail нужен пароль приложения, а не пароль от ящика; ' +
+      'эти поля нужны только для способа «через SMTP». Пароль хранится в site.db открытым ' +
+      'текстом — как и остальные настройки сайта, доступ к базе должен быть закрыт.'));
+
+    body.appendChild(subHead('Отправка'));
+    var flags = el('div', 'ab-row');
+    flags.style.marginBottom = '14px';
+    flags.appendChild(checkbox('Отправлять письмо о каждой новой заявке', 'enabled', String(m.enabled) === '1'));
+    body.appendChild(flags);
+
+    var state = el('div', 'ab-msg ab-msg--info');
+    body.appendChild(state);
+
+    var acts = el('div', 'ab-row');
+    var save = el('button', 'ab-btn ab-btn--primary', 'Сохранить настройки уведомлений');
+    save.type = 'button';
+    var send = el('button', 'ab-btn', 'Отправить тестовое письмо');
+    send.type = 'button';
+    acts.appendChild(save);
+    acts.appendChild(send);
+    body.appendChild(acts);
+
+    /* ---------- подсказка ---------- */
+    body.appendChild(el('p', 'ab-hint',
+      'Если почтовый сервер не отвечает, заявка всё равно сохранится: посетитель увидит ' +
+      'подтверждение, а ошибка попадёт в строку состояния выше и в журнал data/logs/orders-mail.log.'));
+
+    /* ---------- поведение ---------- */
+    function paint() {
+      var c = S.settings.mail || {};
+      var last = c.lastSent ? when(c.lastSent) : 'ещё не отправлялись';
+      state.textContent = 'Последнее письмо: ' + last + '. ' + (c.lastStatus || '');
+      state.className = 'ab-msg ab-msg--' + (/Ошибка/i.test(String(c.lastStatus || '')) ? 'err' : 'info');
+    }
+
+    function collect() {
+      var out = {};
+      $$('[data-key]', body).forEach(function (n) {
+        out[n.dataset.key] = n.type === 'checkbox' ? (n.checked ? '1' : '0') : n.value;
+      });
+      return out;
+    }
+
+    save.addEventListener('click', function () {
+      save.disabled = true;
+      api('settings_save', { settings: { mail: collect() } }).then(need).then(function (j) {
+        S.settings = j.settings;
+        toast('Настройки уведомлений сохранены');
+        paint();
+      }).catch(function () {
+        /* текст ошибки уже показан в toast */
+      }).then(function () { save.disabled = false; });
+    });
+
+    send.addEventListener('click', function () {
+      send.disabled = true;
+      api('notify_test').then(need).then(function (j) {
+        if (j.settings) S.settings = j.settings;
+        toast('Тестовое письмо отправлено');
+      }).catch(function () {
+        /* текст ошибки уже показан в toast */
+      }).then(function () {
+        return api('settings').catch(function () { return null; });
+      }).then(function (j) {
+        if (j && j.ok && j.settings) S.settings = j.settings;
+        paint();
+        send.disabled = false;
+      });
+    });
+
+    panel.appendChild(body);
+    paint();
+    return panel;
   }
 
   /* ================================================================ пользователи */
@@ -1776,7 +2183,30 @@ td.colSpan = COLS.length;
     var body = el('div', 'ab-panel__body');
     var users = [];
 
+    var sec = el('div', 'ab-row');
+    sec.style.margin = '0 0 16px';
+    var secLbl = el('span', 'ab-muted', 'Автоблокировка после 5 неудачных входов — минут:');
+    var secIn = el('input');
+    secIn.type = 'number';
+    secIn.min = '1';
+    secIn.max = '1440';
+    secIn.value = String(S.lockMinutes || 5);
+    secIn.style.maxWidth = '90px';
+    var secSv = el('button', 'ab-btn ab-btn--sm ab-btn--primary', 'Сохранить');
+    secSv.type = 'button';
+    secSv.addEventListener('click', function () {
+      var m = parseInt(secIn.value, 10) || 0;
+      api('security_save', { lockMinutes: m }).then(need).then(function (j) {
+        S.lockMinutes = j.lockMinutes;
+        toast('Длительность блокировки сохранена');
+      });
+    });
+    sec.appendChild(secLbl);
+    sec.appendChild(secIn);
+    sec.appendChild(secSv);
+
     var list = el('div');
+    body.appendChild(sec);
     body.appendChild(list);
 
     function draw() {
@@ -1824,9 +2254,31 @@ td.colSpan = COLS.length;
             });
           });
           row.appendChild(del);
+
+          var bmin = el('input');
+          bmin.type = 'number';
+          bmin.min = '1';
+          bmin.step = '1';
+          bmin.value = String(S.lockMinutes || 5);
+          bmin.title = 'Минут блокировки';
+          bmin.style.maxWidth = '70px';
+          var bbtn = el('button', 'ab-btn ab-btn--sm', 'Блок');
+          bbtn.type = 'button';
+          bbtn.title = 'Заблокировать на указанное число минут';
+          bbtn.addEventListener('click', function () {
+            var m = parseInt(bmin.value, 10) || 0;
+            if (m < 1) { toast('Укажите минуты'); return; }
+            api('user_block', { username: u.username, minutes: m }).then(need).then(function (j) {
+              S.attempts = j.attempts;
+              toast('Заблокирован на ' + m + ' мин.');
+              loadUsers();
+            });
+          });
+          row.appendChild(bmin);
+          row.appendChild(bbtn);
         }
         list.appendChild(row);
-        var meta = el('div', 'ab-muted ab-mono', 'создан ' + when(u.created) + ' · последний вход ' + (u.lastLogin ? when(u.lastLogin) : '—'));
+        var meta = el('div', 'ab-muted ab-mono', 'создан ' + when(u.created) + ' · последний вход ' + (u.last_login ? when(u.last_login) : '—'));
         meta.style.cssText = 'margin:-6px 0 10px 0';
         list.appendChild(meta);
       });
@@ -1893,11 +2345,276 @@ td.colSpan = COLS.length;
       return api('users').then(need).then(function (j) {
         users = j.users;
         S.attempts = j.attempts;
+        if (typeof j.lockMinutes === 'number') { S.lockMinutes = j.lockMinutes; secIn.value = String(j.lockMinutes); }
         draw();
       });
     }
     loadUsers();
     panel.appendChild(body);
+    $('#view').appendChild(panel);
+  }
+
+  /* ================================================================ журнал */
+
+  var AUDIT_LABELS = {
+    login_ok:   ['Вход', 'ab-tag ab-tag--done'],
+    logout:     ['Выход', 'ab-tag ab-tag--off'],
+    login_fail: ['Неудачный вход', 'ab-tag ab-tag--new'],
+    lock:       ['Блокировка', 'ab-tag ab-tag--inwork'],
+    block:      ['Ручная блокировка', 'ab-tag ab-tag--inwork'],
+    unlock:     ['Разблокировка', 'ab-tag ab-tag--done'],
+    password:   ['Смена пароля', 'ab-tag ab-tag--off'],
+    security:   ['Настройки доступа', 'ab-tag ab-tag--off']
+  };
+
+  function viewAudit() {
+    var panel = el('div', 'ab-panel');
+    panel.appendChild(panelHead('Журнал доступа', 'Входы, выходы, неудачные попытки и блокировки учётных записей'));
+    var body = el('div', 'ab-panel__body');
+
+    var fUser = el('input');
+    fUser.placeholder = 'логин';
+    fUser.style.maxWidth = '160px';
+    var fAct = el('select');
+    fAct.style.width = 'auto';
+    var all = el('option', null, 'все события');
+    all.value = '';
+    fAct.appendChild(all);
+    Object.keys(AUDIT_LABELS).forEach(function (k) {
+      var o = el('option', null, AUDIT_LABELS[k][0]);
+      o.value = k;
+      fAct.appendChild(o);
+    });
+    var fGo = el('button', 'ab-btn ab-btn--sm ab-btn--primary', 'Показать');
+    fGo.type = 'button';
+    var fRe = el('button', 'ab-btn ab-btn--sm', 'Обновить');
+    fRe.type = 'button';
+
+    var filters = el('div', 'ab-row');
+    filters.style.margin = '0 0 14px';
+    filters.appendChild(fUser);
+    filters.appendChild(fAct);
+    filters.appendChild(fGo);
+    filters.appendChild(fRe);
+    body.appendChild(filters);
+
+    var box = el('div');
+    body.appendChild(box);
+
+    function load() {
+      return api('audit', { username: fUser.value.trim(), action: fAct.value, limit: 300 }).then(need).then(function (j) {
+        box.innerHTML = '';
+        var rows = j.entries || [];
+        if (!rows.length) {
+          box.appendChild(el('p', 'ab-muted', 'Записей нет.'));
+          return;
+        }
+        var t = el('table', 'ab-table');
+        var tr = el('tr');
+        ['Время', 'Пользователь', 'Событие', 'IP', 'Детали'].forEach(function (h) { tr.appendChild(el('th', null, h)); });
+        var thead = el('thead');
+        thead.appendChild(tr);
+        t.appendChild(thead);
+        var tb = el('tbody');
+        rows.forEach(function (e) {
+          var r = el('tr');
+          r.appendChild(el('td', 'ab-muted ab-mono', when(e.ts)));
+          r.appendChild(el('td', 'ab-mono', e.username || '—'));
+          var lab = AUDIT_LABELS[e.action] || [e.action, ''];
+          r.appendChild(el('td', lab[1] ? lab[1] : null, lab[0]));
+          r.appendChild(el('td', 'ab-mono ab-muted', e.ip || '—'));
+          r.appendChild(el('td', 'ab-muted', e.details || '—'));
+          tb.appendChild(r);
+        });
+        t.appendChild(tb);
+        box.appendChild(t);
+      });
+    }
+    fGo.addEventListener('click', load);
+    fRe.addEventListener('click', load);
+    load();
+
+    panel.appendChild(body);
+    $('#view').appendChild(panel);
+  }
+
+  /* ================================================================ отчёты */
+
+  function reportDate(d) {
+    var p = function (x) { return x < 10 ? '0' + x : '' + x; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+
+  function reportPreset(kind) {
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    if (kind === 'month')   return [reportDate(new Date(y, m, 1)), reportDate(now)];
+    if (kind === 'prev')    return [reportDate(new Date(y, m - 1, 1)), reportDate(new Date(y, m, 0))];
+    if (kind === 'quarter') { var q = Math.floor(m / 3) * 3; return [reportDate(new Date(y, q, 1)), reportDate(now)]; }
+    if (kind === 'year')    return [reportDate(new Date(y, 0, 1)), reportDate(now)];
+    return ['', ''];
+  }
+
+  function reportRender(host, rows) {
+    host.innerHTML = '';
+    if (!rows || rows.length < 2) {
+      host.appendChild(el('p', 'ab-muted', 'Нет данных за выбранный период.'));
+      return;
+    }
+    var head = rows[0];
+    var isMoney = head.map(function (h) { return /₽/.test(String(h)); });
+    var t = el('table', 'ab-table');
+    var thead = el('thead'), tr = el('tr');
+    head.forEach(function (h) { tr.appendChild(el('th', null, h)); });
+    thead.appendChild(tr);
+    t.appendChild(thead);
+    var tb = el('tbody');
+    rows.slice(1).forEach(function (row) {
+      var r = el('tr');
+      var total = row.some(function (v) { return String(v) === 'ИТОГО'; });
+      row.forEach(function (v, i) {
+        var isNum = typeof v === 'number';
+        var text = isNum && isMoney[i] ? money(v) : (v == null ? '' : String(v));
+        r.appendChild(el('td', (isNum || isMoney[i]) ? 'ab-mono' : null, text));
+      });
+      if (total) r.className = 'ab-total';
+      tb.appendChild(r);
+    });
+    t.appendChild(tb);
+    host.appendChild(t);
+  }
+
+  function viewReports() {
+    var panel = el('div', 'ab-panel');
+    panel.appendChild(panelHead('Отчёты', 'Файлы .xlsx открываются в Excel, LibreOffice и Google Таблицах'));
+
+    function inp(w) { return $('input,select,textarea', w); }
+
+    function downloadHref(type, params) {
+      var q = '?action=report_export&type=' + encodeURIComponent(type);
+      if (params) for (var k in params) if (params[k]) q += '&' + k + '=' + encodeURIComponent(params[k]);
+      return API + q;
+    }
+
+    function loadReport(type, params, host, btn) {
+      btn.disabled = true;
+      return api('report_data', Object.assign({ type: type }, params || {}))
+        .then(need)
+        .then(function (j) { reportRender(host, j.rows || []); })
+        .catch(function () {
+          host.innerHTML = '';
+          host.appendChild(el('p', 'ab-muted', 'Не удалось построить отчёт.'));
+        })
+        .then(function () { btn.disabled = false; });
+    }
+
+    function presets(apply) {
+      var row = el('div', 'ab-row');
+      [['month', 'Этот месяц'], ['prev', 'Прошлый месяц'], ['quarter', 'Квартал'],
+       ['year', 'Год'], ['all', 'Всё время']].forEach(function (p) {
+        var b = el('button', 'ab-btn ab-btn--sm', p[1]);
+        b.type = 'button';
+        b.addEventListener('click', function () { apply(p[0]); });
+        row.appendChild(b);
+      });
+      return row;
+    }
+
+    /* --- товары --- */
+    var b1 = el('div', 'ab-panel__body');
+    b1.appendChild(el('h3', null, 'Товары'));
+    b1.appendChild(el('p', 'ab-muted', 'Артикул, название, категория, цвет, цены и наличие.'));
+    var r1 = el('div', 'ab-row');
+    var dl1 = el('a', 'ab-btn ab-btn--primary', 'Скачать .xlsx');
+    dl1.href = downloadHref('products');
+    r1.appendChild(dl1);
+    var sh1 = el('button', 'ab-btn', 'Обновить');
+    sh1.type = 'button';
+    r1.appendChild(sh1);
+    b1.appendChild(r1);
+    var h1 = el('div', 'ab-scroll');
+    h1.style.marginTop = '14px';
+    b1.appendChild(h1);
+    sh1.addEventListener('click', function () { loadReport('products', {}, h1, sh1); });
+    loadReport('products', {}, h1, sh1);
+    panel.appendChild(b1);
+
+    /* --- продажи --- */
+    var b2 = el('div', 'ab-panel__body');
+    b2.appendChild(el('h3', null, 'Продажи'));
+    b2.appendChild(el('p', 'ab-muted', 'Суммарно по позициям заказов за период. Заказы со статусом «Спам» не учитываются.'));
+    var g2 = grid(3);
+    var sFrom = field('Период с', 'repFrom', '', { type: 'date' });
+    var sTo   = field('по', 'repTo', '', { type: 'date' });
+    g2.appendChild(sFrom); g2.appendChild(sTo);
+    b2.appendChild(g2);
+    b2.appendChild(presets(function (k) {
+      var r = reportPreset(k);
+      inp(sFrom).value = r[0]; inp(sTo).value = r[1];
+      refreshSales();
+    }));
+    var r2 = el('div', 'ab-row');
+    var dl2 = el('a', 'ab-btn ab-btn--primary', 'Скачать .xlsx');
+    var sh2 = el('button', 'ab-btn', 'Показать');
+    sh2.type = 'button';
+    r2.appendChild(dl2); r2.appendChild(sh2);
+    b2.appendChild(r2);
+    var h2 = el('div', 'ab-scroll');
+    h2.style.marginTop = '14px';
+    b2.appendChild(h2);
+    function salesParams() { return { from: inp(sFrom).value, to: inp(sTo).value }; }
+    function refreshSales() {
+      var p = salesParams();
+      dl2.href = downloadHref('sales', p);
+      loadReport('sales', p, h2, sh2);
+    }
+    sh2.addEventListener('click', refreshSales);
+    (function () { var r = reportPreset('month'); inp(sFrom).value = r[0]; inp(sTo).value = r[1]; })();
+    refreshSales();
+    panel.appendChild(b2);
+
+    /* --- заказы --- */
+    var b3 = el('div', 'ab-panel__body');
+    b3.appendChild(el('h3', null, 'Заказы'));
+    b3.appendChild(el('p', 'ab-muted', 'Список заказов за период с фильтром по статусу.'));
+    var g3 = grid(3);
+    var oFrom = field('Период с', 'ordFrom', '', { type: 'date' });
+    var oTo   = field('по', 'ordTo', '', { type: 'date' });
+    var oSt   = field('Статус', 'ordStatus', 'all', {
+      type: 'select',
+      options: [
+        { value: 'all', label: 'Все' }, { value: 'new', label: 'Новые' },
+        { value: 'inwork', label: 'В работе' }, { value: 'done', label: 'Выполненные' },
+        { value: 'spam', label: 'Спам' }
+      ]
+    });
+    g3.appendChild(oFrom); g3.appendChild(oTo); g3.appendChild(oSt);
+    b3.appendChild(g3);
+    b3.appendChild(presets(function (k) {
+      var r = reportPreset(k);
+      inp(oFrom).value = r[0]; inp(oTo).value = r[1];
+      refreshOrders();
+    }));
+    var r3 = el('div', 'ab-row');
+    var dl3 = el('a', 'ab-btn ab-btn--primary', 'Скачать .xlsx');
+    var sh3 = el('button', 'ab-btn', 'Показать');
+    sh3.type = 'button';
+    r3.appendChild(dl3); r3.appendChild(sh3);
+    b3.appendChild(r3);
+    var h3 = el('div', 'ab-scroll');
+    h3.style.marginTop = '14px';
+    b3.appendChild(h3);
+    function ordersParams() { return { from: inp(oFrom).value, to: inp(oTo).value, status: inp(oSt).value }; }
+    function refreshOrders() {
+      var p = ordersParams();
+      dl3.href = downloadHref('orders', p);
+      loadReport('orders', p, h3, sh3);
+    }
+    sh3.addEventListener('click', refreshOrders);
+    inp(oSt).addEventListener('change', refreshOrders);
+    (function () { var r = reportPreset('month'); inp(oFrom).value = r[0]; inp(oTo).value = r[1]; })();
+    refreshOrders();
+    panel.appendChild(b3);
+
     $('#view').appendChild(panel);
   }
 
@@ -1948,6 +2665,7 @@ td.colSpan = COLS.length;
 
   function init() {
     bindLogin();
+    bindOrdersAlert();
     $$('#nav button').forEach(function (b) {
       b.addEventListener('click', function () { go(b.dataset.view); });
     });

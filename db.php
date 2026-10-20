@@ -120,8 +120,58 @@ function initSchema(PDO $db): void {
         locked_until  TEXT
     )");
 
+    $db->exec("CREATE TABLE IF NOT EXISTS audit_log (
+        id        INTEGER PRIMARY KEY AUTOINCREMENT,
+        ts        TEXT NOT NULL DEFAULT '',
+        username  TEXT NOT NULL DEFAULT '',
+        action    TEXT NOT NULL DEFAULT '',
+        ip        TEXT NOT NULL DEFAULT '',
+        details   TEXT NOT NULL DEFAULT ''
+    )");
+    $db->exec("CREATE INDEX IF NOT EXISTS idx_audit_ts ON audit_log(ts DESC)");
+    $db->exec("CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(username)");
+
     ensureColumn($db, 'products', 'onHome', 'INTEGER NOT NULL DEFAULT 0');
+    ensureColumn($db, 'products', 'colorGroup', "TEXT NOT NULL DEFAULT ''");
+    ensureColumn($db, 'users', 'last_login', "TEXT NOT NULL DEFAULT ''");
     backfillColorHexes($db);
+    ensureMailSettings($db);
+}
+
+/**
+ * Досоздаёт группу настроек `mail` (уведомления о новых заявках).
+ * Нужна и свежей базе, и уже работающей: заполненные админом значения
+ * не затираются, а ключи от прежней ежедневной рассылки убираются.
+ */
+function ensureMailSettings(PDO $db): void {
+    $cur = dbGetSetting($db, 'mail', []);
+    $cur = is_array($cur) ? $cur : [];
+
+    $defaults = [
+        'notifyEmail' => '',
+        'enabled'     => '0',
+        'transport'   => 'smtp',
+        'fromEmail'   => '',
+        'fromName'    => 'ПОЛИФОРМ',
+        'smtpHost'    => '',
+        'smtpPort'    => '587',
+        'smtpSecure'  => 'tls',
+        'smtpUser'    => '',
+        'smtpPass'    => '',
+        'adminUrl'    => '',
+        'lastSent'    => '',
+        'lastStatus'  => 'Уведомления ещё не отправлялись',
+    ];
+
+    $changed = false;
+    foreach ($defaults as $k => $v) {
+        if (!array_key_exists($k, $cur)) { $cur[$k] = $v; $changed = true; }
+    }
+    /* Ключи от снятой функции ежедневной сводки: чистим, чтобы не путались. */
+    foreach (['dailyEnabled', 'alwaysSend', 'cronToken'] as $gone) {
+        if (array_key_exists($gone, $cur)) { unset($cur[$gone]); $changed = true; }
+    }
+    if ($changed) dbSetSetting($db, 'mail', $cur);
 }
 
 /**
@@ -200,8 +250,8 @@ function seedFromJson(PDO $db): void {
             $st = $db->prepare("INSERT OR REPLACE INTO products
                 (sku,title,shortTitle,categoryId,art,form,sizeL,sizeW,sizeH,gridGap,color,colorHex,
                  packCount,packNote,weightG,priceRetail,priceOpt,volumeMl,material,country,cert,
-                 description,features,images,inStock,stockNote,sima,pos,updated)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                 description,features,images,inStock,stockNote,sima,pos,updated,colorGroup)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             $st->execute([
                 (string)($p['sku'] ?? ''),
                 (string)($p['title'] ?? ''),
@@ -232,6 +282,7 @@ function seedFromJson(PDO $db): void {
                 (string)($p['sima'] ?? ''),
                 $i + 1,
                 $now,
+                (string)($p['colorGroup'] ?? ''),
             ]);
         }
 
@@ -379,7 +430,7 @@ function dbGetUser(PDO $db, string $username): ?array {
 }
 
 function dbAllUsers(PDO $db): array {
-    return $db->query("SELECT username, role, created FROM users ORDER BY username")->fetchAll();
+    return $db->query("SELECT username, role, created, last_login FROM users ORDER BY username")->fetchAll();
 }
 
 function dbDeleteUser(PDO $db, string $username): bool {
@@ -393,6 +444,40 @@ function dbSetPassword(PDO $db, string $username, string $password): bool {
 
 function dbSetRole(PDO $db, string $username, string $role): bool {
     return $db->prepare("UPDATE users SET role = ? WHERE username = ?")->execute([$role, $username]);
+}
+
+function dbTouchLastLogin(PDO $db, string $username): void {
+    $db->prepare("UPDATE users SET last_login = ? WHERE username = ?")
+        ->execute([date('Y-m-d H:i:s'), $username]);
+}
+
+/* ----------------------------------------------------------------- журнал */
+
+/**
+ * Запись в журнал доступа. username — тот, кого касается событие
+ * (для административных действий здесь логин админа, а объект — в details).
+ */
+function dbAudit(PDO $db, string $username, string $action, string $ip = '', string $details = ''): void {
+    $db->prepare("INSERT INTO audit_log (ts, username, action, ip, details) VALUES (?,?,?,?,?)")
+        ->execute([date('Y-m-d H:i:s'), $username, $action, $ip, $details]);
+}
+
+function dbAuditList(PDO $db, array $f = []): array {
+    $where = [];
+    $args  = [];
+    if (($f['username'] ?? '') !== '') { $where[] = 'username = ?'; $args[] = (string)$f['username']; }
+    if (($f['action'] ?? '') !== '')   { $where[] = 'action = ?';   $args[] = (string)$f['action']; }
+
+    $limit = (int)($f['limit'] ?? 200);
+    if ($limit < 1 || $limit > 1000) $limit = 200;
+
+    $sql = 'SELECT * FROM audit_log';
+    if ($where) $sql .= ' WHERE ' . implode(' AND ', $where);
+    $sql .= ' ORDER BY id DESC LIMIT ' . $limit;
+
+    $st = $db->prepare($sql);
+    $st->execute($args);
+    return $st->fetchAll();
 }
 
 /* ------------------------------------------------------------- блокировки */
@@ -437,6 +522,14 @@ function dbUnlockUser(PDO $db, string $username): void {
     $db->prepare("DELETE FROM login_attempts WHERE username = ?")->execute([$username]);
 }
 
+/** Ручная блокировка учётной записи на заданное число минут. */
+function dbSetLock(PDO $db, string $username, int $minutes, string $ip = ''): void {
+    $minutes = max(1, $minutes);
+    $db->prepare("INSERT OR REPLACE INTO login_attempts (username,cnt,ip,last_attempt,locked_until)
+                  VALUES (?,?,?,?,?)")
+        ->execute([$username, 0, $ip, date('Y-m-d H:i:s'), date('Y-m-d H:i:s', time() + $minutes * 60)]);
+}
+
 /* -------------------------------------------------------------- настройки */
 
 function dbGetSetting(PDO $db, string $key, $default = null) {
@@ -468,6 +561,9 @@ function dbAllProducts(PDO $db): array {
     foreach ($rows as &$r) {
         $r['features'] = json_decode((string)$r['features'], true) ?: [];
         $r['images']   = json_decode((string)$r['images'], true) ?: [];
+        /* Группа цветов: одинаковое значение объединяет карточки одного товара
+           в разных расцветках (блок «Цвет» на витрине). */
+        $r['colorGroup'] = (string)($r['colorGroup'] ?? '');
         $r['inStock']  = (int)$r['inStock'] === 1;
    $r['onHome']   = (int)$r['onHome'] === 1;
         $r['priceRetail'] = (float)$r['priceRetail'];
@@ -499,14 +595,15 @@ function dbSaveProduct(PDO $db, array $p): void {
     $size = (array)($p['size'] ?? []);
 
 $sql = "INSERT INTO products
-        (sku,title,shortTitle,categoryId,art,form,sizeL,sizeW,sizeH,gridGap,color,colorHex,
+        (sku,title,shortTitle,categoryId,art,form,sizeL,sizeW,sizeH,gridGap,color,colorHex,colorGroup,
          packCount,packNote,weightG,priceRetail,priceOpt,volumeMl,material,country,cert,
          description,features,images,inStock,stockNote,sima,pos,onHome,updated)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ON CONFLICT(sku) DO UPDATE SET
          title=excluded.title, shortTitle=excluded.shortTitle, categoryId=excluded.categoryId,
          art=excluded.art, form=excluded.form, sizeL=excluded.sizeL, sizeW=excluded.sizeW,
          sizeH=excluded.sizeH, gridGap=excluded.gridGap, color=excluded.color, colorHex=excluded.colorHex,
+         colorGroup=excluded.colorGroup,
          packCount=excluded.packCount, packNote=excluded.packNote, weightG=excluded.weightG,
          priceRetail=excluded.priceRetail, priceOpt=excluded.priceOpt, volumeMl=excluded.volumeMl,
          material=excluded.material, country=excluded.country, cert=excluded.cert,
@@ -528,6 +625,7 @@ $sql = "INSERT INTO products
         (float)($p['gridGap'] ?? 0),
         (string)($p['color'] ?? ''),
         (string)($p['colorHex'] ?? ''),
+        (string)($p['colorGroup'] ?? ''),
         max(1, (int)($p['packCount'] ?? 1)),
         (string)($p['packNote'] ?? ''),
         (float)($p['weightG'] ?? 0),
@@ -679,6 +777,11 @@ function dbOrders(PDO $db, string $status = '', int $limit = 200): array {
     return $rows;
 }
 
+/** Человеческое название статуса заявки — для писем, отчётов и админки. */
+function orderStatusName(string $s): string {
+    return ['new' => 'Новая', 'inwork' => 'В работе', 'done' => 'Выполнена', 'spam' => 'Спам'][$s] ?? $s;
+}
+
 function dbOrderCounts(PDO $db): array {
     $out = ['new' => 0, 'inwork' => 0, 'done' => 0, 'spam' => 0, 'all' => 0];
     foreach ($db->query("SELECT status, COUNT(*) AS c FROM orders GROUP BY status")->fetchAll() as $r) {
@@ -734,6 +837,7 @@ function dbCatalog(PDO $db): array {
             'gridGap'     => (float)$p['gridGap'],
             'color'       => $p['color'],
             'colorHex'    => $p['colorHex'],
+            'colorGroup'  => $p['colorGroup'],
             'packCount'   => (int)$p['packCount'],
             'packNote'    => $p['packNote'],
             'weightG'     => (float)$p['weightG'],
@@ -765,4 +869,103 @@ function dbCatalog(PDO $db): array {
         }, dbAllColors($db)),
         'products'     => $out,
     ];
+}
+
+/* --------------------------------------------------------------- отчёты */
+
+/** Отчёт по товарам: артикул, название, категория, цвет, цены, наличие. */
+function dbReportProducts(PDO $db): array {
+    $cats = [];
+    foreach (dbAllCategories($db) as $c) {
+        $cats[(string)$c['id']] = $c['name'] !== '' ? $c['name'] : (string)($c['short'] ?? '');
+    }
+    $out = [];
+    foreach (dbAllProducts($db) as $p) {
+        $out[] = [
+            'sku'         => (string)$p['sku'],
+            'title'       => (string)($p['shortTitle'] !== '' ? $p['shortTitle'] : $p['title']),
+            'category'    => (string)($cats[(string)$p['categoryId']] ?? $p['categoryId']),
+            'color'       => (string)$p['color'],
+            'priceRetail' => (float)$p['priceRetail'],
+            'priceOpt'    => (float)$p['priceOpt'],
+            'stock'       => !empty($p['inStock'])
+                ? 'в наличии'
+                : ((string)$p['stockNote'] !== '' ? (string)$p['stockNote'] : 'под заказ'),
+        ];
+    }
+    return $out;
+}
+
+/**
+ * Отчёт по продажам: агрегирует позиции заказов по артикулам.
+ * Заказы со статусом «спам» в расчёт не берутся.
+ */
+function dbReportSales(PDO $db, string $from = '', string $to = '', array $statuses = []): array {
+    $sql = "SELECT items FROM orders WHERE status <> 'spam'";
+    $args = [];
+    if ($statuses) {
+        $ph = implode(',', array_fill(0, count($statuses), '?'));
+        $sql .= " AND status IN ($ph)";
+        foreach ($statuses as $s) $args[] = (string)$s;
+    }
+    if ($from !== '') { $sql .= ' AND created >= ?'; $args[] = $from . ' 00:00:00'; }
+    if ($to   !== '') { $sql .= ' AND created <= ?'; $args[] = $to . ' 23:59:59'; }
+
+    $st = $db->prepare($sql);
+    $st->execute($args);
+
+    $agg = [];
+    foreach ($st->fetchAll() as $r) {
+        foreach ((json_decode((string)$r['items'], true) ?: []) as $it) {
+            $sku = (string)($it['sku'] ?? '');
+            if ($sku === '') continue;
+            if (!isset($agg[$sku])) {
+                $agg[$sku] = ['sku' => $sku, 'title' => '', 'qty' => 0, 'qtyRetail' => 0, 'qtyOpt' => 0, 'revenue' => 0.0];
+            }
+            $qty  = (int)($it['qty'] ?? 0);
+            $line = (float)($it['lineTotal'] ?? 0);
+            $agg[$sku]['qty']     += $qty;
+            $agg[$sku]['revenue'] += $line;
+            if ((string)($it['mode'] ?? '') === 'opt') $agg[$sku]['qtyOpt'] += $qty;
+            else $agg[$sku]['qtyRetail'] += $qty;
+            if ($agg[$sku]['title'] === '' && (string)($it['title'] ?? '') !== '') {
+                $agg[$sku]['title'] = (string)$it['title'];
+            }
+        }
+    }
+
+    if ($agg) {
+        $titles = [];
+        foreach (dbAllProducts($db) as $p) {
+            $titles[(string)$p['sku']] = (string)($p['shortTitle'] !== '' ? $p['shortTitle'] : $p['title']);
+        }
+        foreach ($agg as &$a) {
+            if ($a['title'] === '' && isset($titles[$a['sku']])) $a['title'] = $titles[$a['sku']];
+        }
+        unset($a);
+    }
+
+    $out = array_values($agg);
+    usort($out, static fn(array $x, array $y): int => $y['revenue'] <=> $x['revenue']);
+    return $out;
+}
+
+/** Отчёт по заказам: список заказов за период с фильтром по статусу. */
+function dbReportOrders(PDO $db, string $from = '', string $to = '', string $status = ''): array {
+    $sql = 'SELECT * FROM orders WHERE 1=1';
+    $args = [];
+    if ($status !== '' && $status !== 'all') { $sql .= ' AND status = ?'; $args[] = $status; }
+    if ($from !== '') { $sql .= ' AND created >= ?'; $args[] = $from . ' 00:00:00'; }
+    if ($to   !== '') { $sql .= ' AND created <= ?'; $args[] = $to . ' 23:59:59'; }
+    $sql .= ' ORDER BY created DESC';
+
+    $st = $db->prepare($sql);
+    $st->execute($args);
+    $rows = $st->fetchAll();
+    foreach ($rows as &$r) {
+        $r['items'] = json_decode((string)$r['items'], true) ?: [];
+        $r['total'] = (float)$r['total'];
+    }
+    unset($r);
+    return $rows;
 }
