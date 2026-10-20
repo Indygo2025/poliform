@@ -329,6 +329,32 @@
   z-index: 2;
 }
 
+/* Кружки расцветок на плитке каталога: нажал — открылась карточка того же
+   товара в другом цвете. Появляются только у товаров с группой цветов. */
+.pcard__colors {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 2px 0;
+}
+.pcard-color {
+  display: block;
+  width: 40px;
+  height: 40px;
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid #d9dde0;
+  background: #fff;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.pcard-color img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pcard-color:hover { border-color: #aab0b5; transform: translateY(-1px); }
+.pcard-color.is-active { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.pcard-color:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 2px; }
+
 .pcard__body {
   padding: 12px 14px 14px;
   display: flex;
@@ -851,6 +877,46 @@ a.pcard__add:hover {
 .ppb__hint { font-size: .8rem; color: #8a9095; }
 .product-desc { font-size: .94rem; line-height: 1.65; color: #4a4f53; margin: 16px 0 0; }
 .product-sku { margin-bottom: 14px; }
+
+/* Блок «Цвет» на карточке товара: кружки расцветок рядом с фотографией.
+   Текущий цвет обведён, остальные — ссылки на ту же позицию в другом цвете. */
+.product-colors { margin: 0 0 16px; }
+.product-colors__row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.product-colors__label { font-size: .85rem; color: var(--ink-3); }
+.product-colors__label b { color: var(--ink); font-weight: 600; }
+.product-colors__list { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.color-swatch {
+  display: block;
+  width: 58px;
+  height: 58px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid #d9dde0;
+  background: #fff;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.color-swatch img { width: 100%; height: 100%; object-fit: contain; display: block; }
+/* Если фото у расцветки ещё нет — показываем образец цвета */
+.swatch__fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 1px rgba(16, 22, 26, .12);
+  background: repeating-linear-gradient(45deg, #f1f2f3, #f1f2f3 4px, #e2e5e7 4px, #e2e5e7 8px);
+}
+.color-swatch:hover { border-color: #aab0b5; transform: translateY(-1px); }
+.color-swatch.is-active { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.color-swatch:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 2px; }
+.product-colors__others { margin-top: 8px; font-size: .82rem; color: var(--ink-3); }
+.product-colors__others a {
+  color: var(--ink-2);
+  text-decoration: none;
+  border-bottom: 1px dotted #c3c8cd;
+}
+.product-colors__others a:hover { color: var(--signal-deep); border-bottom-color: currentColor; }
 .ppb__pack {
   font-size: .82rem;
   color: #5b6166;
