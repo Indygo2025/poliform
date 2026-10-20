@@ -591,7 +591,13 @@
   function renderProduct() {
     var host = $('[data-product]');
     if (!host) return;
-    var p = bySku(new URLSearchParams(location.search).get('sku'));
+    var sku = new URLSearchParams(location.search).get('sku');
+    if (!sku) {
+      /* Статические страницы GitHub Pages: product-100001.html без ?sku= */
+      var m = location.pathname.match(/product-(\d+)\.html$/i);
+      if (m) sku = m[1];
+    }
+    var p = bySku(sku);
     host.innerHTML = '';
     if (!p) {
       var e = el('div', 'empty-state');
