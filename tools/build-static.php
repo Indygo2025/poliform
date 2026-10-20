@@ -37,8 +37,11 @@ function renderPage(string $root, string $page, array $get = []): string {
     $json = json_encode($get, JSON_UNESCAPED_SLASHES);
     $cmd = '"' . PHP_BINARY . '" -d display_errors=0 -d log_errors=0 '
          . '"' . $root . '/tools/render-page.php" '
-         . $page . ' ' . escapeshellarg($json);
+         . escapeshellarg($page);
+    /* JSON передаём через окружение: escapeshellarg на Windows ломает кавычки. */
+    putenv('PAGE_JSON=' . $json);
     $out = shell_exec($cmd);
+    putenv('PAGE_JSON');
     return is_string($out) ? $out : '';
 }
 
