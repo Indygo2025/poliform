@@ -32,10 +32,21 @@ pl_breadcrumbs_jsonld($base, ['Главная' => 'index.php', 'Каталог' 
     </div>
 
     <div class="catalog-layout">
-      <aside class="filters" data-filters aria-label="Фильтры каталога"></aside>
+      <aside class="filters" id="catalog-filters" data-filters aria-label="Фильтры каталога"></aside>
 
       <div>
         <div class="catalog-toolbar">
+          <button class="filters-toggle" type="button" data-filters-open
+                  aria-controls="catalog-filters" aria-expanded="false">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+              <path d="M1.5 4h13M1.5 8h13M1.5 12h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="5.5" cy="4" r="2" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="10.5" cy="8" r="2" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="6.5" cy="12" r="2" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            Фильтр
+            <span class="filters-toggle__badge" data-filters-badge hidden>0</span>
+          </button>
           <span class="catalog-toolbar__count">Найдено: <b data-count>—</b></span>
           <label class="catalog-toolbar__sort">
             Сортировка

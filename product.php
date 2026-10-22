@@ -22,10 +22,10 @@ if ($product === null) {
         'title' => 'Артикул не найден — Полиформ',
         'description' => 'Запрошенный артикул не найден в каталоге.',
         'base'  => $base,
+        'bodyClass' => 'page-product',
     ]);
     pl_header($d, 'products');
     echo '<section><div class="container">';
-    echo '<nav class="crumbs" aria-label="Хлебные крошки"><a href="index.php">Главная</a> / <a href="products.php">Каталог</a> / <span>Не найдено</span></nav>';
     echo '<div class="empty-state"><b>Артикул не найден</b><span>Вернитесь в каталог и выберите позицию.</span>';
     echo '<a class="btn" href="products.php" style="margin-top:16px">В каталог</a></div>';
     echo '</div></section>';
@@ -41,7 +41,7 @@ $order    = (array)($d['order'] ?? []);
 $title = (string)$p['title'] . ' — Полиформ';
 $desc  = mb_substr((string)$p['description'], 0, 300, 'UTF-8');
 
-pl_head($d, ['title' => $title, 'description' => $desc, 'base' => $base]);
+pl_head($d, ['title' => $title, 'description' => $desc, 'base' => $base, 'bodyClass' => 'page-product']);
 pl_header($d, 'products');
 pl_breadcrumbs_jsonld($base, [
     'Главная'  => 'index.php',
@@ -53,18 +53,8 @@ pl_product_jsonld($p, $base);
 
 <section class="page-top">
   <div class="container">
-    <nav class="crumbs" aria-label="Хлебные крошки">
-      <a href="index.php">Главная</a> /
-      <a href="products.php">Каталог</a> /
-      <a href="products.php?cat=<?= rawurlencode((string)$p['categoryId']) ?>"><?= e((string)($cat['short'] ?? $cat['name'] ?? '')) ?></a> /
-      <span><?= e((string)$p['shortTitle']) ?></span>
-    </nav>
-
-    <div class="sec-head">
-      <div>
-        <span class="eyebrow">Товар №<?= e((string)$p['sku']) ?></span>
-        <div class="page-top__title"><?= e((string)$p['shortTitle']) ?></div>
-      </div>
+    <div class="product-back">
+      <a class="product-back__btn" href="products.php">← Назад в каталог</a>
     </div>
 
     <div data-product><?php /* наполняет shop.js; без JS покажем запасной блок */ ?>
@@ -73,13 +63,6 @@ pl_product_jsonld($p, $base);
           <div class="gallery__main">
             <img src="<?= e((string)($p['images'][0] ?? '')) ?>" alt="<?= e((string)$p['title']) ?>" width="1000" height="1333">
           </div>
-          <?php if (count($p['images']) > 1): ?>
-          <div class="gallery__thumbs">
-            <?php foreach ($p['images'] as $src): ?>
-            <img src="<?= e($src) ?>" alt="" loading="lazy">
-            <?php endforeach; ?>
-          </div>
-          <?php endif; ?>
         </div>
 
         <div class="product-info">

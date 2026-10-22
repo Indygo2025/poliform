@@ -623,6 +623,38 @@ a.pcard__add:hover {
 }
 .filters__reset:hover { background: var(--pl-base); color: var(--ink); }
 
+/* ---------- Шторка фильтров (мобильные/планшеты) ---------- */
+/* На десктопе: шапка/подвал шторки скрыты, кнопка «Фильтр» и подложка не нужны */
+.filters__head, .filters__show, .filters-toggle, .filters-backdrop { display: none; }
+/* Разделитель над «Сбросить» вместо нижней границы последней группы */
+.fgroup:has(+ .filters__foot) { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.filters-toggle {
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  min-height: 42px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font: 600 .88rem var(--font-display);
+  cursor: pointer;
+}
+.filters-toggle:active { background: var(--pl-base); }
+.filters-toggle__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+  background: var(--pl-dark);
+  color: #fff;
+  font: 600 .7rem/1 var(--font-mono);
+}
+.filters-toggle__badge[hidden] { display: none; }
+
 .catalog-toolbar {
   display: flex;
   align-items: center;
@@ -733,23 +765,8 @@ a.pcard__add:hover {
 .gallery { position: sticky; top: 132px; }
 /* Миниатюры — горизонтальная лента под крупным фото */
 .product-layout .gallery { display: block; grid-template-columns: none; }
-/* Зум фото по наведению, как на маркетплейсе: точка приближения следует за курсором */
-.product-layout .gallery__main img { transition: transform .28s ease; will-change: transform; }
-@media (pointer: fine) {
-  .product-layout .gallery__main:hover img { transform: scale(1.4); }
-  .product-layout .gallery__main img { cursor: zoom-in; }
-}
-/* Запасная вёрстка без JS: миниатюры — обычные картинки */
-.product-layout .gallery__thumbs > img {
-  display: block;
-  width: 78px;
-  height: 78px;
-  padding: 4px;
-  border: 1px solid #d9dde0;
-  border-radius: 10px;
-  background: #f5f6f7;
-  object-fit: contain;
-}
+/* Миниатюр под фото больше нет: фото листается свайпом/стрелками,
+   под фото — выбор цвета */
 
 /* Короткие характеристики пунктиром под названием */
 .quick-specs { display: grid; gap: 9px; margin: 20px 0 6px; }
@@ -765,6 +782,10 @@ a.pcard__add:hover {
   border-radius: 12px;
   overflow: hidden;
 }
+/* Свайп/перетаскивание крупного фото, как на Озоне */
+.gallery__main { touch-action: pan-y; cursor: grab; }
+.gallery__main.is-dragging { cursor: grabbing; }
+.gallery__main img { user-select: none; -webkit-user-drag: none; }
 .gallery__main img {
   width: 100%;
   height: 100%;
@@ -808,21 +829,6 @@ a.pcard__add:hover {
   box-shadow: 0 1px 4px rgba(16, 22, 26, .12);
   z-index: 3;
 }
-.gallery__thumbs { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-.gallery__thumbs button {
-  width: 78px;
-  height: 78px;
-  padding: 4px;
-  border-radius: 10px;
-  border: 1px solid #d9dde0;
-  background: #f5f6f7;
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color .15s, box-shadow .15s;
-}
-.gallery__thumbs button:hover { border-color: #aab0b5; }
-.gallery__thumbs button.is-active { border-color: #161616; box-shadow: 0 0 0 1px #161616; }
-.gallery__thumbs img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
 .product-title { font-size: clamp(1.4rem, 2.6vw, 1.9rem); line-height: 1.2; font-weight: 500; margin: 0 0 12px; }
 .product-sku {
@@ -880,7 +886,7 @@ a.pcard__add:hover {
 
 /* Блок «Цвет» на карточке товара: кружки расцветок рядом с фотографией.
    Текущий цвет обведён, остальные — ссылки на ту же позицию в другом цвете. */
-.product-colors { margin: 0 0 16px; }
+.product-colors { margin: 14px 0 16px; }
 .product-colors__row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .product-colors__label { font-size: .85rem; color: var(--ink-3); }
 .product-colors__label b { color: var(--ink); font-weight: 600; }
@@ -1174,14 +1180,152 @@ a.pcard__add:hover {
 }
 
 /* ---------- Адаптив ---------- */
+/* Кнопка «Назад в каталог» на карточке товара — только мобильные/планшеты
+   (включается в @media (max-width: 1080px) ниже) */
+.product-back { display: none; }
 @media (orientation: landscape) and (max-height: 500px) {
   /* Сжатая шапка в ландшафте — строка цен держится под ней */
   .pricing-bar { top: 58px; }
 }
 @media (max-width: 1080px) {
   .catalog-layout { grid-template-columns: 1fr; }
-  .filters { position: static; }
   .cart-layout { grid-template-columns: 1fr; }
+  .cart-summary { position: static; }
+
+  /* Фильтры на мобильных/планшетах прячутся в кнопку «Фильтр» в тулбаре,
+     панель открывается шторкой снизу (как на Ozon).
+     Селекторы через .catalog-layout — чтобы перебить sticky-правила
+     .js-sticky-filters .filters[.pin-top] с тем же/высшим специфическим весом */
+  .filters-toggle { display: inline-flex; }
+  .filters-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(16, 22, 26, .48);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+  }
+  .filters-backdrop.is-open { opacity: 1; visibility: visible; }
+  body.is-filters-open { overflow: hidden; }
+
+  .catalog-layout .filters,
+  .catalog-layout .filters.pin-top {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 151;
+    max-height: min(86vh, 720px);
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 20px 20px 0 0;
+    border-bottom: 0;
+    box-shadow: 0 -12px 40px rgba(16, 22, 26, .25);
+    transform: translateY(101%);
+    visibility: hidden;
+    transition: transform .25s ease, visibility .25s ease;
+  }
+  .catalog-layout .filters.is-open { transform: none; visibility: visible; }
+
+  .filters__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 13px 12px 13px 18px;
+    background: var(--shop-card);
+    border-bottom: 1px solid var(--shop-line);
+  }
+  .filters__head b { font: 600 1rem var(--font-display); color: var(--ink); }
+  .filters__close {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--shop-line);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ink-2);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .catalog-layout .filters .fgroup {
+    margin: 0;
+    padding: 15px 18px;
+    border-bottom: 0;
+  }
+  .catalog-layout .filters .fgroup + .fgroup {
+    border-top: 1px solid var(--shop-line);
+  }
+  .filters__foot {
+    display: flex;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: var(--shop-card);
+    border-top: 1px solid var(--shop-line);
+  }
+  .filters__foot .filters__reset {
+    width: auto;
+    flex: 0 0 auto;
+    align-self: stretch;
+    margin: 0;
+    padding: 12px 16px;
+  }
+  .filters__foot .filters__show {
+    display: block;
+    flex: 1 1 auto;
+    padding: 12px 14px;
+    min-height: 44px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--pl-dark);
+    background: var(--pl-dark);
+    color: #fff;
+    font: 600 .9rem var(--font-display);
+    cursor: pointer;
+  }
+  .filters__foot .filters__show:active { opacity: .85; }
+
+  /* Карточка товара на мобильных/планшетах: шапка и футер прячутся,
+     остаётся только панель «Режим цен» и липкая кнопка «Назад в каталог» */
+  body.page-product .header,
+  body.page-product .footer { display: none; }
+  body.page-product .pricing-bar { top: 0; }
+  /* Шапка секции без отступов — блок с нулевой высотой */
+  body.page-product .page-top { padding: 0; }
+  .product-back {
+    display: block;
+    position: sticky;
+    top: var(--pb-h, 58px);
+    z-index: 59;
+    margin: 0 0 14px;
+    padding: 2px 0;
+    background: var(--shop-card);
+    border-bottom: 1px solid var(--shop-line);
+  }
+  .product-back__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 12px;
+    min-height: 24px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--shop-line);
+    background: #fff;
+    color: var(--ink);
+    font: 600 .8rem/1 var(--font-display);
+    text-decoration: none;
+  }
+  .product-back__btn:active { background: var(--pl-base); }
+
   .cart-summary { position: static; }
   /* Страница товара: фото слева, блок покупки справа, информация под ними */
   .product-layout { grid-template-columns: minmax(280px, 44%) minmax(0, 1fr); gap: 26px; }
@@ -1194,6 +1338,10 @@ a.pcard__add:hover {
   .product-layout .gallery,
   .product-info,
   .product-buy { grid-column: auto; grid-row: auto; }
+  /* Цена — сразу после фотографии, как на маркетплейсе */
+  .product-layout .gallery { order: 1; }
+  .product-buy { order: 2; }
+  .product-info { order: 3; }
   .gallery { position: static; max-width: 520px; }
   .pricing-bar__note { display: none; }
   .pricing-bar .container { gap: 12px; }
@@ -1242,8 +1390,6 @@ a.pcard__add:hover {
   .catalog-toolbar__sort { width: 100%; justify-content: space-between; }
   .pcard__add { min-height: 42px; }
   .gallery { max-width: none; }
-  .gallery__thumbs { gap: 8px; }
-  .gallery__thumbs button { width: 64px; height: 64px; }
 
   .cart-row { grid-template-columns: 62px minmax(0, 1fr); }
   .cart-row__img { width: 62px; height: 62px; }
@@ -1261,7 +1407,6 @@ a.pcard__add:hover {
   .pcard__add { min-height: 44px; }
   .cart-btn { min-height: 44px; }
   .filters__reset { padding: 13px; }
-  .gallery__thumbs button { width: 72px; height: 72px; }
   .catalog-toolbar__sort select { min-height: 44px; }
   .pricing-switch button { min-height: 46px; }
   .cart-row__del { min-width: 44px; min-height: 44px; }
