@@ -9,6 +9,7 @@
   var FALLBACK_URL = 'data/products.json';
   var MODE_KEY = 'poliform.mode';
   var CART_KEY = 'poliform.cart';
+  var CATBACK_KEY = 'poliform.catback';
   var OPT = 'opt', RET = 'ret';
 
   var catalog = null, products = [], categories = [], cart = [], settings = {};
@@ -136,6 +137,98 @@
       var node = active ? el('span', 'pcard-color is-active') : el('a', 'pcard-color');
       if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
       node.title = colorLabel(v) + ' · арт. ' + artLabel(v);
+      node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
+      if (active) node.setAttribute('aria-current', 'page');
+      node.appendChild(swatchInner(v));
+      row.appendChild(node);
+    });
+    return row;
+  }
+
+  /* ---------- Цвета одного товара ----------
+     Товары с одинаковым значением colorGroup — одна и та же позиция в разных
+     расцветках. На витрине они связаны блоком «Цвет»: нажал кружок — открылась
+     карточка другой расцветки, как на маркетплейсе. */
+  function groupKey(p) { return String((p && p.colorGroup) || '').trim().toLowerCase(); }
+  function groupMates(p) {
+    var g = groupKey(p);
+    if (!g) return [];
+    return products.filter(function (x) { return groupKey(x) === g; });
+  }
+  function hexOf(p) {
+    var v = String((p && p.colorHex) || '').trim();
+    return /^#[0-9a-f]{6}$/i.test(v) ? v : '';
+  }
+  function colorLabel(p) {
+    return String((p && p.color) || '').trim()
+      || String((p && p.shortTitle) || (p && p.sku) || 'Цвет');
+  }
+
+  /* Наполнение образца расцветки: фото товара в этом цвете,
+     а если фото ещё нет — образец цвета. */
+  function swatchInner(p) {
+    var src = (p.thumbs && p.thumbs[0]) || (p.images && p.images[0]) || '';
+    if (src) {
+      var img = el('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      return img;
+    }
+    var fill = el('span', 'swatch__fill');
+    var hex = hexOf(p);
+    if (hex) fill.style.background = hex;
+    return fill;
+  }
+
+  /* Блок «Цвет» на странице товара: текущая расцветка + кружки остальных. */
+  function productColors(p, mates) {
+    var box = el('div', 'product-colors');
+    var row = el('div', 'product-colors__row');
+
+    var lab = el('span', 'product-colors__label');
+    lab.appendChild(document.createTextNode('Цвет: '));
+    lab.appendChild(el('b', null, colorLabel(p)));
+    row.appendChild(lab);
+
+    var list = el('div', 'product-colors__list');
+    mates.forEach(function (v) {
+      var active = v.sku === p.sku;
+      var node = active ? el('span', 'color-swatch is-active') : el('a', 'color-swatch');
+      if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
+      node.title = colorLabel(v) + ' · арт. ' + v.sku;
+      node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
+      if (active) node.setAttribute('aria-current', 'page');
+      node.appendChild(swatchInner(v));
+      list.appendChild(node);
+    });
+    row.appendChild(list);
+    box.appendChild(row);
+
+    /* Текстом — чтобы цвета были понятны и на телефоне, где нет подсказок. */
+    var others = mates.filter(function (v) { return v.sku !== p.sku; });
+    if (others.length) {
+      var more = el('div', 'product-colors__others');
+      more.appendChild(document.createTextNode('Другие цвета: '));
+      others.forEach(function (v, i) {
+        if (i) more.appendChild(document.createTextNode(', '));
+        var a = el('a', null, colorLabel(v));
+        a.href = 'product.php?sku=' + encodeURIComponent(v.sku);
+        more.appendChild(a);
+      });
+      box.appendChild(more);
+    }
+    return box;
+  }
+
+  /* Кружки расцветок на плитке каталога. */
+  function tileColors(p, mates) {
+    var row = el('div', 'pcard__colors');
+    mates.forEach(function (v) {
+      var active = v.sku === p.sku;
+      var node = active ? el('span', 'pcard-color is-active') : el('a', 'pcard-color');
+      if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
+      node.title = colorLabel(v) + ' · арт. ' + v.sku;
       node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
       if (active) node.setAttribute('aria-current', 'page');
       node.appendChild(swatchInner(v));
@@ -285,8 +378,8 @@
     sw.title = p.color;
     media.appendChild(sw);
 
-    /* Галерея на карточке: при наведении на фото появляются остальные фото.
-       Движение мыши по горизонтали или клик по миниатюре меняют главное фото. */
+    /* Галерея на карточке: при наведении появляются остальные фото,
+       клик по миниатюре меняет главное. Фото не переключается за курсором. */
     var ph = el('div', 'pcard__ph');
     ph.appendChild(media);
     var thumbs = p.thumbs && p.thumbs.length ? p.thumbs : null;
@@ -319,13 +412,6 @@
       ph.appendChild(shots);
       media.addEventListener('mouseenter', function () {
         shots.classList.add('is-open');
-        set(0);
-      });
-      media.addEventListener('mousemove', function (e) {
-        var r = media.getBoundingClientRect();
-        var ratio = (e.clientX - r.left) / r.width;
-        var i = Math.max(0, Math.min(thumbs.length - 1, Math.floor(ratio * thumbs.length)));
-        set(i);
       });
       ph.addEventListener('mouseleave', function () {
         shots.classList.remove('is-open');
@@ -345,6 +431,9 @@
     h3.appendChild(a);
     body.appendChild(h3);
     body.appendChild(el('span', 'pcard__sku', 'Арт. ' + artLabel(p)));
+
+    var tileMates = groupMates(p);
+    if (tileMates.length > 1) body.appendChild(tileColors(p, tileMates));
 
     var tileMates = groupMates(p);
     if (tileMates.length > 1) body.appendChild(tileColors(p, tileMates));
@@ -491,7 +580,18 @@
   function buildFilters() {
     var wrap = $('[data-filters]');
     if (!wrap) return;
+    var keepScroll = wrap.scrollTop;
     wrap.innerHTML = '';
+
+    /* Шапка шторки: на десктопе скрыта CSS, на мобиле — заголовок и крестик */
+    var head = el('div', 'filters__head');
+    head.appendChild(el('b', null, 'Фильтры'));
+    var close = el('button', 'filters__close', '×');
+    close.type = 'button';
+    close.setAttribute('data-filters-close', '');
+    close.setAttribute('aria-label', 'Закрыть фильтры');
+    head.appendChild(close);
+    wrap.appendChild(head);
 
     var g1 = el('div', 'fgroup');
     g1.appendChild(el('h4', null, 'Категория'));
@@ -565,6 +665,9 @@
     g4.appendChild(l4);
     wrap.appendChild(g4);
 
+    /* Подвал: «Сбросить» на десктопе в одну колонку,
+       в шторке — рядом с кнопкой «Показать N позиций» */
+    var foot = el('div', 'filters__foot');
     var reset = el('button', 'filters__reset', 'Сбросить фильтры');
     reset.type = 'button';
     reset.addEventListener('click', function () {
@@ -573,7 +676,131 @@
       if (s) s.value = 'default';
       renderCatalog();
     });
-    wrap.appendChild(reset);
+    foot.appendChild(reset);
+
+    var show = el('button', 'filters__show', 'Показать');
+    show.type = 'button';
+    show.setAttribute('data-filters-show', '');
+    show.addEventListener('click', closeFilters);
+    foot.appendChild(show);
+
+    wrap.appendChild(foot);
+    wrap.scrollTop = keepScroll;
+  }
+
+  /* ---------- Шторка фильтров (мобильные/планшеты) ---------- */
+  function activeFilterCount() {
+    var n = state.cat !== 'all' ? 1 : 0;
+    n += state.colors.length;
+    if (state.pack) n++;
+    if (state.onlyStock) n++;
+    return n;
+  }
+
+  function syncFilterUI(found) {
+    var n = activeFilterCount();
+    $$('[data-filters-badge]').forEach(function (b) {
+      b.textContent = String(n);
+      b.hidden = n === 0;
+    });
+    var show = $('[data-filters-show]');
+    if (show) {
+      show.textContent = 'Показать ' + found + ' ' +
+        plural(found, 'позицию', 'позиции', 'позиций');
+    }
+    var t = $('[data-filters-open]');
+    if (t) {
+      t.setAttribute('aria-expanded',
+        document.body.classList.contains('is-filters-open') ? 'true' : 'false');
+    }
+  }
+
+  function filtersBackdrop() {
+    var bd = $('[data-filters-backdrop]');
+    if (!bd) {
+      bd = el('div', 'filters-backdrop');
+      bd.setAttribute('data-filters-backdrop', '');
+      bd.addEventListener('click', closeFilters);
+      document.body.appendChild(bd);
+    }
+    return bd;
+  }
+
+  function openFilters() {
+    var f = $('[data-filters]');
+    if (!f) return;
+    filtersBackdrop().classList.add('is-open');
+    f.classList.add('is-open');
+    document.body.classList.add('is-filters-open');
+    syncFilterUI(filtered().length);
+  }
+
+  function closeFilters() {
+    var f = $('[data-filters]');
+    if (f) f.classList.remove('is-open');
+    var bd = $('[data-filters-backdrop]');
+    if (bd) bd.classList.remove('is-open');
+    document.body.classList.remove('is-filters-open');
+    syncFilterUI(filtered().length);
+  }
+
+  function bindFilterSheet() {
+    if (bindFilterSheet._bound) return;
+    bindFilterSheet._bound = true;
+    /* Делегирование: панель фильтров пересобирается на каждый рендер */
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || !t.closest) return;
+      if (t.closest('[data-filters-open]')) openFilters();
+      else if (t.closest('[data-filters-close]') || t.closest('[data-filters-show]')) closeFilters();
+    });
+    document.addEventListener('keydown', function (e) {
+      if ((e.key === 'Escape' || e.keyCode === 27) &&
+          document.body.classList.contains('is-filters-open')) closeFilters();
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 1080 &&
+          document.body.classList.contains('is-filters-open')) closeFilters();
+    });
+  }
+
+  /* Возврат из карточки товара в каталог «на ту же позицию»:
+     при клике по товару запоминаем прокрутку и фильтры в sessionStorage,
+     при следующей загрузке каталога восстанавливаем и удаляем запись. */
+  function bindCatalogBack() {
+    document.addEventListener('click', function (e) {
+      if (!$('[data-grid]')) return; /* только страница каталога */
+      var t = e.target;
+      if (!t || !t.closest) return;
+      var a = t.closest('a');
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      /* product.php?sku=… (локально) или product-100001.html (GitHub Pages),
+         но не products.php — каталог */
+      if (!/product(?:\.php|\-\d+\.html)(?:\?|$)/.test(href)) return;
+      try {
+        sessionStorage.setItem(CATBACK_KEY, JSON.stringify({
+          y: window.pageYOffset || document.documentElement.scrollTop || 0,
+          state: {
+            cat: state.cat, colors: state.colors, pack: state.pack,
+            onlyStock: state.onlyStock, sort: state.sort
+          }
+        }));
+      } catch (err) { /* приватный режим — просто без восстановления */ }
+    });
+  }
+
+  /* Высота липкой панели «Режим цен» — под неё цепляется кнопка
+     «Назад в каталог» на карточке товара (только мобильные/планшеты). */
+  function trackPricingBar() {
+    var pb = $('.pricing-bar');
+    if (!pb) return;
+    function measure() {
+      document.documentElement.style.setProperty('--pb-h', pb.offsetHeight + 'px');
+    }
+    measure();
+    if (window.ResizeObserver) new ResizeObserver(measure).observe(pb);
+    else window.addEventListener('resize', measure);
   }
 
   function renderCatalog() {
@@ -581,6 +808,7 @@
     if (!grid) return;
     buildFilters();
     var list = filtered();
+    syncFilterUI(list.length);
     grid.innerHTML = '';
     var c = $('[data-count]');
     if (c) c.textContent = list.length + ' ' + plural(list.length, 'позиция', 'позиции', 'позиций');
@@ -598,7 +826,13 @@
   function renderProduct() {
     var host = $('[data-product]');
     if (!host) return;
-    var p = bySku(new URLSearchParams(location.search).get('sku'));
+    var sku = new URLSearchParams(location.search).get('sku');
+    if (!sku) {
+      /* Статические страницы GitHub Pages: product-100001.html без ?sku= */
+      var m = location.pathname.match(/product-(\d+)\.html$/i);
+      if (m) sku = m[1];
+    }
+    var p = bySku(sku);
     host.innerHTML = '';
     if (!p) {
       var e = el('div', 'empty-state');
@@ -684,22 +918,73 @@
       navNext.addEventListener('click', function () { showPhoto(gi + 1); });
       main.appendChild(navNext);
       main.appendChild(el('div', 'gallery__count', '1 / ' + nimg));
+    }
 
-      thEl = el('div', 'gallery__thumbs');
-      p.images.forEach(function (src, i) {
-        var btn = el('button', i === 0 ? 'is-active' : '');
-        btn.type = 'button';
-        btn.setAttribute('aria-label', 'Фото ' + (i + 1));
-        var im = el('img');
-        im.src = p.thumbs[i];
-        im.alt = '';
-        im.loading = 'lazy';
-        btn.appendChild(im);
-        btn.addEventListener('click', function () { showPhoto(i); });
-        btn.addEventListener('mouseenter', function () { showPhoto(i); });
-        thEl.appendChild(btn);
+    /* Свайп и перетаскивание фото пальцем/мышью, как на Озоне:
+       тянем фото в сторону — оно едет за пальцем; отпустили за порогом —
+       листается, раньше порога — возвращается на место. */
+    if (nimg > 1) {
+      var dragging = false, axis = null, dx = 0, startX = 0, startY = 0, w = 0;
+      var lastX = 0, lastT = 0, vx = 0, busy = false;
+      main.addEventListener('dragstart', function (e) { e.preventDefault(); });
+      main.addEventListener('pointerdown', function (e) {
+        if (busy || e.button > 0) return;
+        if (e.target && e.target.closest && e.target.closest('button')) return; /* стрелки/счётчик */
+        dragging = true; axis = null; dx = 0; vx = 0;
+        startX = lastX = e.clientX; startY = e.clientY; lastT = e.timeStamp;
+        w = main.getBoundingClientRect().width;
       });
-      g.appendChild(thEl);
+      main.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        var ddx = e.clientX - startX, ddy = e.clientY - startY;
+        if (!axis) {
+          if (Math.abs(ddx) < 8 && Math.abs(ddy) < 8) return;
+          axis = Math.abs(ddx) > Math.abs(ddy) ? 'x' : 'y';
+          if (axis !== 'x') { dragging = false; return; } /* вертикаль — скролл страницы */
+          try { main.setPointerCapture(e.pointerId); } catch (err) {}
+          big.style.transition = 'none';
+          main.classList.add('is-dragging');
+        }
+        dx = ddx;
+        /* сопротивление на первом и последнем фото */
+        if ((gi === 0 && dx > 0) || (gi === nimg - 1 && dx < 0)) dx *= 0.3;
+        big.style.transform = 'translateX(' + dx + 'px)';
+        if (e.timeStamp - lastT > 16) {
+          vx = (e.clientX - lastX) / (e.timeStamp - lastT);
+          lastX = e.clientX; lastT = e.timeStamp;
+        }
+        if (e.cancelable) e.preventDefault();
+      });
+      function endDrag() {
+        var a = axis; axis = null; dragging = false;
+        main.classList.remove('is-dragging');
+        if (a !== 'x') return;
+        var sgn = dx < 0 ? -1 : 1; /* куда уехало фото: влево/вправо */
+        var flick = Math.abs(vx) > 0.45 && Math.abs(dx) > 24;
+        /* на первом/последнем фото не листаем даже фликом — только возврат */
+        var atEdge = (gi === 0 && dx > 0) || (gi === nimg - 1 && dx < 0);
+        if (!atEdge && (Math.abs(dx) > w * 0.22 || flick)) {
+          var dir = -sgn; /* свайп влево → следующее фото */
+          busy = true;
+          big.style.transition = 'transform .18s ease';
+          big.style.transform = 'translateX(' + sgn * 110 + '%)';
+          setTimeout(function () {
+            showPhoto(gi + dir);
+            big.style.transition = 'none';
+            big.style.transform = 'translateX(' + (-sgn * 110) + '%)';
+            void big.offsetHeight; /* форсируем reflow: стартовое положение зафиксировано */
+            big.style.transition = 'transform .24s ease';
+            big.style.transform = '';
+            setTimeout(function () { busy = false; }, 260);
+          }, 180);
+        } else {
+          big.style.transition = 'transform .25s ease';
+          big.style.transform = '';
+        }
+        dx = 0;
+      }
+      main.addEventListener('pointerup', endDrag);
+      main.addEventListener('pointercancel', endDrag);
     }
 
     /* инфо */
@@ -713,9 +998,9 @@
     }
     head.appendChild(skuRow);
 
-    /* Блок «Цвет» — рядом с фото, как в карточке маркетплейса */
+    /* Блок «Цвет» — сразу под фото, на месте убранных миниатюр */
     var mates = groupMates(p);
-    if (mates.length > 1) head.appendChild(productColors(p, mates));
+    if (mates.length > 1) g.appendChild(productColors(p, mates));
 
     /* цена */
     var box = el('div', 'product-price-box');
@@ -1263,6 +1548,9 @@
     syncModeUI();
     badge();
     bindModeSwitch();
+    bindFilterSheet();
+    bindCatalogBack();
+    trackPricingBar();
     initSort();
     initForm();
     renderAll();
@@ -1293,6 +1581,8 @@
       var s = Math.max(0, window.pageYOffset || window.scrollY || 0);
       var delta = lastS >= 0 ? s - lastS : 0;
       lastS = s;
+      /* На мобиле/планшете фильтры — шторка, прилипание не нужно */
+      if (window.innerWidth <= 1080) { f.classList.remove('pin-top'); return; }
       if (delta < 0) stick(true);       /* скролл вверх: прилипаем к верху */
       else if (delta > 0) stick(false); /* скролл вниз: прилипаем к низу */
     }
@@ -1333,7 +1623,32 @@
         var qs = new URLSearchParams(location.search);
         if (qs.get('cat') && categories.some(function (c) { return c.id === qs.get('cat'); })) state.cat = qs.get('cat');
         if (qs.get('color')) state.colors = [qs.get('color')];
+
+        /* Пришли из карточки товара? Восстанавливаем фильтры и позицию.
+           Читаем и удаляем ключ только на каталоге — на карточке товара
+           он должен пережить загрузку и сработать при «Назад в каталог». */
+        var onCatalog = !!$('[data-grid]');
+        var back = null;
+        if (onCatalog) {
+          try { back = JSON.parse(sessionStorage.getItem(CATBACK_KEY) || 'null'); }
+          catch (e) { back = null; }
+          try { sessionStorage.removeItem(CATBACK_KEY); } catch (e) {}
+        }
+        if (onCatalog && back && back.state) {
+          state.cat = back.state.cat || 'all';
+          state.colors = Array.isArray(back.state.colors) ? back.state.colors : [];
+          state.pack = back.state.pack || null;
+          state.onlyStock = !!back.state.onlyStock;
+          state.sort = back.state.sort || 'default';
+          var ssel = $('[data-sort]');
+          if (ssel) ssel.value = state.sort;
+        }
+
         renderAll();
+        /* Прыжок без анимации: у карточек aspect-ratio, высота сетки уже финальная */
+        if (onCatalog && back && back.y) {
+          window.scrollTo({ top: back.y, left: 0, behavior: 'instant' });
+        }
         pinFilters();
       })
       .catch(function (err) {

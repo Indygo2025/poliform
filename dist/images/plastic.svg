@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <filter id="fine">
+      <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+  </defs>
+  <g filter="url(#soft)" opacity=".42">
+    <ellipse cx="44" cy="40" rx="40" ry="26" fill="#ffffff"/>
+    <ellipse cx="120" cy="104" rx="44" ry="30" fill="#ffffff"/>
+    <ellipse cx="56" cy="126" rx="32" ry="20" fill="#e8eef2"/>
+    <ellipse cx="132" cy="30" rx="26" ry="18" fill="#eef3f6"/>
+  </g>
+  <rect width="160" height="160" filter="url(#fine)" opacity=".5"/>
+</svg>

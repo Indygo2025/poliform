@@ -83,6 +83,7 @@ function pl_head(array $d, array $opts = []): void {
 $keys  = trim((string)($seo['keywords'] ?? ''));
 $ogTitle = trim((string)($opts['ogTitle'] ?? ''));
 if ($ogTitle === '') $ogTitle = trim((string)($d['blocks']['heroTitle'] ?? ''));
+$bodyCls = trim((string)($opts['bodyClass'] ?? ''));
     $base  = pl_og_placeholder(rtrim((string)($opts['base'] ?? 'https://poliform.pages.dev/'), '/') . '/');
     ?><!DOCTYPE html>
 <html lang="ru">
@@ -113,7 +114,7 @@ if ($ogTitle === '') $ogTitle = trim((string)($d['blocks']['heroTitle'] ?? ''));
 <link rel="stylesheet" href="<?= pl_asset('css/plastic-live.css') ?>">
 <link rel="stylesheet" href="<?= pl_asset('css/shop.css') ?>">
 </head>
-<body>
+<body<?= $bodyCls !== '' ? ' class="' . e($bodyCls) . '"' : '' ?>>
 
 <div class="progress" role="presentation"></div>
 <?php
