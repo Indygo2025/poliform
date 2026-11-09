@@ -103,7 +103,7 @@
     mates.forEach(function (v) {
       var active = v.sku === p.sku;
       var node = active ? el('span', 'color-swatch is-active') : el('a', 'color-swatch');
-      if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
+      if (!active) node.href = 'product-' + encodeURIComponent(v.sku) + '.html';
       node.title = colorLabel(v) + ' · арт. ' + artLabel(v);
       node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
       if (active) node.setAttribute('aria-current', 'page');
@@ -121,7 +121,7 @@
       others.forEach(function (v, i) {
         if (i) more.appendChild(document.createTextNode(', '));
         var a = el('a', null, colorLabel(v));
-        a.href = 'product.php?sku=' + encodeURIComponent(v.sku);
+        a.href = 'product-' + encodeURIComponent(v.sku) + '.html';
         more.appendChild(a);
       });
       box.appendChild(more);
@@ -135,7 +135,7 @@
     mates.forEach(function (v) {
       var active = v.sku === p.sku;
       var node = active ? el('span', 'pcard-color is-active') : el('a', 'pcard-color');
-      if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
+      if (!active) node.href = 'product-' + encodeURIComponent(v.sku) + '.html';
       node.title = colorLabel(v) + ' · арт. ' + artLabel(v);
       node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
       if (active) node.setAttribute('aria-current', 'page');

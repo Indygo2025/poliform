@@ -46,6 +46,8 @@ function renderPage(string $root, string $page, array $get = []): string {
 }
 
 function rewriteLinks(string $html): string {
+    // Карточки товара: product.php?sku=100001 -> product-100001.html
+    $html = preg_replace('~product\.php\?sku=([A-Za-z0-9_-]+)~', 'product-$1.html', $html);
     return preg_replace('~\.php(?=["?#])~', '.html', $html);
 }
 
@@ -116,6 +118,9 @@ function copyDir(string $from, string $to): void {
 function patchShopJs(string $js): string {
     $map = [
         "'product.php?sku=' + p.sku" => "'product-' + p.sku + '.html'",
+        "'product.php?sku=' + v.sku" => "'product-' + v.sku + '.html'",
+        "'product.php?sku=' + encodeURIComponent(v.sku)" => "'product-' + encodeURIComponent(v.sku) + '.html'",
+        "'product.php?sku=' + encodeURIComponent(p.sku)" => "'product-' + encodeURIComponent(p.sku) + '.html'",
         "'products.php?cat=' + c.id" => "'products.html?cat=' + c.id",
         "'cart.php#order'"           => "'cart.html#order'",
         "'products.php'"             => "'products.html'",
