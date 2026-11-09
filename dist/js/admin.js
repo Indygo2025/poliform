@@ -61,6 +61,44 @@
     host.appendChild(el('div', 'ab-msg ab-msg--' + (kind || 'info'), text));
   }
 
+  /* Отображение артикула: «Нулевой / наш» (если задан нулевой). */
+  function artLabel(p) {
+    var b = String((p && p.baseArt) || '').trim();
+    var s = String((p && p.sku) || '').trim();
+    return b ? (b + ' / ' + s) : s;
+  }
+
+  /* ---------- просмотр фото ---------- */
+  var photoLb = null;
+  function openPhoto(src) {
+    if (!src) return;
+    if (!photoLb) {
+      photoLb = el('div', 'ab-lightbox');
+      photoLb.setAttribute('role', 'dialog');
+      photoLb.setAttribute('aria-label', 'Просмотр фотографии');
+      var close = el('button', 'ab-lightbox__close', '×');
+      close.type = 'button';
+      close.title = 'Закрыть';
+      close.setAttribute('aria-label', 'Закрыть');
+      var img = el('img', 'ab-lightbox__img');
+      img.alt = '';
+      photoLb.appendChild(close);
+      photoLb.appendChild(img);
+      photoLb.addEventListener('click', function (e) {
+        if (e.target === photoLb || e.target === close) closePhoto();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && photoLb && photoLb.classList.contains('is-open')) closePhoto();
+      });
+      document.body.appendChild(photoLb);
+    }
+    photoLb.querySelector('img').src = src;
+    photoLb.classList.add('is-open');
+  }
+  function closePhoto() {
+    if (photoLb) photoLb.classList.remove('is-open');
+  }
+
   /* ---------- API ---------- */
   function api(action, data) {
     var opt = { method: 'POST', credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } };
@@ -752,7 +790,7 @@
       star.addEventListener('click', function () { toggleHome(p, star); });
       nm.appendChild(star);
       var tx = el('div');
-      tx.appendChild(el('div', 'ab-mono ab-muted', p.sku));
+      tx.appendChild(el('div', 'ab-mono ab-muted', artLabel(p)));
       var a = el('a', null, p.shortTitle || p.title);
       a.href = '#';
       a.addEventListener('click', function (e) { e.preventDefault(); editor(p.sku); });
@@ -814,7 +852,7 @@
       var del = el('button', 'ab-btn ab-btn--sm ab-btn--danger', 'Удалить');
       del.type = 'button';
       del.addEventListener('click', function () {
-        if (!confirm('Удалить «' + (p.shortTitle || p.title) + '» (' + p.sku + ')?\nФайлы фото останутся в папке.')) return;
+        if (!confirm('Удалить «' + (p.shortTitle || p.title) + '» (' + artLabel(p) + ')?\nФайлы фото останутся в папке.')) return;
         api('product_del', { sku: p.sku }).then(need).then(function () {
           toast('Товар удалён');
           return loadAll().then(function () { go('products'); });
@@ -862,7 +900,7 @@
 
 function match(p, f) {
         if (f.q) {
-          var hay = [p.sku, p.shortTitle, p.title].join(' ').toLowerCase();
+          var hay = [p.sku, p.baseArt, p.shortTitle, p.title].join(' ').toLowerCase();
           var words = f.q.toLowerCase().split(/\s+/).filter(Boolean);
           if (!words.every(function (w) { return hay.indexOf(w) > -1; })) return false;
         }
@@ -932,7 +970,7 @@ td.colSpan = COLS.length;
 
     if (!p) {
       p = {
-        sku: S.nextSku || '', title: '', shortTitle: '', categoryId: (S.categories[0] || {}).id || '',
+        sku: S.nextSku || '', baseArt: '', title: '', shortTitle: '', categoryId: (S.categories[0] || {}).id || '',
         art: '', form: 'Прямоугольная', sizeL: 0, sizeW: 0, sizeH: 0, gridGap: 0,
         color: '', colorHex: '', colorGroup: '', packCount: 1, packNote: '', weightG: 0,
         priceRetail: 0, priceOpt: 0, volumeMl: 0, material: 'Пластик',
@@ -942,7 +980,7 @@ td.colSpan = COLS.length;
     }
     var draft = JSON.parse(JSON.stringify(p));
 
-    $('#view-title').textContent = sku ? 'Товар ' + sku : 'Новый товар';
+    $('#view-title').textContent = sku ? 'Товар ' + artLabel(draft) : 'Новый товар';
     $('#view-sub').textContent = sku ? 'Изменения применятся на витрине сразу после сохранения' : 'Заполните карточку и сохраните';
     $('#view-actions').innerHTML = '';
     var back = el('button', 'ab-btn', '← К списку');
@@ -989,6 +1027,8 @@ td.colSpan = COLS.length;
         var im = el('img');
         im.src = src;
         im.alt = '';
+        im.title = 'Открыть фото';
+        im.addEventListener('click', function () { openPhoto(src); });
         w.appendChild(im);
         var x = el('button', 'ab-photo__x', '×');
         x.type = 'button';
@@ -1046,8 +1086,9 @@ td.colSpan = COLS.length;
     mBody.appendChild(gFlags);
     mBody.appendChild(el('p', 'ab-hint', 'На главной показывается только первое фото товара. Отметьте несколько товаров — они покажутся по очереди в карусели.'));
 
-    var g1 = grid(2);
-    g1.appendChild(field('Артикул', 'sku', draft.sku, { readonly: true }));
+    var g1 = grid(3);
+    g1.appendChild(field('Нулевой Артикул', 'baseArt', draft.baseArt || '', { placeholder: 'напр. 9357773' }));
+    g1.appendChild(field('Артикул (наш)', 'sku', draft.sku, { readonly: true }));
     g1.appendChild(field('Категория', 'categoryId', draft.categoryId, {
       type: 'select',
       options: S.categories.map(function (c) { return { value: c.id, label: c.name }; })
@@ -1340,7 +1381,7 @@ td.colSpan = COLS.length;
       var cat = el('div', 'ab-muted', catName(draft.categoryId));
       pvBody.appendChild(cat);
       pvBody.appendChild(el('div', null, draft.shortTitle || 'Без названия'));
-      pvBody.appendChild(el('div', 'ab-mono ab-muted', 'Арт. ' + (draft.sku || '—')));
+      pvBody.appendChild(el('div', 'ab-mono ab-muted', 'Арт. ' + (artLabel(draft) || '—')));
       var d = [draft.sizeL, draft.sizeW, draft.sizeH].join('×') + ' см';
       pvBody.appendChild(el('div', 'ab-muted', d));
 
@@ -1552,8 +1593,12 @@ td.colSpan = COLS.length;
     if (items.length) {
       var ul = el('ul', 'ab-order-items');
       items.forEach(function (it) {
+        var ip = bySku(it.sku);
+        var iart = (it.baseArt || (ip && ip.baseArt) || '').toString().trim();
+        var isku = String(it.sku || '');
+        var ilabel = iart ? (iart + ' / ' + isku) : isku;
         ul.appendChild(el('li', null,
-          it.sku + ' · ' + (it.title || '') + ' · ' + (it.mode === OPT ? 'опт' : 'розница') +
+          ilabel + ' · ' + (it.title || '') + ' · ' + (it.mode === OPT ? 'опт' : 'розница') +
           ' · ' + it.qty + ' шт. · ' + money(it.lineTotal)));
       });
       box.appendChild(ul);
