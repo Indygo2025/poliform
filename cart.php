@@ -15,7 +15,7 @@ pl_header($d, 'cart');
 pl_breadcrumbs_jsonld($base, ['Главная' => 'index.php', 'Корзина и заявка' => 'cart.php']);
 ?>
 
-<section>
+<section class="page-top">
   <div class="container">
     <nav class="crumbs" aria-label="Хлебные крошки">
       <a href="index.php">Главная</a> / <span>Корзина и заявка</span>

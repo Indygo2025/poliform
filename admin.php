@@ -1,0 +1,113 @@
+<?php
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+$v = function (string $path): string {
+    $file = __DIR__ . '/' . $path;
+    return $path . '?v=' . (is_file($file) ? filemtime($file) : '1');
+};
+?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Полиформ — админка</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<?= $v('css/admin.css') ?>">
+</head>
+<body>
+
+<!-- ===================================================== вход -->
+<div class="ab-login" id="login" hidden>
+  <form class="ab-login__card" id="login-form" autocomplete="on">
+    <div class="ab-login__logo"><span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6"/></svg></span> ПОЛИФОРМ</div>
+    <h1>Вход в админку</h1>
+    <p>Управление каталогом, заявками и текстами сайта.</p>
+    <div id="login-msg"></div>
+    <div class="ab-field">
+      <label for="lg-user">Логин</label>
+      <input id="lg-user" name="username" autocomplete="username" required>
+    </div>
+    <div class="ab-field">
+      <label for="lg-pass">Пароль</label>
+      <div class="ab-pass">
+        <input id="lg-pass" name="password" type="password" autocomplete="current-password" required>
+        <button class="ab-pass__eye" type="button" id="lg-eye" aria-label="Показать пароль" aria-pressed="false" tabindex="-1">
+          <svg class="ab-eye-open" viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+            <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="2.9" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          <svg class="ab-eye-off" viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true" hidden>
+            <path d="M3 3l18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10.6 6.1A9.9 9.9 0 0 1 12 6c6.4 0 10 6 10 6a17.6 17.6 0 0 1-3.2 3.7M6.5 7.8C3.8 9.4 2 12 2 12s3.6 6 10 6a9.8 9.8 0 0 0 3.5-.65" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M9.6 9.8a2.9 2.9 0 0 0 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <button class="ab-btn ab-btn--primary ab-grow" type="submit">Войти</button>
+  </form>
+</div>
+
+<!-- ===================================================== корпус -->
+<div class="ab-shell" id="app" hidden>
+  <aside class="ab-side">
+    <div class="ab-side__brand">
+      <i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="M4 19 L12 4 L20 19 Z" stroke="#161616" stroke-width="2.6"/></svg></i>
+      <b>ПОЛИФОРМ<small>панель управления</small></b>
+    </div>
+    <nav class="ab-nav" id="nav">
+      <button type="button" data-view="products" class="is-active">Каталог</button>
+      <button type="button" data-view="orders">Заявки <span class="ab-badge" data-orders-badge hidden>0</span></button>
+      <button type="button" data-view="reports">Отчёты</button>
+      <button type="button" data-view="categories">Категории и цвета</button>
+      <button type="button" data-view="texts">Тексты сайта</button>
+      <button type="button" data-view="contacts">Контакты и SEO</button>
+      <button type="button" data-view="users" data-admin-only>Пользователи</button>
+      <button type="button" data-view="audit" data-admin-only>Журнал доступа</button>
+      <button type="button" data-view="service">Резервная копия</button>
+    </nav>
+    <div class="ab-side__foot">
+      <div id="who" class="ab-mono" style="margin-bottom:6px"></div>
+      <div class="ab-row">
+        <a class="ab-btn ab-btn--sm" href="index.php" target="_blank" rel="noopener">Открыть сайт</a>
+        <button class="ab-btn ab-btn--sm" type="button" id="logout">Выйти</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="ab-main">
+    <!-- Предупреждение о необработанных заявках: появляется сразу после входа -->
+    <div class="ab-alert" id="orders-alert" role="status" hidden>
+      <span class="ab-alert__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M10.6 3.6 2.9 17a1.6 1.6 0 0 0 1.4 2.4h15.4A1.6 1.6 0 0 0 21.1 17L13.4 3.6a1.6 1.6 0 0 0-2.8 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 8.4v4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.3" r="1.15" fill="currentColor"/></svg>
+      </span>
+      <div class="ab-alert__text">
+        <b id="orders-alert-title"></b>
+        <span id="orders-alert-note"></span>
+      </div>
+      <button class="ab-btn ab-btn--sm ab-btn--primary" type="button" id="orders-alert-go">Обработать</button>
+      <button class="ab-btn ab-btn--sm ab-btn--icon" type="button" id="orders-alert-hide" aria-label="Скрыть сообщение" title="Скрыть до следующего входа">×</button>
+    </div>
+
+    <div class="ab-head">
+      <div class="ab-grow">
+        <h1 id="view-title">Каталог</h1>
+        <p id="view-sub"></p>
+      </div>
+      <div class="ab-row" id="view-actions"></div>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="ab-toast" id="toast" role="status"></div>
+
+<script src="<?= $v('js/admin.js') ?>"></script>
+</body>
+</html>
