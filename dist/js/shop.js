@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    ПОЛИФОРМ — витрина пластиковых изделий
    Каталог, режим Опт/Розница, фильтры, корзина
    ========================================================================== */
@@ -179,62 +179,6 @@
     var hex = hexOf(p);
     if (hex) fill.style.background = hex;
     return fill;
-  }
-
-  /* Блок «Цвет» на странице товара: текущая расцветка + кружки остальных. */
-  function productColors(p, mates) {
-    var box = el('div', 'product-colors');
-    var row = el('div', 'product-colors__row');
-
-    var lab = el('span', 'product-colors__label');
-    lab.appendChild(document.createTextNode('Цвет: '));
-    lab.appendChild(el('b', null, colorLabel(p)));
-    row.appendChild(lab);
-
-    var list = el('div', 'product-colors__list');
-    mates.forEach(function (v) {
-      var active = v.sku === p.sku;
-      var node = active ? el('span', 'color-swatch is-active') : el('a', 'color-swatch');
-      if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
-      node.title = colorLabel(v) + ' · арт. ' + v.sku;
-      node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
-      if (active) node.setAttribute('aria-current', 'page');
-      node.appendChild(swatchInner(v));
-      list.appendChild(node);
-    });
-    row.appendChild(list);
-    box.appendChild(row);
-
-    /* Текстом — чтобы цвета были понятны и на телефоне, где нет подсказок. */
-    var others = mates.filter(function (v) { return v.sku !== p.sku; });
-    if (others.length) {
-      var more = el('div', 'product-colors__others');
-      more.appendChild(document.createTextNode('Другие цвета: '));
-      others.forEach(function (v, i) {
-        if (i) more.appendChild(document.createTextNode(', '));
-        var a = el('a', null, colorLabel(v));
-        a.href = 'product.php?sku=' + encodeURIComponent(v.sku);
-        more.appendChild(a);
-      });
-      box.appendChild(more);
-    }
-    return box;
-  }
-
-  /* Кружки расцветок на плитке каталога. */
-  function tileColors(p, mates) {
-    var row = el('div', 'pcard__colors');
-    mates.forEach(function (v) {
-      var active = v.sku === p.sku;
-      var node = active ? el('span', 'pcard-color is-active') : el('a', 'pcard-color');
-      if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
-      node.title = colorLabel(v) + ' · арт. ' + v.sku;
-      node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
-      if (active) node.setAttribute('aria-current', 'page');
-      node.appendChild(swatchInner(v));
-      row.appendChild(node);
-    });
-    return row;
   }
 
   /* ---------- Режим Опт / Розница ---------- */
@@ -431,9 +375,6 @@
     h3.appendChild(a);
     body.appendChild(h3);
     body.appendChild(el('span', 'pcard__sku', 'Арт. ' + artLabel(p)));
-
-    var tileMates = groupMates(p);
-    if (tileMates.length > 1) body.appendChild(tileColors(p, tileMates));
 
     var tileMates = groupMates(p);
     if (tileMates.length > 1) body.appendChild(tileColors(p, tileMates));
