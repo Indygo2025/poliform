@@ -432,11 +432,13 @@
     return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
-  function buildDeck(host, list) {
+  function buildDeck(host, list, opts) {
+    opts = opts || {};
+    var makeNode = opts.build || buildCard;
     if (host._deckRO) { host._deckRO.disconnect(); host._deckRO = null; }
     host.innerHTML = '';
     host.setAttribute('role', 'region');
-    host.setAttribute('aria-label', 'Популярные товары');
+    host.setAttribute('aria-label', opts.label || 'Популярные товары');
     host.tabIndex = 0;
 
     var STEP = 30;
@@ -444,8 +446,8 @@
     var DURATION = 430;
 
     var stage = el('div', 'home-deck__stage');
-    var cards = list.map(function (p) {
-      var card = buildCard(p);
+    var cards = list.map(function (item) {
+      var card = makeNode(item);
       card.classList.add('home-deck__card');
       stage.appendChild(card);
       return card;
@@ -455,17 +457,17 @@
     var bar = el('div', 'home-deck__controls');
     var prev = el('button', 'home-deck__nav', '‹');
     prev.type = 'button';
-    prev.setAttribute('aria-label', 'Предыдущий товар');
+    prev.setAttribute('aria-label', opts.prevLabel || 'Предыдущий товар');
     var count = el('span', 'home-deck__count');
     count.setAttribute('aria-live', 'polite');
     var next = el('button', 'home-deck__nav', '›');
     next.type = 'button';
-    next.setAttribute('aria-label', 'Следующий товар');
+    next.setAttribute('aria-label', opts.nextLabel || 'Следующий товар');
     bar.appendChild(prev);
     bar.appendChild(count);
     bar.appendChild(next);
 
-    var hint = el('p', 'home-deck__hint', 'Потяните карточку в сторону или листайте стрелками');
+    var hint = el('p', 'home-deck__hint', opts.hint || 'Потяните карточку в сторону или листайте стрелками');
     host.appendChild(bar);
     host.appendChild(hint);
 
@@ -632,27 +634,43 @@
   }
 
   /* ---------- Главная ---------- */
+  /* Карточка производственной линейки (категории) для колоды на главной. */
+  function buildCatCard(c, items) {
+    var a = el('a', 'cat-card');
+    a.href = 'products.html?cat=' + c.id;
+    var img = el('img');
+    img.src = items[0].thumbs[0];
+    img.alt = c.name;
+    img.loading = 'lazy';
+    a.appendChild(img);
+    var b = el('div', 'cat-card__body');
+    b.appendChild(el('h3', null, c.short || c.name));
+    b.appendChild(el('p', null, c.desc));
+    b.appendChild(el('span', 'cat-card__count', items.length + ' ' + plural(items.length, 'артикул', 'артикула', 'артикулов')));
+    a.appendChild(b);
+    return a;
+  }
+
   function renderHome() {
     var cw = $('[data-home-cats]');
     if (cw) {
-      cw.innerHTML = '';
+      var catNodes = [];
       categories.forEach(function (c) {
         var items = products.filter(function (p) { return p.categoryId === c.id; });
         if (!items.length) return;
-        var a = el('a', 'cat-card');
-        a.href = 'products.html?cat=' + c.id;
-        var img = el('img');
-        img.src = items[0].thumbs[0];
-        img.alt = c.name;
-        img.loading = 'lazy';
-        a.appendChild(img);
-        var b = el('div', 'cat-card__body');
-        b.appendChild(el('h3', null, c.short || c.name));
-        b.appendChild(el('p', null, c.desc));
-        b.appendChild(el('span', 'cat-card__count', items.length + ' ' + plural(items.length, 'артикул', 'артикула', 'артикулов')));
-        a.appendChild(b);
-        cw.appendChild(a);
+        catNodes.push(buildCatCard(c, items));
       });
+      if (cw.hasAttribute('data-deck')) {
+        buildDeck(cw, catNodes, {
+          build: function (node) { return node; },
+          label: 'Производственные линейки',
+          prevLabel: 'Предыдущая линейка',
+          nextLabel: 'Следующая линейка'
+        });
+      } else {
+        cw.innerHTML = '';
+        catNodes.forEach(function (node) { cw.appendChild(node); });
+      }
     }
 
     var g = $('[data-home-grid]');
@@ -1018,7 +1036,7 @@
       var c2 = el('a', null, 'Каталог');
       c2.href = 'products.html';
       var c3 = el('a', null, catName(p.categoryId));
-      c2.href = 'products.php?cat=' + p.categoryId;
+      c3.href = 'products.html?cat=' + p.categoryId;
       crumbs.appendChild(c1);
       crumbs.appendChild(document.createTextNode(' / '));
       crumbs.appendChild(c2);

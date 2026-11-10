@@ -1536,6 +1536,11 @@ a.pcard__add:hover {
 .home-deck__card.is-hidden { opacity: 0; pointer-events: none; }
 .home-deck__card img { -webkit-user-drag: none; }
 
+/* Колода производственных линеек: та же механика, карточки чуть шире товарных */
+.home-deck--cats { width: min(100%, 440px); }
+.home-deck--cats .cat-card { box-shadow: 0 12px 30px rgba(16, 22, 26, .18); }
+.home-deck--cats .cat-card img { padding: 22px; }
+
 .home-deck__controls {
   display: flex;
   align-items: center;

@@ -122,6 +122,7 @@ function patchShopJs(string $js): string {
         "'product.php?sku=' + encodeURIComponent(v.sku)" => "'product-' + encodeURIComponent(v.sku) + '.html'",
         "'product.php?sku=' + encodeURIComponent(p.sku)" => "'product-' + encodeURIComponent(p.sku) + '.html'",
         "'products.php?cat=' + c.id" => "'products.html?cat=' + c.id",
+        "'products.php?cat=' + p.categoryId" => "'products.html?cat=' + p.categoryId",
         "'cart.php#order'"           => "'cart.html#order'",
         "'products.php'"             => "'products.html'",
         "'cart.php'"                 => "'cart.html'",
