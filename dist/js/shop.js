@@ -415,6 +415,212 @@
     return card;
   }
 
+  /* ---------- Главная: колода карточек ----------
+     Верхняя карточка улетает в сторону, остальные с глубиной выдвигаются
+     вперёд — как в референсе Figma Community. */
+  function deckReducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function buildDeck(host, list) {
+    if (host._deckRO) { host._deckRO.disconnect(); host._deckRO = null; }
+    host.innerHTML = '';
+    host.setAttribute('role', 'region');
+    host.setAttribute('aria-label', 'Популярные товары');
+    host.tabIndex = 0;
+
+    var STEP = 30;
+    var SCALE_STEP = 0.04;
+    var DURATION = 430;
+
+    var stage = el('div', 'home-deck__stage');
+    var cards = list.map(function (p) {
+      var card = buildCard(p);
+      card.classList.add('home-deck__card');
+      stage.appendChild(card);
+      return card;
+    });
+    host.appendChild(stage);
+
+    var bar = el('div', 'home-deck__controls');
+    var prev = el('button', 'home-deck__nav', '‹');
+    prev.type = 'button';
+    prev.setAttribute('aria-label', 'Предыдущий товар');
+    var count = el('span', 'home-deck__count');
+    count.setAttribute('aria-live', 'polite');
+    var next = el('button', 'home-deck__nav', '›');
+    next.type = 'button';
+    next.setAttribute('aria-label', 'Следующий товар');
+    bar.appendChild(prev);
+    bar.appendChild(count);
+    bar.appendChild(next);
+
+    var hint = el('p', 'home-deck__hint', 'Потяните карточку в сторону или листайте стрелками');
+    host.appendChild(bar);
+    host.appendChild(hint);
+
+    var n = cards.length;
+    var top = 0;
+    var busy = false;
+    var drag = null;
+
+    if (n < 2) {
+      bar.hidden = true;
+      hint.hidden = true;
+    }
+
+    function depthOf(i) { return (i - top + n) % n; }
+
+    function measure() {
+      var max = 0;
+      cards.forEach(function (card) { max = Math.max(max, card.offsetHeight); });
+      if (!max) return;
+      var levels = Math.min(3, Math.max(0, n - 1));
+      var bottom = max * (1 - SCALE_STEP * levels) + STEP * levels;
+      stage.style.height = Math.ceil(Math.max(max, bottom)) + 10 + 'px';
+    }
+
+    function layout() {
+      cards.forEach(function (card, i) {
+        var d = depthOf(i);
+        card.setAttribute('data-depth', String(d));
+        card.style.setProperty('--d', String(Math.min(d, 4)));
+        card.classList.toggle('is-hidden', d > 3);
+        card.classList.toggle('is-top', d === 0);
+        card.inert = d !== 0;
+        if (d === 0) card.removeAttribute('aria-hidden');
+        else card.setAttribute('aria-hidden', 'true');
+      });
+      count.textContent = (top + 1) + ' / ' + n;
+      measure();
+    }
+
+    function finishAdvance(card) {
+      card.style.transition = 'none';
+      card.style.transform = '';
+      card.style.opacity = '';
+      card.style.zIndex = '';
+      top = (top + 1) % n;
+      layout();
+      void card.offsetWidth;
+      requestAnimationFrame(function () {
+        card.style.transition = '';
+        setTimeout(function () { busy = false; }, 30);
+      });
+    }
+
+    function flyTop(sign) {
+      if (busy || n < 2) return;
+      busy = true;
+      if (drag) { drag = null; stage.classList.remove('is-dragging'); }
+      var card = cards[top];
+      if (deckReducedMotion()) { finishAdvance(card); return; }
+      var dist = (stage.clientWidth || 320) + card.offsetWidth * 0.5;
+      card.style.transition = 'transform ' + DURATION + 'ms cubic-bezier(.22,.75,.25,1), opacity ' + DURATION + 'ms ease';
+      card.style.zIndex = '40';
+      card.style.transform = 'translateX(calc(-50% + ' + (sign * dist) + 'px)) translateY(-14px) rotate(' + (sign * 14) + 'deg) scale(1.02)';
+      card.style.opacity = '0';
+      setTimeout(function () { finishAdvance(card); }, DURATION);
+    }
+
+    function goPrev() {
+      if (busy || n < 2) return;
+      busy = true;
+      var prevIndex = (top - 1 + n) % n;
+      var card = cards[prevIndex];
+
+      /* Предыдущая карточка сначала встаёт на глубину 3 без анимации,
+         затем колода шагает назад — она выезжает вперёд. */
+      card.style.transition = 'none';
+      card.classList.remove('is-hidden');
+      card.setAttribute('data-depth', '3');
+      card.style.setProperty('--d', '3');
+      card.inert = true;
+      void card.offsetWidth;
+      card.style.transition = '';
+      top = prevIndex;
+      layout();
+      setTimeout(function () { busy = false; }, 380);
+    }
+
+    function suppressClick() {
+      var off = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        stage.removeEventListener('click', off, true);
+      };
+      stage.addEventListener('click', off, true);
+      setTimeout(function () { stage.removeEventListener('click', off, true); }, 400);
+    }
+
+    next.addEventListener('click', function () { flyTop(1); });
+    prev.addEventListener('click', goPrev);
+    host.addEventListener('keydown', function (e) {
+      if (e.target.closest && e.target.closest('input, textarea, select')) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); flyTop(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+    });
+
+    /* Свайп/перетаскивание верхней карточки. */
+    stage.addEventListener('pointerdown', function (e) {
+      if (busy || n < 2 || (e.button != null && e.button !== 0)) return;
+      var card = e.target.closest ? e.target.closest('.home-deck__card') : null;
+      if (!card || card !== cards[top]) return;
+      if (e.target.closest('input, textarea, select')) return;
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, active: false, card: card };
+    });
+
+    stage.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x;
+      var dy = e.clientY - drag.y;
+      if (!drag.active) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
+        drag.active = true;
+        stage.classList.add('is-dragging');
+        drag.card.style.transition = 'none';
+        try { stage.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
+      }
+      drag.dx = dx;
+      var rot = Math.max(-12, Math.min(12, dx * 0.04));
+      var lift = Math.min(16, Math.abs(dx) * 0.04);
+      drag.card.style.transform = 'translateX(calc(-50% + ' + dx + 'px)) translateY(-' + lift + 'px) rotate(' + rot + 'deg) scale(1.01)';
+      drag.card.style.opacity = String(Math.max(0.55, 1 - Math.abs(dx) / (stage.clientWidth || 340) * 0.5));
+      e.preventDefault();
+    }, { passive: false });
+
+    function endDrag(e) {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      var d = drag;
+      drag = null;
+      if (!d.active) return;
+      stage.classList.remove('is-dragging');
+      try { stage.releasePointerCapture(d.id); } catch (err) { /* не критично */ }
+      suppressClick();
+      var limit = Math.max(64, (stage.clientWidth || 340) * 0.28);
+      if (Math.abs(d.dx) >= limit) {
+        flyTop(d.dx > 0 ? 1 : -1);
+      } else {
+        d.card.style.transition = '';
+        d.card.style.transform = '';
+        d.card.style.opacity = '';
+      }
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function () { measure(); });
+      cards.forEach(function (card) { ro.observe(card); });
+      host._deckRO = ro;
+    } else {
+      window.addEventListener('resize', measure);
+    }
+
+    layout();
+  }
+
   /* ---------- Главная ---------- */
   function renderHome() {
     var cw = $('[data-home-cats]');
@@ -441,11 +647,14 @@
 
     var g = $('[data-home-grid]');
     if (g) {
-      g.innerHTML = '';
       var limit = parseInt(g.getAttribute('data-limit'), 10) || 8;
       var skip = new URLSearchParams(location.search).get('sku');
-      var list = products.filter(function (p) { return p.sku !== skip; });
-      list.slice(0, limit).forEach(function (p) { g.appendChild(buildCard(p)); });
+      var list = products.filter(function (p) { return p.sku !== skip; }).slice(0, limit);
+      if (g.hasAttribute('data-deck')) buildDeck(g, list);
+      else {
+        g.innerHTML = '';
+        list.forEach(function (p) { g.appendChild(buildCard(p)); });
+      }
     }
 
     var k = $('[data-home-kpi]');
