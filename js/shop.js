@@ -302,10 +302,13 @@
 
     var badges = el('div', 'pcard__badges');
     if (p.inStock === false) badges.appendChild(el('span', 'pbadge pbadge--out', 'Под заказ'));
-    else if (mode === OPT) badges.appendChild(el('span', 'pbadge pbadge--opt', 'Опт'));
-    if (mode === OPT && p.priceRetail > p.priceOpt && savePct(p) >= 1)
-      badges.appendChild(el('span', 'pbadge pbadge--disc', '−' + savePct(p) + '%'));
-    badges.appendChild(el('span', 'pbadge pbadge--pack', 'Бокс ' + p.packCount + ' шт.'));
+    if (mode === OPT) {
+      /* Плашка «Опт» и фасовка — только в оптовом режиме. В рознице их нет. */
+      if (p.inStock !== false) badges.appendChild(el('span', 'pbadge pbadge--opt', 'Опт'));
+      if (p.priceRetail > p.priceOpt && savePct(p) >= 1)
+        badges.appendChild(el('span', 'pbadge pbadge--disc', '−' + savePct(p) + '%'));
+      badges.appendChild(el('span', 'pbadge pbadge--pack', 'Бокс ' + p.packCount + ' шт.'));
+    }
 
     /* Галерея на карточке: при наведении появляются остальные фото,
        клик по миниатюре меняет главное. Фото не переключается за курсором. */
