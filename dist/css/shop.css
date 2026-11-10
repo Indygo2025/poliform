@@ -250,8 +250,10 @@
 .pcard__media {
   position: relative;
   display: block;
-  /* Пропорция макета: 332 × 280, фото заполняет подложку целиком */
-  aspect-ratio: 332 / 280;
+  /* Фото товара — вертикальные 3:4 (1000×1333) с надписями у верхнего и нижнего
+     края, поэтому область фото повторяет их пропорции. object-fit: contain —
+     снимок показывается целиком, без обрезки краёв. */
+  aspect-ratio: 3 / 4;
   background: var(--pc-media);
   overflow: hidden;
 }
@@ -259,21 +261,21 @@
   position: relative;
   display: block;
 }
-/* Галерея карточки: вертикальные миниатюры слева от фото при наведении,
-   не перекрывая основное изображение */
+/* Галерея карточки: миниатюры появляются при наведении узкой полосой
+   по низу фото, чтобы не закрывать надписи на самом снимке. */
 .pcard__shots {
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   gap: 6px;
-  padding: 10px 8px;
-  width: 56px;
-  background: rgba(247, 245, 240, .97);
-  border-right: 0;
+  padding: 6px;
+  background: rgba(255, 255, 255, .92);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(41, 47, 40, .18);
   z-index: 2;
   opacity: 0;
   visibility: hidden;
@@ -282,15 +284,13 @@
 }
 .pcard:hover .pcard__shots,
 .pcard__shots.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
-/* Миниатюры лежат поверх фото полупрозрачной полосой — снимок не сдвигаем,
-   иначе нарушается полноэкранная подложка макета. */
 .pcard__shot {
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border: 2px solid #fff;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #fff;
   overflow: hidden;
   cursor: pointer;
@@ -300,13 +300,27 @@
 .pcard__shot.is-active { border-color: var(--pc-deep); }
 .pcard__shot:focus-visible { outline: 2px solid var(--pc-deep); outline-offset: 1px; }
 .pcard__media img {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   padding: 0;
-  transition: transform .4s ease;
 }
-.pcard:hover .pcard__media img { transform: scale(1.025); }
+/* Фон под фото: размытая копия того же снимка. Нужен для кадров, чьи пропорции
+   не 3:4 (квадратные фото) — вместо однотонных полос сверху и снизу получается
+   мягкая подложка в тон снимку. У фото 3:4 фон полностью закрыт. */
+.pcard__media img.pcard__bg {
+  position: absolute;
+  top: -8%;
+  left: -8%;
+  width: 116%;
+  height: 116%;
+  z-index: 0;
+  object-fit: cover;
+  filter: blur(18px) saturate(1.08);
+  opacity: .9;
+}
 /* Бейджи карточки: белые пилюли поверх фото, слева сверху — как в макете */
 .pcard__badges {
   position: absolute;

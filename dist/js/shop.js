@@ -288,6 +288,12 @@
 
     var media = el('a', 'pcard__media');
     media.href = 'product-' + p.sku + '.html';
+    var bg = el('img', 'pcard__bg');
+    bg.src = p.thumbs[0];
+    bg.alt = '';
+    bg.loading = 'lazy';
+    bg.setAttribute('aria-hidden', 'true');
+    media.appendChild(bg);
     var img = el('img');
     img.src = p.thumbs[0];
     img.alt = p.title;
@@ -313,6 +319,7 @@
         if (i === cur) return;
         cur = i;
         img.src = thumbs[i];
+        bg.src = thumbs[i];
         $$('.pcard__shot', ph).forEach(function (b, k) { b.classList.toggle('is-active', k === i); });
       };
       var shots = el('div', 'pcard__shots');
