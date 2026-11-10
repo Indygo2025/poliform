@@ -129,22 +129,6 @@
     return box;
   }
 
-  /* Кружки расцветок на плитке каталога. */
-  function tileColors(p, mates) {
-    var row = el('div', 'pcard__colors');
-    mates.forEach(function (v) {
-      var active = v.sku === p.sku;
-      var node = active ? el('span', 'pcard-color is-active') : el('a', 'pcard-color');
-      if (!active) node.href = 'product.php?sku=' + encodeURIComponent(v.sku);
-      node.title = colorLabel(v) + ' · арт. ' + artLabel(v);
-      node.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
-      if (active) node.setAttribute('aria-current', 'page');
-      node.appendChild(swatchInner(v));
-      row.appendChild(node);
-    });
-    return row;
-  }
-
   /* ---------- Цвета одного товара ----------
      Товары с одинаковым значением colorGroup — одна и та же позиция в разных
      расцветках. На витрине они связаны блоком «Цвет»: нажал кружок — открылась
@@ -317,15 +301,11 @@
       badges.appendChild(el('span', 'pbadge pbadge--disc', '−' + savePct(p) + '%'));
     badges.appendChild(el('span', 'pbadge pbadge--pack', 'Бокс ' + p.packCount + ' шт.'));
 
-    var sw = el('span', 'pcard__swatch');
-    sw.style.background = p.colorHex;
-    sw.title = p.color;
-    media.appendChild(sw);
-
     /* Галерея на карточке: при наведении появляются остальные фото,
        клик по миниатюре меняет главное. Фото не переключается за курсором. */
     var ph = el('div', 'pcard__ph');
     ph.appendChild(media);
+    ph.appendChild(badges);
     var thumbs = p.thumbs && p.thumbs.length ? p.thumbs : null;
     if (thumbs && thumbs.length > 1) {
       var cur = 0;
@@ -365,32 +345,51 @@
     card.appendChild(ph);
 
     var body = el('div', 'pcard__body');
-    /* Бейджи «Опт / скидка / бокс» — отдельной строкой под фото, над категорией */
-    body.appendChild(badges);
-    body.appendChild(el('span', 'pcard__cat', catName(p.categoryId)));
 
     var h3 = el('h3', 'pcard__title');
     var a = el('a', null, p.shortTitle);
     a.href = 'product.php?sku=' + p.sku;
     h3.appendChild(a);
     body.appendChild(h3);
-    body.appendChild(el('span', 'pcard__sku', 'Арт. ' + artLabel(p)));
 
-    var tileMates = groupMates(p);
-    if (tileMates.length > 1) body.appendChild(tileColors(p, tileMates));
+    /* Подзаголовок как в макете: тип изделия · размер. */
+    var sub = [];
+    if (p.art) sub.push(String(p.art));
+    sub.push(dim(p));
+    body.appendChild(el('p', 'pcard__desc', sub.join(' · ')));
 
-    var attrs = el('ul', 'pcard__attrs');
-    attrs.appendChild(el('li', null, dim(p)));
-    if (p.volumeMl) attrs.appendChild(el('li', null, p.volumeMl + ' мл'));
-    attrs.appendChild(el('li', null, p.art));
-    body.appendChild(attrs);
+    /* Строка цвета: кружок текущей расцветки, её название и кружки остальных. */
+    var colorLine = el('div', 'pcard__colorline');
+    var dot = el('span', 'pcard__dot');
+    var hex = hexOf(p);
+    if (hex) dot.style.background = hex;
+    else dot.classList.add('is-empty');
+    colorLine.appendChild(dot);
+    colorLine.appendChild(el('span', 'pcard__colorname', colorLabel(p)));
+
+    var mates = groupMates(p).filter(function (v) { return v.sku !== p.sku; });
+    if (mates.length) {
+      var variants = el('span', 'pcard__variants');
+      mates.slice(0, 5).forEach(function (v) {
+        var va = el('a', 'pcard-variant');
+        va.href = 'product.php?sku=' + encodeURIComponent(v.sku);
+        va.title = colorLabel(v) + ' · арт. ' + artLabel(v);
+        va.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
+        var vh = hexOf(v);
+        if (vh) va.style.background = vh;
+        else if (v.thumbs && v.thumbs[0]) va.style.backgroundImage = 'url("' + v.thumbs[0] + '")';
+        variants.appendChild(va);
+      });
+      if (mates.length > 5) variants.appendChild(el('span', 'pcard-variant-more', '+' + (mates.length - 5)));
+      colorLine.appendChild(variants);
+    }
+    body.appendChild(colorLine);
 
     var price = el('div', 'pcard__price');
     var now = el('div', 'price-now');
     now.appendChild(el('b', null, money(priceOf(p))));
     now.appendChild(el('span', null, '/ шт.'));
     price.appendChild(now);
-
     var unit = el('div', 'pcard__unit');
     if (mode === OPT) {
       if (p.priceRetail > p.priceOpt) price.appendChild(el('div', 'price-was', money(p.priceRetail)));
@@ -411,6 +410,10 @@
       body.appendChild(ask);
       if (p.stockNote) body.appendChild(el('div', 'pcard__opt-hint', p.stockNote));
     }
+
+    /* Нижняя строка карточки: артикул (нулевой / наш), как подпись под ценой. */
+    body.appendChild(el('div', 'pcard__meta', 'Арт. ' + artLabel(p)));
+
     card.appendChild(body);
     return card;
   }

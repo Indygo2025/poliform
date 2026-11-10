@@ -221,31 +221,38 @@
   gap: 20px;
 }
 
-/* ---------- Карточка товара (стиль Яндекс.Маркета) ---------- */
+/* ---------- Карточка товара (макет Figma: тёплая подложка, тёмно-зелёный) ---------- */
 .pcard {
+  --pc-ink: #292f28;
+  --pc-muted: #72766c;
+  --pc-deep: #3e513f;
+  --pc-line: #e7e1d6;
+  --pc-media: #efe9de;
   display: flex;
   flex-direction: column;
   background: #fff;
-  border: 1px solid rgba(16, 22, 26, .09);
-  border-radius: 12px;
+  border: 0;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: none;
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  box-shadow: 0 1px 2px rgba(41, 47, 40, .05);
+  transition: transform .22s ease, box-shadow .22s ease;
   position: relative;
+  color: var(--pc-ink);
 }
 .pcard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(16, 22, 26, .08);
-  border-color: rgba(16, 22, 26, .12);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 44px rgba(41, 47, 40, .12);
 }
-.pcard:focus-within { border-color: #b3b3b3; }
+.pcard:focus-within {
+  box-shadow: 0 0 0 2px rgba(62, 81, 63, .22), 0 18px 44px rgba(41, 47, 40, .12);
+}
 
 .pcard__media {
   position: relative;
   display: block;
-  /* Компактная карточка: фото не квадратное, а 4:3 — карточка ниже примерно на 20% */
-  aspect-ratio: 4 / 3;
-  background: #f5f6f7;
+  /* Пропорция макета: 332 × 280, фото заполняет подложку целиком */
+  aspect-ratio: 332 / 280;
+  background: var(--pc-media);
   overflow: hidden;
 }
 .pcard__ph {
@@ -265,8 +272,8 @@
   gap: 6px;
   padding: 10px 8px;
   width: 56px;
-  background: #f5f6f7;
-  border-right: 1px solid var(--shop-line);
+  background: rgba(247, 245, 240, .97);
+  border-right: 0;
   z-index: 2;
   opacity: 0;
   visibility: hidden;
@@ -275,45 +282,60 @@
 }
 .pcard:hover .pcard__shots,
 .pcard__shots.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
-/* Сдвигаем фото вправо, чтобы миниатюры не перекрывали его */
-.pcard__ph .pcard__media { transition: padding-left .18s ease; }
-.pcard:hover .pcard__ph .pcard__media,
-.pcard__ph:has(.pcard__shots.is-open) .pcard__media { padding-left: 56px; }
+/* Миниатюры лежат поверх фото полупрозрачной полосой — снимок не сдвигаем,
+   иначе нарушается полноэкранная подложка макета. */
 .pcard__shot {
   flex: 0 0 auto;
   width: 40px;
   height: 40px;
   padding: 0;
   border: 2px solid #fff;
-  border-radius: var(--r-sm);
+  border-radius: 10px;
   background: #fff;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(16, 22, 26, .18);
+  box-shadow: 0 1px 4px rgba(41, 47, 40, .18);
 }
 .pcard__shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.pcard__shot.is-active { border-color: var(--signal-deep); }
-.pcard__shot:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 1px; }
+.pcard__shot.is-active { border-color: var(--pc-deep); }
+.pcard__shot:focus-visible { outline: 2px solid var(--pc-deep); outline-offset: 1px; }
 .pcard__media img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  padding: 8px;
-  transition: opacity .2s ease;
+  object-fit: cover;
+  padding: 0;
+  transition: transform .4s ease;
 }
-/* Бейджи карточки: строка под фотографией (не поверх снимка) */
+.pcard:hover .pcard__media img { transform: scale(1.025); }
+/* Бейджи карточки: белые пилюли поверх фото, слева сверху — как в макете */
 .pcard__badges {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   margin: 0;
+  pointer-events: none;
 }
 .pcard__badges .pbadge {
-  box-shadow: none;
-  border: 1px solid rgba(16, 22, 26, .07);
-  padding: 3px 7px;
+  font-family: var(--font-display);
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .01em;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 0;
+  background: #fff;
+  color: var(--pc-deep);
+  box-shadow: 0 2px 10px rgba(41, 47, 40, .10);
 }
+.pcard__badges .pbadge--disc { background: var(--pc-deep); color: #fff; }
+.pcard__badges .pbadge--out { background: var(--shop-sale); color: #fff; }
+.pcard__badges .pbadge--opt { background: #fff; color: var(--pc-deep); }
 .pbadge {
   font-family: var(--font-mono);
   font-size: .6rem;
@@ -331,131 +353,144 @@
 .pbadge--out { background: var(--shop-sale); color: #fff; }
 .pbadge--pack { background: #f1f2f3; color: #52585c; }
 
-.pcard__swatch {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 3px solid #fff;
-  box-shadow: 0 2px 10px rgba(16, 22, 26, .3);
-  z-index: 2;
-}
-
-/* Кружки расцветок на плитке каталога: нажал — открылась карточка того же
-   товара в другом цвете. Появляются только у товаров с группой цветов. */
-.pcard__colors {
+/* Строка цвета в теле карточки: кружок текущей расцветки + название,
+   рядом — маленькие кружки других расцветок (ведут на свою карточку). */
+.pcard__colorline {
   display: flex;
   align-items: center;
-  gap: 6px;
   flex-wrap: wrap;
-  margin: 2px 0;
+  gap: 6px 8px;
+  margin-top: 14px;
+  min-height: 20px;
+  font-size: .82rem;
+  line-height: 1.3;
+  color: var(--pc-ink);
 }
-.pcard-color {
-  display: block;
-  width: 34px;
-  height: 34px;
-  padding: 2px;
-  border-radius: 8px;
-  border: 1px solid #d9dde0;
+.pcard__dot {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ddd8cd;
+  box-shadow: inset 0 0 0 1px rgba(41, 47, 40, .18);
+}
+.pcard__dot.is-empty {
   background: #fff;
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color .15s, box-shadow .15s, transform .15s;
+  box-shadow: inset 0 0 0 1px rgba(41, 47, 40, .25);
 }
-.pcard-color img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.pcard-color:hover { border-color: #aab0b5; transform: translateY(-1px); }
-.pcard-color.is-active { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
-.pcard-color:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 2px; }
+.pcard__colorname {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.pcard__variants {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.pcard-variant {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(41, 47, 40, .16);
+  background-size: cover;
+  background-position: center;
+  transition: transform .15s, border-color .15s;
+}
+.pcard-variant:hover { transform: scale(1.12); border-color: var(--pc-deep); }
+.pcard-variant:focus-visible { outline: 2px solid var(--pc-deep); outline-offset: 2px; }
+.pcard-variant-more { font-size: .72rem; color: var(--pc-muted); }
 
 .pcard__body {
-  padding: 9px 11px 10px;
+  padding: 18px 20px 20px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 3px;
-}
-.pcard__cat {
-  font-family: var(--font-mono);
-  font-size: .6rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: #7a8085;
 }
 .pcard__title {
-  font-size: .9rem;
-  line-height: 1.28;
+  font-size: 1.1rem;
+  line-height: 1.32;
   font-weight: 500;
+  letter-spacing: -.01em;
   margin: 0;
+  color: var(--pc-ink);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 2.4em;
+  min-height: 2.64em;
 }
-.pcard__title a { color: var(--ink); text-decoration: none; }
-.pcard__title a:hover { color: var(--signal-deep); }
-.pcard__sku {
+.pcard__title a { color: inherit; text-decoration: none; }
+.pcard__title a:hover { color: var(--pc-deep); }
+.pcard__desc {
+  margin: 6px 0 0;
+  font-size: .84rem;
+  line-height: 1.4;
+  color: var(--pc-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pcard__meta {
+  margin-top: 12px;
   font-family: var(--font-mono);
   font-size: .68rem;
-  color: #9aa0a5;
-  letter-spacing: .03em;
-}
-.pcard__attrs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 10px;
-  margin-top: 0;
-}
-.pcard__attrs li {
-  list-style: none;
-  font-size: .74rem;
-  color: #6b7176;
-}
-.pcard__attrs li + li::before {
-  content: '·';
-  margin-right: 10px;
-  color: #c3c7ca;
+  letter-spacing: .02em;
+  color: #9a9e94;
 }
 
 .pcard__price {
   margin-top: auto;
-  padding-top: 7px;
+  padding-top: 16px;
 }
 .price-now {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .price-now b {
   font-family: var(--font-display);
-  font-size: 1.22rem;
+  font-size: 1.42rem;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: -.02em;
-  color: #161616;
+  letter-spacing: -.03em;
+  color: var(--pc-ink);
 }
-.price-now span { font-size: .76rem; color: #8a9095; }
+.price-now span { font-size: .78rem; color: var(--pc-muted); }
 .price-was {
-  font-size: .8rem;
-  color: #9aa0a5;
+  margin-top: 2px;
+  font-size: .78rem;
+  color: #a3a79d;
   text-decoration: line-through;
 }
 .pcard__unit {
   font-size: .72rem;
-  color: #8a9095;
-  margin-top: 4px;
-  line-height: 1.3;
+  color: var(--pc-muted);
+  margin-top: 6px;
+  line-height: 1.45;
 }
-.pcard__unit b { color: #52585c; }
-.pcard[data-mode="opt"] .pcard__opt-hint { color: #0f7a5a; }
+.pcard__unit b { color: var(--pc-deep); font-weight: 600; }
+.pcard[data-mode="opt"] .pcard__opt-hint { color: var(--pc-deep); }
 
 .pcard__qty {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 14px;
+}
+.pcard__qty .qty { height: 42px; border-color: var(--pc-line); }
+.pcard__qty .qty button { width: 30px; height: 40px; color: var(--pc-deep); }
+.pcard__qty .qty button:hover { background: #f3f0e8; color: var(--pc-ink); }
+.pcard__qty .qty input {
+  width: 44px;
+  font-size: .85rem;
+  color: var(--pc-ink);
 }
 .qty {
   display: inline-flex;
@@ -495,45 +530,47 @@
 .pcard__add {
   flex: 1;
   justify-content: center;
-  padding: 8px 14px;
-  font-size: .82rem;
+  min-height: 42px;
+  padding: 10px 14px;
+  font-family: var(--font-display);
+  font-size: .86rem;
+  font-weight: 500;
   border-radius: 10px;
-  font-weight: 700;
 }
 button.pcard__add {
   border: 0;
-  background: #FFDE00;
-  color: #1b1b1b;
+  background: var(--pc-deep);
+  color: #fff;
   box-shadow: none;
 }
 button.pcard__add:hover {
-  background: #f5d600;
-  color: #1b1b1b;
+  background: #33452f;
+  color: #fff;
   transform: none;
   box-shadow: none;
 }
 button.pcard__add:active { transform: none; }
-button.pcard__add:focus-visible { outline: 3px solid rgba(255, 222, 0, .55); outline-offset: 2px; }
+button.pcard__add:focus-visible { outline: 2px solid var(--pc-deep); outline-offset: 2px; }
 a.pcard__add {
   background: #fff;
-  color: #2b2f33;
-  border: 1px solid #d9dde0;
+  color: var(--pc-deep);
+  border: 1px solid var(--pc-line);
   box-shadow: none;
 }
 a.pcard__add:hover {
-  background: #f1f2f3;
-  color: #2b2f33;
-  border-color: #b6bcbf;
+  background: #f6f3ec;
+  color: var(--pc-deep);
+  border-color: #c9c2b3;
   transform: none;
   box-shadow: none;
 }
-.pcard__add.is-added { background: #1f9d61 !important; color: #fff; border-color: transparent; }
+.pcard__add.is-added { background: #2f7d55 !important; color: #fff; border-color: transparent; }
 
 .pcard__opt-hint {
   font-size: .7rem;
-  color: var(--shop-opt);
+  color: var(--pc-muted);
   font-weight: 600;
-  margin-top: 3px;
+  margin-top: 4px;
   min-height: 1em;
 }
 .pcard__opt-hint:empty { display: none; }
@@ -1478,8 +1515,8 @@ a.pcard__add:hover {
 .home-deck__card:hover {
   transform: translateX(-50%) translateY(calc(var(--d, 0) * 30px)) scale(calc(1 - var(--d, 0) * .04));
 }
-.home-deck__card { box-shadow: 0 10px 24px rgba(16, 22, 26, .10); }
-.home-deck__card[data-depth="0"] { box-shadow: 0 24px 52px rgba(16, 22, 26, .16); }
+.home-deck__card { box-shadow: 0 10px 24px rgba(41, 47, 40, .12); }
+.home-deck__card[data-depth="0"] { box-shadow: 0 24px 52px rgba(41, 47, 40, .18); }
 .home-deck__card.is-top { cursor: grab; }
 .home-deck.is-dragging .home-deck__card.is-top { cursor: grabbing; }
 .home-deck__card.is-hidden { opacity: 0; pointer-events: none; }
