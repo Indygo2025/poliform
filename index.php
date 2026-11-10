@@ -128,7 +128,7 @@ pl_header($d, 'index');
         <p class="sec-sub"><?= e(blk($h, 'catSub', 'Каждая категория — своя пресс-форма и своя фасовка.')) ?></p>
       </div>
     </div>
-    <div class="home-deck home-deck--cats" data-home-cats data-deck aria-label="Производственные линейки"></div>
+    <div class="cat-decks" data-home-cats></div>
   </div>
 </section>
 

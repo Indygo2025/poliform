@@ -435,6 +435,7 @@
   function buildDeck(host, list, opts) {
     opts = opts || {};
     var makeNode = opts.build || buildCard;
+    if (opts.compact) host.classList.add('home-deck--compact');
     if (host._deckRO) { host._deckRO.disconnect(); host._deckRO = null; }
     host.innerHTML = '';
     host.setAttribute('role', 'region');
@@ -467,9 +468,9 @@
     bar.appendChild(count);
     bar.appendChild(next);
 
-    var hint = el('p', 'home-deck__hint', opts.hint || 'Потяните карточку в сторону или листайте стрелками');
+    var hint = opts.hint === false ? null : el('p', 'home-deck__hint', opts.hint || 'Потяните карточку в сторону или листайте стрелками');
     host.appendChild(bar);
-    host.appendChild(hint);
+    if (hint) host.appendChild(hint);
 
     var n = cards.length;
     var top = 0;
@@ -478,7 +479,7 @@
 
     if (n < 2) {
       bar.hidden = true;
-      hint.hidden = true;
+      if (hint) hint.hidden = true;
     }
 
     function depthOf(i) { return (i - top + n) % n; }
@@ -489,7 +490,11 @@
       if (!max) return;
       var levels = Math.min(3, Math.max(0, n - 1));
       var bottom = max * (1 - SCALE_STEP * levels) + STEP * levels;
-      stage.style.height = Math.ceil(Math.max(max, bottom)) + 10 + 'px';
+      var h = Math.ceil(Math.max(max, bottom)) + 10;
+      /* В ряду из нескольких колод высоту выравниваем по самой высокой,
+         чтобы стрелки и счётчики стояли на одной линии. */
+      if (opts.syncHeights) opts.syncHeights(stage, h);
+      else stage.style.height = h + 'px';
     }
 
     function layout() {
@@ -634,43 +639,53 @@
   }
 
   /* ---------- Главная ---------- */
-  /* Карточка производственной линейки (категории) для колоды на главной. */
-  function buildCatCard(c, items) {
-    var a = el('a', 'cat-card');
-    a.href = 'products.php?cat=' + c.id;
-    var img = el('img');
-    img.src = items[0].thumbs[0];
-    img.alt = c.name;
-    img.loading = 'lazy';
-    a.appendChild(img);
-    var b = el('div', 'cat-card__body');
-    b.appendChild(el('h3', null, c.short || c.name));
-    b.appendChild(el('p', null, c.desc));
-    b.appendChild(el('span', 'cat-card__count', items.length + ' ' + plural(items.length, 'артикул', 'артикула', 'артикулов')));
-    a.appendChild(b);
-    return a;
+  /* Блок производственной линейки: заголовок категории и своя колода карточек
+     товаров этой категории (листается независимо от остальных блоков). */
+  function buildCatBlock(c, items, limit, syncHeights) {
+    var block = el('div', 'cat-deck');
+    var head = el('div', 'cat-deck__head');
+    var h3 = el('h3', 'cat-deck__title');
+    var link = el('a', null, c.short || c.name);
+    link.href = 'products.php?cat=' + c.id;
+    h3.appendChild(link);
+    head.appendChild(h3);
+    var all = el('a', 'cat-deck__all', 'Все ' + items.length + ' →');
+    all.href = 'products.php?cat=' + c.id;
+    head.appendChild(all);
+    block.appendChild(head);
+
+    var deck = el('div', 'home-deck home-deck--compact');
+    block.appendChild(deck);
+
+    buildDeck(deck, items.slice(0, limit), {
+      compact: true,
+      hint: false,
+      syncHeights: syncHeights,
+      label: 'Линейка «' + (c.short || c.name) + '»',
+      prevLabel: 'Предыдущий товар линейки',
+      nextLabel: 'Следующий товар линейки'
+    });
+    return block;
   }
 
   function renderHome() {
     var cw = $('[data-home-cats]');
     if (cw) {
-      var catNodes = [];
+      cw.innerHTML = '';
+      var perDeck = parseInt(cw.getAttribute('data-limit'), 10) || 8;
+      var catStages = [];
+      var syncHeights = function (stage, h) {
+        stage._deckH = h;
+        if (catStages.indexOf(stage) < 0) catStages.push(stage);
+        var max = 0;
+        catStages.forEach(function (s) { max = Math.max(max, s._deckH || 0); });
+        catStages.forEach(function (s) { s.style.height = max + 'px'; });
+      };
       categories.forEach(function (c) {
         var items = products.filter(function (p) { return p.categoryId === c.id; });
         if (!items.length) return;
-        catNodes.push(buildCatCard(c, items));
+        cw.appendChild(buildCatBlock(c, items, perDeck, syncHeights));
       });
-      if (cw.hasAttribute('data-deck')) {
-        buildDeck(cw, catNodes, {
-          build: function (node) { return node; },
-          label: 'Производственные линейки',
-          prevLabel: 'Предыдущая линейка',
-          nextLabel: 'Следующая линейка'
-        });
-      } else {
-        cw.innerHTML = '';
-        catNodes.forEach(function (node) { cw.appendChild(node); });
-      }
     }
 
     var g = $('[data-home-grid]');

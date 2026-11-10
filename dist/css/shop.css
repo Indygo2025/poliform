@@ -1219,33 +1219,6 @@ a.pcard__add:hover {
 .toast b { color: var(--signal); }
 .toast a { color: var(--signal); font-weight: 700; text-decoration: underline; white-space: nowrap; }
 
-/* ---------- Сетка категорий на главной ---------- */
-.cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
-.cat-card {
-  position: relative;
-  display: block;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--pl-dark);
-  color: #eef4f7;
-  text-decoration: none;
-  box-shadow: var(--e1);
-  transition: transform .3s var(--spring), box-shadow .3s;
-}
-.cat-card:hover { transform: translateY(-4px); box-shadow: var(--e2); color: #eef4f7; }
-.cat-card img {
-  width: 100%;
-  aspect-ratio: 5 / 4;
-  object-fit: contain;
-  padding: 14px;
-  opacity: .92;
-  display: block;
-}
-.cat-card__body { padding: 16px 18px 20px; }
-.cat-card__body h3 { font-size: 1.1rem; margin: 0 0 6px; color: #fff; }
-.cat-card__body p { font-size: .84rem; color: #a9bcc7; margin: 0 0 10px; line-height: 1.4; }
-.cat-card__count { font-family: var(--font-mono); font-size: .7rem; color: var(--signal); letter-spacing: .1em; text-transform: uppercase; }
-
 /* ---------- Блок «как заказать» ---------- */
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; }
 .step-num {
@@ -1491,8 +1464,8 @@ a.pcard__add:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pcard, .pcard__media img, .cat-card, .cart-btn, .toast { transition: none !important; }
-  .pcard:hover, .cat-card:hover, .cart-btn:hover { transform: none; }
+  .pcard, .pcard__media img, .cart-btn, .toast { transition: none !important; }
+  .pcard:hover, .cart-btn:hover { transform: none; }
 }
 
 /* ---------- Главная: колода карточек (верхняя улетает, остальные вперёд) ---------- */
@@ -1536,10 +1509,47 @@ a.pcard__add:hover {
 .home-deck__card.is-hidden { opacity: 0; pointer-events: none; }
 .home-deck__card img { -webkit-user-drag: none; }
 
-/* Колода производственных линеек: та же механика, карточки чуть шире товарных */
-.home-deck--cats { width: min(100%, 440px); }
-.home-deck--cats .cat-card { box-shadow: 0 12px 30px rgba(16, 22, 26, .18); }
-.home-deck--cats .cat-card img { padding: 22px; }
+/* Производственные линейки на главной: 4 блока в ряд, в каждом — своя колода
+   карточек товаров этой категории (листается независимо от соседних). */
+.cat-decks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.cat-deck { display: flex; flex-direction: column; min-width: 0; }
+.cat-deck__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.cat-deck__title { margin: 0; font-size: 1.02rem; line-height: 1.25; }
+.cat-deck__title a { color: var(--ink); text-decoration: none; }
+.cat-deck__title a:hover { color: var(--shop-opt); }
+.cat-deck__all {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  letter-spacing: .04em;
+  color: #8a9095;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cat-deck__all:hover { color: var(--ink); text-decoration: underline; }
+
+/* Компактная колода внутри блока линейки */
+.home-deck.home-deck--compact { width: 100%; margin: 0; }
+.home-deck--compact .home-deck__controls { margin-top: 10px; gap: 10px; }
+.home-deck--compact .home-deck__nav { width: 34px; height: 34px; font-size: 1rem; }
+.home-deck--compact .home-deck__count { font-size: .78rem; min-width: 38px; }
+
+@media (max-width: 1199px) {
+  .cat-decks { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+}
+@media (max-width: 700px) {
+  .cat-decks { grid-template-columns: minmax(0, 1fr); }
+}
 
 .home-deck__controls {
   display: flex;
