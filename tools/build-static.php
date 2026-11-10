@@ -113,10 +113,13 @@ function copyDir(string $from, string $to): void {
 
 /**
  * Статические ссылки: артикулы — в product-<sku>.html, страницы — в .html.
- * Вызовы api.php оставляем: витрина сама падает на данных из products.json.
+ * На GitHub Pages нет PHP, поэтому api.php заменяем на заранее собранный
+ * data/products.json — иначе витрина каждый раз ловит 404 и только потом
+ * падает на резервный источник.
  */
 function patchShopJs(string $js): string {
     $map = [
+        "var API_URL = 'api.php?action=catalog';" => "var API_URL = 'data/products.json';",
         "'product.php?sku=' + p.sku" => "'product-' + p.sku + '.html'",
         "'product.php?sku=' + v.sku" => "'product-' + v.sku + '.html'",
         "'product.php?sku=' + encodeURIComponent(v.sku)" => "'product-' + encodeURIComponent(v.sku) + '.html'",

@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var API_URL = 'api.php?action=catalog';
+  var API_URL = 'data/products.json';
   var FALLBACK_URL = 'data/products.json';
   var MODE_KEY = 'poliform.mode';
   var CART_KEY = 'poliform.cart';
