@@ -1836,6 +1836,10 @@
     });
   }
 
+  function fallbackCopy(ta) {
+    try { ta.select(); document.execCommand('copy'); } catch (err) { /* копирование недоступно */ }
+  }
+
   function showOrderText(text) {
     var link = $('[data-telegram-link]');
     if (link) link.href = 'https://t.me/share/url?url=' + encodeURIComponent(location.href) + '&text=' + encodeURIComponent(text);
@@ -1843,8 +1847,11 @@
     if (ta) {
       ta.value = text;
       ta.style.display = 'block';
-      ta.select();
-      try { document.execCommand('copy'); } catch (err) { /* копирование недоступно */ }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {}).catch(function () { fallbackCopy(ta); });
+      } else {
+        fallbackCopy(ta);
+      }
     }
   }
 
