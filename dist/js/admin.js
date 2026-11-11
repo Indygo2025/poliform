@@ -677,7 +677,7 @@
     }
 
     var exp = el('a', 'ab-btn', 'Отчёт по товарам (.xlsx)');
-    exp.href = API + '?action=report_export&type=products';
+    exp.href = API + '?action=report_export&type=products&csrf=' + encodeURIComponent(S.csrf);
     exp.title = 'Выгрузить каталог в Excel';
     actions.appendChild(exp);
 
@@ -1615,18 +1615,20 @@ td.colSpan = COLS.length;
     tr.appendChild(s);
 
     var act = el('td');
-    var del = el('button', 'ab-btn ab-btn--sm ab-btn--danger', '×');
-    del.type = 'button';
-    del.title = 'Удалить заявку';
-    del.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (!confirm('Удалить заявку #' + o.id + '?')) return;
-      api('order_del', { id: o.id }).then(need).then(function () {
-        toast('Заявка удалена');
-        return openOrdersTab(S.orderTab, false);
+    if (S.user && S.user.role === 'admin') {
+      var del = el('button', 'ab-btn ab-btn--sm ab-btn--danger', '×');
+      del.type = 'button';
+      del.title = 'Удалить заявку';
+      del.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!confirm('Удалить заявку #' + o.id + '?')) return;
+        api('order_del', { id: o.id }).then(need).then(function () {
+          toast('Заявка удалена');
+          return openOrdersTab(S.orderTab, false);
+        });
       });
-    });
-    act.appendChild(del);
+      act.appendChild(del);
+    }
     tr.appendChild(act);
 
     var detail = el('tr');
@@ -2318,7 +2320,7 @@ td.colSpan = COLS.length;
         });
         var pass = el('input');
         pass.type = 'password';
-        pass.placeholder = 'новый пароль';
+        pass.placeholder = 'новый пароль (мин 8, буквы и цифры)';
         pass.style.maxWidth = '150px';
         var sv = el('button', 'ab-btn ab-btn--sm ab-btn--primary', 'Сохранить');
         sv.type = 'button';
@@ -2381,7 +2383,7 @@ td.colSpan = COLS.length;
       un.placeholder = 'логин';
       var up2 = el('input');
       up2.type = 'password';
-      up2.placeholder = 'пароль (мин. 6)';
+      up2.placeholder = 'пароль (мин. 8, буквы и цифры)';
       var ur = el('select');
       ur.style.width = 'auto';
       [['operator', 'оператор'], ['admin', 'админ']].forEach(function (r) {
@@ -2582,7 +2584,7 @@ td.colSpan = COLS.length;
     function inp(w) { return $('input,select,textarea', w); }
 
     function downloadHref(type, params) {
-      var q = '?action=report_export&type=' + encodeURIComponent(type);
+      var q = '?action=report_export&type=' + encodeURIComponent(type) + '&csrf=' + encodeURIComponent(S.csrf);
       if (params) for (var k in params) if (params[k]) q += '&' + k + '=' + encodeURIComponent(params[k]);
       return API + q;
     }
@@ -2720,21 +2722,22 @@ td.colSpan = COLS.length;
     body.appendChild(el('h3', null, 'Копия всего сайта (ZIP)'));
     body.appendChild(el('p', 'ab-muted',
       'Один архив со всеми файлами: PHP-страницы, вёрстка, скрипты, изображения и база site.db. ' +
-      'Для восстановления распакуйте архив на хостинг — сайт заработает как есть. Копии баз и .git в архив не входят.'));
+      'Для восстановления распакуйте архив на хостинг — сайт заработает как есть. ' +
+      'Бэкапы баз, .git, служебные логи и папка dist/ (собирается заново) в архив не входят.'));
     var full = el('a', 'ab-btn ab-btn--primary', 'Скачать копию сайта (ZIP)');
-    full.href = API + '?action=backup_full';
+    full.href = API + '?action=backup_full&csrf=' + encodeURIComponent(S.csrf);
     body.appendChild(full);
 
     body.appendChild(el('h3', null, 'База данных'));
     body.appendChild(el('p', 'ab-muted', 'Файл site.db: товары, заявки, тексты, цены и настройки. Подходит для быстрой точечной замены.'));
     var dl = el('a', 'ab-btn', 'Скачать site.db');
-    dl.href = API + '?action=backup';
+    dl.href = API + '?action=backup&csrf=' + encodeURIComponent(S.csrf);
     body.appendChild(dl);
 
     body.appendChild(el('h3', null, 'Каталог в JSON'));
     body.appendChild(el('p', 'ab-muted', 'Формат data/products.json — каталог без заявок и настроек.'));
     var ex = el('a', 'ab-btn', 'Скачать products.json');
-    ex.href = API + '?action=export';
+    ex.href = API + '?action=export&csrf=' + encodeURIComponent(S.csrf);
     body.appendChild(ex);
 
     body.appendChild(el('h3', null, 'Чек-лист перед публикацией'));

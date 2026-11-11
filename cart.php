@@ -10,6 +10,7 @@ pl_head($d, [
     'title' => 'Корзина и заявка — Полиформ',
     'description' => 'Корзина заказа пластиковых изделий: оптовая часть кратна боксу, розничная — поштучно.',
     'base'  => $base,
+    'robots' => 'noindex, nofollow',
 ]);
 pl_header($d, 'cart');
 pl_breadcrumbs_jsonld($base, ['Главная' => 'index.php', 'Корзина и заявка' => 'cart.php']);

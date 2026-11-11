@@ -129,42 +129,6 @@
     return box;
   }
 
-  /* ---------- Цвета одного товара ----------
-     Товары с одинаковым значением colorGroup — одна и та же позиция в разных
-     расцветках. На витрине они связаны блоком «Цвет»: нажал кружок — открылась
-     карточка другой расцветки, как на маркетплейсе. */
-  function groupKey(p) { return String((p && p.colorGroup) || '').trim().toLowerCase(); }
-  function groupMates(p) {
-    var g = groupKey(p);
-    if (!g) return [];
-    return products.filter(function (x) { return groupKey(x) === g; });
-  }
-  function hexOf(p) {
-    var v = String((p && p.colorHex) || '').trim();
-    return /^#[0-9a-f]{6}$/i.test(v) ? v : '';
-  }
-  function colorLabel(p) {
-    return String((p && p.color) || '').trim()
-      || String((p && p.shortTitle) || (p && p.sku) || 'Цвет');
-  }
-
-  /* Наполнение образца расцветки: фото товара в этом цвете,
-     а если фото ещё нет — образец цвета. */
-  function swatchInner(p) {
-    var src = (p.thumbs && p.thumbs[0]) || (p.images && p.images[0]) || '';
-    if (src) {
-      var img = el('img');
-      img.src = src;
-      img.alt = '';
-      img.loading = 'lazy';
-      return img;
-    }
-    var fill = el('span', 'swatch__fill');
-    var hex = hexOf(p);
-    if (hex) fill.style.background = hex;
-    return fill;
-  }
-
   /* ---------- Режим Опт / Розница ---------- */
   function getMode() { return localStorage.getItem(MODE_KEY) === OPT ? OPT : RET; }
   function syncModeUI() {
@@ -1606,33 +1570,6 @@
     layout.appendChild(buy);
     host.appendChild(layout);
 
-    var ld = el('script');
-    ld.type = 'application/ld+json';
-    ld.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: p.title,
-      sku: p.sku,
-      image: p.images,
-      description: p.description,
-      material: p.material,
-      color: p.color,
-      brand: { '@type': 'Brand', name: 'Полиформ' },
-      countryOfOrigin: { '@type': 'Country', name: p.country },
-      offers: {
-        '@type': 'AggregateOffer',
-        priceCurrency: 'RUB',
-        lowPrice: Math.min(p.priceOpt, p.priceRetail),
-        highPrice: Math.max(p.priceOpt, p.priceRetail),
-        offerCount: 2,
-        availability: p.inStock === false ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock'
-      },
-      additionalProperty: [
-        { '@type': 'PropertyValue', name: 'Габариты', value: dim(p) },
-        { '@type': 'PropertyValue', name: 'Фасовка', value: 'В боксе ' + p.packCount + ' шт.' }
-      ]
-    });
-    document.head.appendChild(ld);
   }
 
   function updatePrice(p, cur, box) {

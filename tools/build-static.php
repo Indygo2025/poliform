@@ -83,6 +83,23 @@ file_put_contents(
 );
 echo "… data/products.json\n";
 
+/* ---- sitemap.xml ---- */
+$urls = [
+    ['https://poliform.pages.dev/', 'weekly', '1.0'],
+    ['https://poliform.pages.dev/products.html', 'weekly', '0.9'],
+    ['https://poliform.pages.dev/about.html', 'yearly', '0.6'],
+];
+foreach ($skus as $sku) {
+    $urls[] = ['https://poliform.pages.dev/product-' . $sku . '.html', 'monthly', '0.8'];
+}
+$sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+foreach ($urls as $u) {
+    $sitemap .= '  <url><loc>' . $u[0] . '</loc><changefreq>' . $u[1] . '</changefreq><priority>' . $u[2] . '</priority></url>' . "\n";
+}
+$sitemap .= '</urlset>' . "\n";
+file_put_contents("$dist/sitemap.xml", $sitemap);
+echo "… sitemap.xml\n";
+
 /* ---- Ассеты ---- */
 foreach (['css', 'images'] as $d) {
     copyDir("$root/$d", "$dist/$d");
@@ -99,7 +116,7 @@ foreach (['favicon.svg'] as $f) {
     if (is_file("$root/$f")) copy("$root/$f", "$dist/$f");
 }
 file_put_contents("$dist/.nojekyll", '');
-file_put_contents("$dist/robots.txt", "User-agent: *\nAllow: /\n");
+file_put_contents("$dist/robots.txt", "User-agent: *\nAllow: /\nDisallow: /admin.php\nDisallow: /admin.html\nDisallow: /api.php\nDisallow: /tools/\nDisallow: /inc/\nDisallow: /lib/\n\nSitemap: https://poliform.pages.dev/sitemap.xml\n");
 
 /* ---- Вспомогательное ---- */
 function copyDir(string $from, string $to): void {

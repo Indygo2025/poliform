@@ -1,2 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /admin.php
+Disallow: /admin.html
+Disallow: /api.php
+Disallow: /tools/
+Disallow: /inc/
+Disallow: /lib/
+
+Sitemap: https://poliform.pages.dev/sitemap.xml

@@ -73,6 +73,32 @@ function pl_og_placeholder(string $base): string {
 }
 
 /**
+ * Канонический путь страницы для <link rel="canonical"> и og:url.
+ * Собирается из пути текущего запроса; для карточек товара к нему добавляется ?sku=.
+ */
+function pl_canonicalPath(): string {
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+    $path = trim(rawurldecode((string) $uri), '/');
+    $script = basename($path);
+    $map = [
+        'index.php'   => '/',
+        'products.php' => '/products',
+        'product.php' => '/product',
+        'about.php'   => '/about',
+        'cart.php'    => '/cart',
+    ];
+    if (array_key_exists($script, $map)) {
+        $canonical = (string)$map[$script];
+        if ($script === 'product.php') {
+            $sku = isset($_GET['sku']) ? rawurlencode((string) $_GET['sku']) : '';
+            if ($sku !== '') $canonical .= '?sku=' . $sku;
+        }
+        return $canonical;
+    }
+    return $path === '' ? '/' : '/' . $path;
+}
+
+/**
  * Базовые заголовки безопасности витрины. CSP пока разрешает шрифты Google —
  * после self-host убираем внешние источники.
  */
@@ -95,23 +121,24 @@ function pl_head(array $d, array $opts = []): void {
     $seo  = $d['seo'];
     $title = (string)($opts['title'] ?? $seo['title'] ?? 'Полиформ');
     $desc  = (string)($opts['description'] ?? $seo['description'] ?? '');
-    $og    = (string)($seo['ogImage'] ?? 'images/products/1430471-0.jpg');
+    $og    = (string)($seo['ogImage'] ?? ($d['products'][0]['images'][0] ?? 'images/products/100001-0.jpg'));
 $keys  = trim((string)($seo['keywords'] ?? ''));
 $ogTitle = trim((string)($opts['ogTitle'] ?? ''));
 if ($ogTitle === '') $ogTitle = trim((string)($d['blocks']['heroTitle'] ?? ''));
 $bodyCls = trim((string)($opts['bodyClass'] ?? ''));
-    $base  = pl_og_placeholder(rtrim((string)($opts['base'] ?? 'https://poliform.pages.dev/'), '/') . '/');
+    $base  = rtrim((string)($opts['base'] ?? 'https://indygo2025.github.io/poliform/'), '/') . '/';
+    $canon = rtrim($base, '/') . pl_canonicalPath();
+    $robots = (string)($opts['robots'] ?? 'index, follow');
     ?><!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="<?= e($robots) ?>">
+<link rel="canonical" href="<?= e($canon) ?>">
 <title><?= e($title) ?></title>
 <?php if ($desc !== ''): ?>
 <meta name="description" content="<?= e($desc) ?>">
-<?php endif; ?>
-<?php if ($keys !== ''): ?>
-<meta name="keywords" content="<?= e($keys) ?>">
 <?php endif; ?>
 <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#e7e5e0">
@@ -120,9 +147,13 @@ $bodyCls = trim((string)($opts['bodyClass'] ?? ''));
 <?php if ($desc !== ''): ?>
 <meta property="og:description" content="<?= e($desc) ?>">
 <?php endif; ?>
-<meta property="og:image" content="<?= e($base . ltrim($og, '/')) ?>">
-<meta property="og:url" content="<?= e($base) ?>">
+<meta property="og:image" content="<?= e($base . $og) ?>">
+<meta property="og:url" content="<?= e($canon) ?>">
+<meta property="og:site_name" content="Полиформ">
 <meta property="og:locale" content="ru_RU">
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:title" content="<?= e($ogTitle !== '' ? $ogTitle : $title) ?>">
+<meta property="twitter:image" content="<?= e($base . $og) ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
