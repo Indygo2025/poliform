@@ -60,6 +60,13 @@ poliform-plastic/
 - `sitemap.xml` — главная, каталог, about + 81 страница товара (`product-<sku>.html`).
 - JSON-LD: `BreadcrumbList` (шаги) + `Product` (цены, остаток) — генерируются PHP на карточке товара.
 
+## Производительность
+
+- Фото товаров отдаются в WebP (генерируются из JPG/PNG через GD), для галереи — `<picture>` с фолбэком на оригинал.
+- Шрифты Space Grotesk и JetBrains Mono — self-hosted (`fonts/*.woff2`), внешних запросов к Google Fonts нет.
+- CSS/JS подключаются с меткой времени изменения (`pl_asset`), поэтому браузер не держит устаревшие файлы.
+- Сборка снапшота: `php tools/build-static.php` (копирует css/js/images/fonts, пишет sitemap.xml и robots.txt).
+
 ## Безопасность
 
 - Заголовки: CSP (без внешних скриптов/стилей, шрифты Google разрешены), `X-Content-Type-Options: nosniff`,
