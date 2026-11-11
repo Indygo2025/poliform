@@ -108,8 +108,8 @@ function pl_security_headers(): void {
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
     header("Content-Security-Policy: default-src 'self'; script-src 'self'; "
-        . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        . "font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; "
+        . "style-src 'self' 'unsafe-inline'; "
+        . "font-src 'self'; img-src 'self' data:; "
         . "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
 }
 
@@ -122,6 +122,7 @@ function pl_head(array $d, array $opts = []): void {
     $title = (string)($opts['title'] ?? $seo['title'] ?? 'Полиформ');
     $desc  = (string)($opts['description'] ?? $seo['description'] ?? '');
     $og    = (string)($seo['ogImage'] ?? ($d['products'][0]['images'][0] ?? 'images/products/100001-0.jpg'));
+    $og    = (string)preg_replace('~\.(jpe?g|png)$~i', '.webp', $og);
 $keys  = trim((string)($seo['keywords'] ?? ''));
 $ogTitle = trim((string)($opts['ogTitle'] ?? ''));
 if ($ogTitle === '') $ogTitle = trim((string)($d['blocks']['heroTitle'] ?? ''));
@@ -154,9 +155,13 @@ $bodyCls = trim((string)($opts['bodyClass'] ?? ''));
 <meta property="twitter:card" content="summary_large_image">
 <meta property="twitter:title" content="<?= e($ogTitle !== '' ? $ogTitle : $title) ?>">
 <meta property="twitter:image" content="<?= e($base . $og) ?>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/space-grotesk-400.woff2') format('woff2'); }
+@font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 500; font-display: swap; src: url('fonts/space-grotesk-500.woff2') format('woff2'); }
+@font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/space-grotesk-700.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/jetbrains-mono-400.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/jetbrains-mono-700.woff2') format('woff2'); }
+</style>
 <link rel="stylesheet" href="<?= pl_asset('css/style.css') ?>">
 <link rel="stylesheet" href="<?= pl_asset('css/plastic-live.css') ?>">
 <link rel="stylesheet" href="<?= pl_asset('css/shop.css') ?>">
@@ -348,7 +353,7 @@ function pl_product_jsonld(array $p, string $base): void {
         '@type' => 'Product',
         'name' => (string)$p['title'],
         'sku' => (string)$p['sku'],
-        'image' => array_map(static fn(string $i): string => $base . ltrim($i, '/'), $p['images']),
+        'image' => array_map(static fn(string $i): string => $base . ltrim((string)preg_replace('~\.(jpe?g|png)$~i', '.webp', $i), '/'), $p['images']),
         'description' => (string)$p['description'],
         'material' => (string)$p['material'],
         'color' => (string)$p['color'],

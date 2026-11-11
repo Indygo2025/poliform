@@ -70,12 +70,17 @@ pl_product_jsonld($p, $base);
       <div class="product-layout">
         <div class="gallery">
           <div class="gallery__main">
-            <img src="<?= e((string)($p['images'][0] ?? '')) ?>" alt="<?= e((string)$p['title']) ?>" width="1000" height="1333">
+            <?php $gMain = (string)($p['images'][0] ?? ''); $gMainWebp = (string)preg_replace('~\.(jpe?g|png)$~i', '.webp', $gMain); ?>
+            <picture>
+              <source src="<?= e($gMainWebp) ?>" type="image/webp">
+              <img src="<?= e($gMain) ?>" alt="<?= e((string)$p['title']) ?>" width="1000" height="1333">
+            </picture>
           </div>
           <?php if (count($p['images']) > 1): ?>
           <div class="gallery__thumbs">
             <?php foreach ($p['images'] as $src): ?>
-            <img src="<?= e($src) ?>" alt="" loading="lazy">
+            <?php $gThumb = (string)$src; $gThumb = (string)preg_replace('~\.(jpe?g|png)$~i', '-t.webp', $gThumb); ?>
+            <img src="<?= e($gThumb) ?>" alt="" loading="lazy">
             <?php endforeach; ?>
           </div>
           <?php endif; ?>

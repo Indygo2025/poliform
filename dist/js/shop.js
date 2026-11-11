@@ -78,7 +78,7 @@
     var src = (p.thumbs && p.thumbs[0]) || (p.images && p.images[0]) || '';
     if (src) {
       var img = el('img');
-      img.src = src;
+      img.src = String(src).replace(/\.(jpe?g|png)$/i, '.webp');
       img.alt = '';
       img.loading = 'lazy';
       return img;
@@ -253,13 +253,13 @@
     var media = el('a', 'pcard__media');
     media.href = 'product-' + p.sku + '.html';
     var bg = el('img', 'pcard__bg');
-    bg.src = p.thumbs[0];
+    bg.src = String(p.thumbs[0]).replace(/\.(jpe?g|png)$/i, '.webp');
     bg.alt = '';
     bg.loading = 'lazy';
     bg.setAttribute('aria-hidden', 'true');
     media.appendChild(bg);
     var img = el('img');
-    img.src = p.thumbs[0];
+    img.src = String(p.thumbs[0]).replace(/\.(jpe?g|png)$/i, '.webp');
     img.alt = p.title;
     img.loading = 'lazy';
     media.appendChild(img);
@@ -285,8 +285,8 @@
       var set = function (i) {
         if (i === cur) return;
         cur = i;
-        img.src = thumbs[i];
-        bg.src = thumbs[i];
+        img.src = String(thumbs[i]).replace(/\.(jpe?g|png)$/i, '.webp');
+        bg.src = String(thumbs[i]).replace(/\.(jpe?g|png)$/i, '.webp');
         $$('.pcard__shot', ph).forEach(function (b, k) { b.classList.toggle('is-active', k === i); });
       };
       var shots = el('div', 'pcard__shots');
@@ -296,7 +296,7 @@
         b.className = 'pcard__shot' + (i === 0 ? ' is-active' : '');
         b.setAttribute('aria-label', 'Фото ' + (i + 1));
         var ti = el('img');
-        ti.src = t;
+        ti.src = String(t).replace(/\.(jpe?g|png)$/i, '.webp');
         ti.alt = '';
         ti.loading = 'lazy';
         b.appendChild(ti);
@@ -351,7 +351,7 @@
         va.setAttribute('aria-label', 'Цвет: ' + colorLabel(v));
         var vh = hexOf(v);
         if (vh) va.style.background = vh;
-        else if (v.thumbs && v.thumbs[0]) va.style.backgroundImage = 'url("' + v.thumbs[0] + '")';
+        else if (v.thumbs && v.thumbs[0]) va.style.backgroundImage = 'url("' + String(v.thumbs[0]).replace(/\.(jpe?g|png)$/i, '.webp') + '")';
         variants.appendChild(va);
       });
       if (mates.length > 5) variants.appendChild(el('span', 'pcard-variant-more', '+' + (mates.length - 5)));
@@ -1262,7 +1262,7 @@
     var g = el('div', 'gallery');
     var main = el('div', 'gallery__main');
     var big = el('img');
-    big.src = p.images[0];
+    big.src = String(p.images[0]).replace(/\.(jpe?g|png)$/i, '.webp');
     big.alt = p.title;
     main.appendChild(big);
     g.appendChild(main);
@@ -1285,7 +1285,7 @@
       if (i < 0) i = nimg - 1;
       if (i >= nimg) i = 0;
       gi = i;
-      big.src = p.images[i];
+      big.src = String(p.images[i]).replace(/\.(jpe?g|png)$/i, '.webp');
       var cnt = g.querySelector('.gallery__count');
       if (cnt) cnt.textContent = (i + 1) + ' / ' + nimg;
       if (thEl) $$('button', thEl).forEach(function (x, k) { x.classList.toggle('is-active', k === i); });
@@ -1632,7 +1632,7 @@
       var row = el('div', 'cart-row');
       var ib = el('div', 'cart-row__img');
       var im = el('img');
-      im.src = p.thumbs[0];
+      im.src = String(p.thumbs[0]).replace(/\.(jpe?g|png)$/i, '.webp');
       im.alt = p.shortTitle;
       im.loading = 'lazy';
       ib.appendChild(im);

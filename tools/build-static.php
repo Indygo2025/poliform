@@ -28,7 +28,7 @@ if (is_dir($dist)) {
         $f->isDir() ? @rmdir($f->getPathname()) : @unlink($f->getPathname());
     }
 }
-foreach (['css', 'js', 'images', 'data'] as $d) {
+foreach (['css', 'js', 'images', 'data', 'fonts'] as $d) {
     if (!is_dir("$dist/$d")) @mkdir("$dist/$d", 0777, true);
 }
 
@@ -101,8 +101,8 @@ file_put_contents("$dist/sitemap.xml", $sitemap);
 echo "… sitemap.xml\n";
 
 /* ---- Ассеты ---- */
-foreach (['css', 'images'] as $d) {
-    copyDir("$root/$d", "$dist/$d");
+foreach (['css', 'images', 'fonts'] as $d) {
+    if (is_dir("$root/$d")) { copyDir("$root/$d", "$dist/$d"); }
     echo "… $d/\n";
 }
 foreach (glob("$root/js/*.js") ?: [] as $f) {

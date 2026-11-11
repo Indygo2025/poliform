@@ -20,7 +20,7 @@ $heroSku = trim((string)($b['heroVisualSku'] ?? '100004'));
 $heroSlide = static function (array $p): array {
     return [
         'sku'  => (string)$p['sku'],
-        'img'  => (string)($p['images'][0] ?? ''),
+        'img'  => (string)preg_replace('~\.(jpe?g|png)$~i', '.webp', (string)($p['images'][0] ?? '')),
         'name' => (string)($p['shortTitle'] ?: $p['title']),
     ];
 };
