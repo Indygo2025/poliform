@@ -641,6 +641,229 @@
     layout();
   }
 
+  /* ---------- Главная: лента популярных карточек ----------
+     Карточки стоят в один ряд и сдвигаются сами каждые несколько секунд.
+     После шага первая карточка переносится в конец — лента зацикливается
+     без рывков и клонирования (у каждой карточки остаются свои обработчики). */
+  function buildShelf(host, list, opts) {
+    opts = opts || {};
+    var DURATION = 560;
+    var DELAY = 3500;
+
+    if (host._shelf) { host._shelf.destroy(); host._shelf = null; }
+    host.innerHTML = '';
+    host.classList.add('home-shelf');
+    host.setAttribute('role', 'region');
+    host.setAttribute('aria-label', opts.label || 'Популярные товары');
+    host.tabIndex = 0;
+
+    var viewport = el('div', 'home-shelf__viewport');
+    var track = el('div', 'home-shelf__track');
+    var cards = list.map(function (item) {
+      var card = buildCard(item);
+      card.classList.add('home-shelf__card');
+      track.appendChild(card);
+      return card;
+    });
+    viewport.appendChild(track);
+    host.appendChild(viewport);
+
+    var bar = el('div', 'home-shelf__controls');
+    var prev = el('button', 'home-shelf__nav', '‹');
+    prev.type = 'button';
+    prev.setAttribute('aria-label', opts.prevLabel || 'Предыдущие товары');
+    var next = el('button', 'home-shelf__nav', '›');
+    next.type = 'button';
+    next.setAttribute('aria-label', opts.nextLabel || 'Следующие товары');
+    bar.appendChild(prev);
+    bar.appendChild(next);
+    host.appendChild(bar);
+
+    var n = cards.length;
+    var busy = false;
+    var timer = null;
+    var autoTimer = null;
+    var hovered = false;
+    var focused = false;
+    var touching = false;
+    var touchTimer = null;
+    var ro = null;
+    var io = null;
+    var inView = true;
+
+    function reducedMotion() {
+      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+
+    function gapPx() {
+      var g = window.getComputedStyle(track).columnGap || window.getComputedStyle(track).gap;
+      return parseFloat(g) || 0;
+    }
+
+    function perView() {
+      var card = cards[0];
+      if (!card) return 1;
+      var cw = card.getBoundingClientRect().width;
+      var gap = gapPx();
+      var vw = viewport.clientWidth;
+      if (!cw) return 1;
+      return Math.max(1, Math.round((vw + gap) / (cw + gap)));
+    }
+
+    function canScroll() { return n > perView(); }
+
+    function updateControls() {
+      var sc = canScroll();
+      bar.hidden = !sc;
+      prev.disabled = !sc;
+      next.disabled = !sc;
+    }
+
+    function clearTimer() {
+      if (timer) { clearTimeout(timer); timer = null; }
+    }
+
+    function stepPx() {
+      var card = cards[0];
+      return (card ? card.getBoundingClientRect().width : 0) + gapPx();
+    }
+
+    function move(dir) {
+      if (busy || n < 2 || !canScroll()) return;
+      busy = true;
+      clearTimer();
+      var step = stepPx();
+      var dur = reducedMotion() ? 0 : DURATION;
+      var ease = 'transform ' + dur + 'ms cubic-bezier(.22,.75,.25,1)';
+
+      if (dir < 0) {
+        /* Назад: последнюю карточку ставим перед первой без анимации,
+           затем сдвигаем ленту к нулю — она въезжает слева. */
+        var last = cards[cards.length - 1];
+        track.insertBefore(last, track.firstChild);
+        cards.pop();
+        cards.unshift(last);
+        track.style.transition = 'none';
+        track.style.transform = 'translate3d(' + (-step) + 'px, 0, 0)';
+        void track.offsetWidth;
+        track.style.transition = dur ? ease : 'none';
+        track.style.transform = 'translate3d(0, 0, 0)';
+        timer = setTimeout(function () {
+          track.style.transition = '';
+          busy = false;
+          timer = null;
+        }, dur + 30);
+      } else {
+        track.style.transition = dur ? ease : 'none';
+        track.style.transform = 'translate3d(' + (-step) + 'px, 0, 0)';
+        timer = setTimeout(function () {
+          /* Шаг завершён: первая карточка уходит в конец, лента
+             возвращается в исходное положение без анимации. */
+          var first = cards.shift();
+          track.appendChild(first);
+          cards.push(first);
+          track.style.transition = 'none';
+          track.style.transform = 'translate3d(0, 0, 0)';
+          void track.offsetWidth;
+          track.style.transition = '';
+          busy = false;
+          timer = null;
+        }, dur + 30);
+      }
+    }
+
+    function paused() {
+      return hovered || focused || touching || document.hidden || !inView;
+    }
+
+    function startAuto() {
+      stopAuto();
+      /* При включённом «уменьшить движение» лента не двигается сама —
+         остаются только стрелки. */
+      if (reducedMotion()) return;
+      autoTimer = setInterval(function () {
+        if (!busy && !paused()) move(1);
+      }, DELAY);
+    }
+
+    function stopAuto() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+
+    function resetPosition() {
+      clearTimer();
+      busy = false;
+      track.style.transition = 'none';
+      track.style.transform = 'translate3d(0, 0, 0)';
+      void track.offsetWidth;
+      track.style.transition = '';
+      updateControls();
+    }
+
+    next.addEventListener('click', function () { move(1); startAuto(); });
+    prev.addEventListener('click', function () { move(-1); startAuto(); });
+
+    /* Пауза, пока курсор или фокус на блоке, чтобы карточку можно было
+       спокойно рассмотреть и нажать «В корзину». */
+    host.onmouseenter = function () { hovered = true; };
+    host.onmouseleave = function () { hovered = false; };
+    host.onfocusin = function () { focused = true; };
+    host.onfocusout = function (e) {
+      if (!host.contains(e.relatedTarget)) focused = false;
+    };
+    host.ontouchstart = function () {
+      touching = true;
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    };
+    host.ontouchend = function () {
+      if (touchTimer) clearTimeout(touchTimer);
+      touchTimer = setTimeout(function () { touching = false; touchTimer = null; }, 2500);
+    };
+    host.onkeydown = function (e) {
+      if (e.target.closest && e.target.closest('input, textarea, select')) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); move(1); startAuto(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); move(-1); startAuto(); }
+    };
+
+    function onResize() {
+      if (busy) return;
+      resetPosition();
+    }
+
+    if (window.ResizeObserver) {
+      ro = new ResizeObserver(onResize);
+      ro.observe(viewport);
+    } else {
+      window.addEventListener('resize', onResize);
+    }
+
+    /* Пока лента вне экрана, не крутим её — экономим кадры. */
+    if (window.IntersectionObserver) {
+      io = new IntersectionObserver(function (entries) {
+        inView = !!(entries[0] && entries[0].isIntersecting);
+      }, { threshold: 0.05 });
+      io.observe(host);
+    }
+
+    host._shelf = {
+      destroy: function () {
+        stopAuto();
+        clearTimer();
+        if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+        if (ro) { ro.disconnect(); ro = null; }
+        else window.removeEventListener('resize', onResize);
+        if (io) { io.disconnect(); io = null; }
+      }
+    };
+
+    if (n < 2) {
+      bar.hidden = true;
+    } else {
+      updateControls();
+      startAuto();
+    }
+  }
+
   /* ---------- Главная ---------- */
   /* Блок производственной линейки: заголовок категории и своя колода карточек
      товаров этой категории (листается независимо от остальных блоков). */
@@ -696,7 +919,8 @@
       var limit = parseInt(g.getAttribute('data-limit'), 10) || 8;
       var skip = new URLSearchParams(location.search).get('sku');
       var list = products.filter(function (p) { return p.sku !== skip; }).slice(0, limit);
-      if (g.hasAttribute('data-deck')) buildDeck(g, list);
+      if (g.hasAttribute('data-shelf')) buildShelf(g, list);
+      else if (g.hasAttribute('data-deck')) buildDeck(g, list);
       else {
         g.innerHTML = '';
         list.forEach(function (p) { g.appendChild(buildCard(p)); });

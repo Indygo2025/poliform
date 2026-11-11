@@ -155,7 +155,7 @@ pl_header($d, 'index');
       </div>
       <a class="btn btn-ghost" href="products.php"><?= e(blk($h, 'popBtnAll', 'Весь каталог')) ?> · <?= (int)$n['products'] ?> позиций</a>
     </div>
-    <div class="home-deck" data-home-grid data-deck aria-label="Популярные товары"></div>
+    <div class="home-shelf" data-home-grid data-shelf aria-label="Популярные товары"></div>
   </div>
 </section>
 

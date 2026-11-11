@@ -1556,14 +1556,16 @@ a.pcard__add:hover {
   .cat-decks { grid-template-columns: minmax(0, 1fr); }
 }
 
-.home-deck__controls {
+.home-deck__controls,
+.home-shelf__controls {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
   margin-top: 16px;
 }
-.home-deck__nav {
+.home-deck__nav,
+.home-shelf__nav {
   width: 46px;
   height: 46px;
   border-radius: 50%;
@@ -1577,9 +1579,13 @@ a.pcard__add:hover {
   justify-content: center;
   transition: background .15s, border-color .15s, transform .15s;
 }
-.home-deck__nav:hover { background: #f4f4f2; border-color: rgba(16, 22, 26, .28); }
-.home-deck__nav:active { transform: scale(.96); }
-.home-deck__nav:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 2px; }
+.home-deck__nav:hover,
+.home-shelf__nav:hover { background: #f4f4f2; border-color: rgba(16, 22, 26, .28); }
+.home-deck__nav:active,
+.home-shelf__nav:active { transform: scale(.96); }
+.home-deck__nav:focus-visible,
+.home-shelf__nav:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 2px; }
+.home-shelf__nav:disabled { opacity: .35; cursor: default; }
 .home-deck__count {
   font-family: var(--font-mono);
   font-size: .82rem;
@@ -1602,4 +1608,55 @@ a.pcard__add:hover {
 }
 @media (prefers-reduced-motion: reduce) {
   .home-deck__card { transition: none; }
+}
+
+/* ---------- Главная: лента популярных позиций ----------
+   Карточки выстроены в один ряд и сдвигаются автоматически. */
+.home-shelf {
+  --shelf-gap: 18px;
+  --shelf-per: 4;
+  position: relative;
+  outline: none;
+}
+.home-shelf:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 8px; border-radius: 16px; }
+
+.home-shelf__viewport {
+  overflow: hidden;
+  /* вертикальные отступы оставляют место тени карточки при наведении */
+  padding: 6px 0 18px;
+  margin: -6px 0 -18px;
+  touch-action: pan-y;
+}
+
+.home-shelf__track {
+  display: flex;
+  gap: var(--shelf-gap);
+  will-change: transform;
+  transition: transform .56s cubic-bezier(.22, .75, .25, 1);
+}
+
+.home-shelf__card {
+  flex: 0 0 calc((100% - (var(--shelf-per) - 1) * var(--shelf-gap)) / var(--shelf-per));
+  min-width: 0;
+}
+
+.home-shelf__controls { margin-top: 18px; }
+
+@media (max-width: 1199px) {
+  .home-shelf { --shelf-per: 3; }
+}
+@media (max-width: 899px) {
+  .home-shelf { --shelf-per: 2; }
+}
+@media (max-width: 619px) {
+  .home-shelf {
+    --shelf-per: 1;
+    --shelf-gap: 14px;
+    width: min(100%, 360px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-shelf__track { transition: none !important; }
 }
