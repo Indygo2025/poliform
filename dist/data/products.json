@@ -1,5 +1,5 @@
 {
-    "generated": "2026-11-10T16:22:46+00:00",
+    "generated": "2026-11-11T17:20:59+00:00",
     "source": "database",
     "categories": [
         {
@@ -3988,6 +3988,10 @@
             "telegram": "https://t.me/poliform",
             "tgLabel": "@poliform",
             "hours": "Пн–Пт, 09:00–18:00 (МСК)"
+        },
+        "shop": {
+            "hidePrice": "0",
+            "hideCart": "0"
         }
     }
 }

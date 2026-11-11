@@ -622,12 +622,59 @@
 
   /* ================================================================ каталог */
 
+  /* Переключатель видимости блока на карточках товара: цена или покупка.
+     Сохраняем только свой ключ, чтобы два быстрых нажатия не затирали
+     настройку друг друга, и выстраиваем запросы в очередь. */
+  var shopSaveChain = Promise.resolve();
+
+  function shopToggle(key, label, onLabel, onToast, offToast) {
+    var btn = el('button', 'ab-btn', '');
+    btn.type = 'button';
+
+    function paint() {
+      var on = String((((S.settings || {}).shop) || {})[key] || '0') === '1';
+      btn.textContent = on ? onLabel : label;
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.title = on ? 'Нажмите, чтобы снова показывать' : 'Нажмите, чтобы скрыть на всех карточках';
+    }
+    paint();
+
+    btn.addEventListener('click', function () {
+      var shop = Object.assign({}, ((S.settings || {}).shop) || {});
+      var next = String(shop[key] || '0') === '1' ? '0' : '1';
+      var patch = {};
+      patch[key] = next;
+      btn.disabled = true;
+      shopSaveChain = shopSaveChain.then(function () {
+        return api('settings_save', { settings: { shop: patch } }).then(need).then(function (j) {
+          S.settings = j.settings;
+          btn.disabled = false;
+          paint();
+          toast(next === '1' ? onToast : offToast);
+        }, function (e) {
+          btn.disabled = false;
+          toast(e && e.message ? e.message : 'Не удалось сохранить', true);
+        });
+      });
+    });
+
+    return btn;
+  }
+
   function viewProducts() {
     var actions = $('#view-actions');
     var add = el('button', 'ab-btn ab-btn--primary', '+ Новый товар');
     add.type = 'button';
     add.addEventListener('click', function () { editor(null); });
     actions.appendChild(add);
+
+    if (S.user && S.user.role === 'admin') {
+      actions.appendChild(shopToggle('hidePrice', 'Скрыть цены', 'Цены скрыты',
+        'Цены скрыты на всех карточках', 'Цены снова показываются'));
+      actions.appendChild(shopToggle('hideCart', 'Скрыть корзину', 'Корзина скрыта',
+        'Блок покупки скрыт на всех карточках', 'Блок покупки снова показывается'));
+    }
 
     var exp = el('a', 'ab-btn', 'Отчёт по товарам (.xlsx)');
     exp.href = API + '?action=report_export&type=products';

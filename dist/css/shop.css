@@ -351,6 +351,10 @@
 .pcard__badges .pbadge--out { background: var(--shop-sale); color: #fff; }
 .pcard__badges .pbadge--opt { background: #fff; color: var(--pc-deep); }
 .pcard__badges:empty { display: none; }
+
+/* Скрытие блоков карточки из админки («Каталог» → «Скрыть цены» / «Скрыть корзину»). */
+.is-hide-price .pcard__price { display: none; }
+.is-hide-cart .pcard__qty { display: none; }
 .pbadge {
   font-family: var(--font-mono);
   font-size: .6rem;

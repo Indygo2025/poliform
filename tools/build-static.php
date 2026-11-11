@@ -75,6 +75,7 @@ $s = dbAllSettings($db);
 $cat['settings'] = [
     'order'    => (array)($s['order'] ?? []),
     'contacts' => (array)($s['contacts'] ?? []),
+    'shop'     => (array)($s['shop'] ?? []),
 ];
 file_put_contents(
     "$dist/data/products.json",

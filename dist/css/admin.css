@@ -171,6 +171,12 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .ab-btn--sm { padding: 5px 10px; font-size: .82rem; }
 .ab-btn--icon { padding: 6px 9px; }
 .ab-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.ab-btn.is-on {
+  background: rgba(15, 122, 90, .1);
+  border-color: rgba(15, 122, 90, .45);
+  color: var(--ab-ok);
+}
+.ab-btn.is-on:hover { background: rgba(15, 122, 90, .16); }
 
 /* ---------------------------------------------------------------- РєРѕСЂРїСѓСЃ */
 

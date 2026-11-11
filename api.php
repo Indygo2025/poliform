@@ -569,6 +569,7 @@ function catalogPublic(): void {
     $out['settings'] = [
         'order'    => (array)($s['order'] ?? []),
         'contacts' => (array)($s['contacts'] ?? []),
+        'shop'     => (array)($s['shop'] ?? []),
     ];
     header('Cache-Control: public, max-age=60');
     echo json_encode($out, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

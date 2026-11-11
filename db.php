@@ -137,6 +137,7 @@ function initSchema(PDO $db): void {
     ensureColumn($db, 'users', 'last_login', "TEXT NOT NULL DEFAULT ''");
     backfillColorHexes($db);
     ensureMailSettings($db);
+    ensureShopSettings($db);
 }
 
 /**
@@ -173,6 +174,27 @@ function ensureMailSettings(PDO $db): void {
         if (array_key_exists($gone, $cur)) { unset($cur[$gone]); $changed = true; }
     }
     if ($changed) dbSetSetting($db, 'mail', $cur);
+}
+
+/**
+ * Досоздаёт группу настроек `shop` — что показывать на карточках товара.
+ * Работает и на свежей базе, и на уже заполненной: существующие значения
+ * не затираются, только добавляются недостающие ключи.
+ */
+function ensureShopSettings(PDO $db): void {
+    $cur = dbGetSetting($db, 'shop', []);
+    $cur = is_array($cur) ? $cur : [];
+
+    $defaults = [
+        'hidePrice' => '0',
+        'hideCart'  => '0',
+    ];
+
+    $changed = false;
+    foreach ($defaults as $k => $v) {
+        if (!array_key_exists($k, $cur)) { $cur[$k] = $v; $changed = true; }
+    }
+    if ($changed) dbSetSetting($db, 'shop', $cur);
 }
 
 /**
@@ -351,6 +373,11 @@ function seedSettings(PDO $db, array $json): void {
             'lead'    => 'Стоимость доставки рассчитывает менеджер. Наличие по цвету подтверждаем после заявки.',
             'success' => 'Заявка принята. Менеджер свяжется по телефону в рабочее время.',
             'requireApproved' => '1',
+        ],
+        /* Видимость блоков на карточках: цены и покупки. */
+        'shop' => [
+            'hidePrice' => '0',
+            'hideCart'  => '0',
         ],
         'blocks' => [
             'heroTitle'   => 'Пластиковые изделия для питомцев',

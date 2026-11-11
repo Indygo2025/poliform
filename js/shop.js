@@ -1881,6 +1881,14 @@
       var lead = $('[data-order-lead]');
       if (lead) lead.textContent = o.lead;
     }
+
+    /* Видимость блоков на карточках задаётся в админке («Каталог»).
+       Классы на <html> скрывают цену и/или блок покупки во всех карточках
+       сразу — в каталоге, на главной и в колодах. */
+    var sh = settings.shop || {};
+    var root = document.documentElement;
+    root.classList.toggle('is-hide-price', String(sh.hidePrice) === '1');
+    root.classList.toggle('is-hide-cart', String(sh.hideCart) === '1');
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
