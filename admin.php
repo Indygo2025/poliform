@@ -1,7 +1,17 @@
 <?php
+declare(strict_types=1);
+
 header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: same-origin');
+header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; "
+    . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    . "font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; "
+    . "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
 $v = function (string $path): string {
     $file = __DIR__ . '/' . $path;
     return $path . '?v=' . (is_file($file) ? filemtime($file) : '1');
@@ -70,7 +80,7 @@ $v = function (string $path): string {
       <button type="button" data-view="contacts">Контакты и SEO</button>
       <button type="button" data-view="users" data-admin-only>Пользователи</button>
       <button type="button" data-view="audit" data-admin-only>Журнал доступа</button>
-      <button type="button" data-view="service">Резервная копия</button>
+      <button type="button" data-view="service" data-admin-only>Резервная копия</button>
     </nav>
     <div class="ab-side__foot">
       <div id="who" class="ab-mono" style="margin-bottom:6px"></div>

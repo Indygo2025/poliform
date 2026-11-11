@@ -1,0 +1,27 @@
+# ПОЛИФОРМ — правила Apache для локального XAMPP и Apache-хостингов.
+# На GitHub Pages (dist/) эти правила не нужны: там только публичные файлы.
+
+# Запрет листинга каталогов.
+Options -Indexes
+
+# Служебные и чувствительные файлы недоступны по HTTP:
+# база SQLite (хеши паролей, заявки), её бэкапы, архивы, логи, ключи, README.
+<FilesMatch "\.(bak|zip|log|tmp|pem|key|env|md|cfg|ini|sh|bat|ps1|psd)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^(site\.db|пароль|password|_probe|_tmp|_)">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^composer\.">
+  Require all denied
+</FilesMatch>
+
+# Каталоги служебные не отдаём (.git, .github).
+RedirectMatch 404 (?i)\.git
+
+# Заголовки безопасности для статики (для PHP их ставит код).
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

@@ -72,9 +72,25 @@ function pl_og_placeholder(string $base): string {
     return $base;
 }
 
+/**
+ * Базовые заголовки безопасности витрины. CSP пока разрешает шрифты Google —
+ * после self-host убираем внешние источники.
+ */
+function pl_security_headers(): void {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; "
+        . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        . "font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; "
+        . "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
+}
+
 /* ------------------------------------------------------------------ шапка */
 
 function pl_head(array $d, array $opts = []): void {
+    pl_security_headers();
     $site = $d['site'];
     $seo  = $d['seo'];
     $title = (string)($opts['title'] ?? $seo['title'] ?? 'Полиформ');

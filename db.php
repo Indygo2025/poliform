@@ -131,6 +131,13 @@ function initSchema(PDO $db): void {
     $db->exec("CREATE INDEX IF NOT EXISTS idx_audit_ts ON audit_log(ts DESC)");
     $db->exec("CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(username)");
 
+    /* Спам-фильтр заявок: журнал обращений с одного IP за окно времени. */
+    $db->exec("CREATE TABLE IF NOT EXISTS order_rate (
+        ip  TEXT NOT NULL,
+        ts  INTEGER NOT NULL
+    )");
+    $db->exec("CREATE INDEX IF NOT EXISTS idx_order_rate_ts ON order_rate(ts)");
+
     ensureColumn($db, 'products', 'onHome', 'INTEGER NOT NULL DEFAULT 0');
     ensureColumn($db, 'products', 'colorGroup', "TEXT NOT NULL DEFAULT ''");
     ensureColumn($db, 'products', 'baseArt', "TEXT NOT NULL DEFAULT ''");
@@ -792,6 +799,23 @@ function dbAddOrder(PDO $db, array $o): int {
     return (int)$db->lastInsertId();
 }
 
+/* ---------- спам-фильтр заявок по IP ---------- */
+
+/** Есть ли лимит обращений: не больше $limit заявок с IP за $windowMin минут. */
+function dbOrderRateOk(PDO $db, string $ip, int $limit, int $windowMin): bool {
+    $since = time() - $windowMin * 60;
+    $db->prepare("DELETE FROM order_rate WHERE ts < ?")->execute([$since]);
+    $st = $db->prepare("SELECT COUNT(*) FROM order_rate WHERE ip = ? AND ts >= ?");
+    $st->execute([$ip !== '' ? $ip : '0.0.0.0', $since]);
+    return (int)$st->fetchColumn() < max(1, $limit);
+}
+
+/** Отмечаем принятую заявку в журнале спам-фильтра. */
+function dbOrderRateHit(PDO $db, string $ip): void {
+    $db->prepare("INSERT INTO order_rate (ip, ts) VALUES (?, ?)")
+        ->execute([$ip !== '' ? $ip : '0.0.0.0', time()]);
+}
+
 function dbOrders(PDO $db, string $status = '', int $limit = 200): array {
     if ($status !== '' && $status !== 'all') {
         $st = $db->prepare("SELECT * FROM orders WHERE status = ? ORDER BY created DESC LIMIT ?");
@@ -881,7 +905,11 @@ function dbCatalog(PDO $db): array {
             'cert'        => $p['cert'],
             'images'      => $p['images'],
             'thumbs'      => array_map(static function (string $s): string {
-                return preg_replace('~\.jpg$~i', '-t.jpg', $s) ?? $s;
+                /* Миниатюра — отдельный файл <имя>-t.jpg, генерируется для любого
+                   исходника (jpg/png/webp). Для путей без миниатюры остаётся
+                   оригинал, поэтому карточка не останется без картинки. */
+                $t = preg_replace('~\.(jpe?g|png|webp)$~i', '-t.jpg', $s);
+                return ($t !== null && is_file(__DIR__ . '/' . $t)) ? $t : $s;
             }, $p['images']),
             'description' => $p['description'],
             'features'    => $p['features'],

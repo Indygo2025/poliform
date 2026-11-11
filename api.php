@@ -29,6 +29,9 @@ require_once __DIR__ . '/inc/orders_mail.php';
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_MINUTES      = 5;
+/** Спам-фильтр заявок: не больше LIMIT заявок с одного IP за WINDOW минут. */
+const ORDER_RATE_LIMIT  = 8;
+const ORDER_RATE_WINDOW = 15;
 
 /* ------------------------------------------------------------- ответы */
 
@@ -172,6 +175,21 @@ function requireAdminRead(): array {
     return requireAuth('admin');
 }
 
+/**
+ * Скачивания обычной ссылкой (backup/export/report): токен передаём в параметре
+ * ?csrf=… и проверяем вручную. SameSite=Lax не блокирует top-level переход,
+ * поэтому без параметра чужая страница могла бы ссылкой инициировать выгрузку
+ * БД из открытой сессии админа.
+ */
+function requireAuthDownload(bool $adminOnly = true): array {
+    $u = $adminOnly ? requireAuth('admin') : requireAuth();
+    $t = (string)($_GET['csrf'] ?? '');
+    if ($t === '' || !hash_equals(csrfToken(), $t)) {
+        fail('Ссылка устарела — обновите страницу и скачайте снова', 403);
+    }
+    return $u;
+}
+
 /* -------------------------------------------------------------- товары */
 
 function productsPayload(): array {
@@ -293,10 +311,16 @@ function colorDelete(array $in): void {
 
 /* --------------------------------------------------------------- заявки */
 
-/** Приём заявки с витрины: без авторизации, с проверкой и honeypot. */
+/** Приём заявки с витрины: без авторизации, с проверкой, honeypot,
+ *  спам-фильтром по IP и пересчётом цен на сервере. */
 function orderAdd(array $in): void {
     $db = db();
     if (trim((string)($in['website'] ?? '')) !== '') success(['id' => 0]);
+
+    /* Спам-фильтр: ограничиваем частоту заявок с одного адреса. */
+    if (!dbOrderRateOk($db, clientIp(), ORDER_RATE_LIMIT, ORDER_RATE_WINDOW)) {
+        fail('Слишком много заявок подряд. Позвоните нам или попробуйте позже.', 429);
+    }
 
     $name  = trim((string)($in['name'] ?? ''));
     $phone = trim((string)($in['phone'] ?? ''));
@@ -304,9 +328,38 @@ function orderAdd(array $in): void {
     if ($name === '') fail('Укажите имя');
     if (!validPhone($phone)) fail('Укажите телефон для связи');
 
-    $items = (array)($in['items'] ?? []);
+    /* Цены пересчитываем по базе: клиент присылает только sku, режим и количество.
+       Так витрину нельзя использовать для «заказа» по заниженной цене. */
+    $items = [];
     $total = 0.0;
-    foreach ($items as $it) $total += (float)($it['lineTotal'] ?? 0);
+    foreach ((array)($in['items'] ?? []) as $it) {
+        $sku = trim((string)($it['sku'] ?? ''));
+        $p   = $sku !== '' ? dbGetProduct($db, $sku) : null;
+        if (!$p) fail('Позиция ' . ($sku !== '' ? $sku : '?') . ' не найдена — обновите страницу и соберите заявку заново');
+
+        $mode = (($it['mode'] ?? '') === 'opt') ? 'opt' : 'ret';
+        $qty  = (int)($it['qty'] ?? 0);
+        if ($mode === 'opt') {
+            $pack = max(1, (int)$p['packCount']);
+            $qty  = max($pack, (int)ceil($qty / $pack) * $pack); /* кратно боксу */
+        }
+        $qty  = max(1, $qty);
+        $unit = $mode === 'opt' ? (float)$p['priceOpt'] : (float)$p['priceRetail'];
+        $line = round($unit * $qty, 2);
+        $total += $line;
+
+        $items[] = [
+            'sku'       => (string)$p['sku'],
+            'baseArt'   => (string)$p['baseArt'],
+            'title'     => (string)$p['title'],
+            'mode'      => $mode,
+            'qty'       => $qty,
+            'packCount' => (int)$p['packCount'],
+            'unit'      => $unit,
+            'lineTotal' => $line,
+        ];
+    }
+    $total = round($total, 2);
 
     $kind = trim((string)($in['kind'] ?? ''));
     if ($kind === '') {
@@ -331,6 +384,7 @@ function orderAdd(array $in): void {
     ];
 
     $id = dbAddOrder($db, $order);
+    dbOrderRateHit($db, clientIp());
 
     /* Письмо о новой заявке. Ошибки SMTP уже записаны в lastStatus и журнал:
        посетитель в любом случае получает подтверждение, заявка сохранена. */
@@ -403,14 +457,21 @@ function notifyTest(): void {
 /* ----------------------------------------------------------- настройки */
 
 function settingsGet(): void {
-    requireAuth();
-    success(['settings' => dbAllSettings(db())]);
+    $u = requireAuth();
+    $s = dbAllSettings(db());
+    /* SMTP-пароль и адреса сервера — только админу: оператору они не нужны. */
+    if ((string)$u['role'] !== 'admin') unset($s['mail']);
+    success(['settings' => $s]);
 }
+
+/** Группы настроек, которые админка вообще может сохранять. */
+const SETTINGS_GROUPS = ['site', 'seo', 'contacts', 'blocks', 'home', 'order', 'mail', 'shop', 'security'];
 
 function settingsSave(array $in): void {
     requireAdmin();
     $s = (array)($in['settings'] ?? []);
     foreach ($s as $group => $values) {
+        if (!in_array((string)$group, SETTINGS_GROUPS, true)) continue;
         if (!preg_match('/^[a-z_]+$/', (string)$group)) continue;
         $current = (array)(dbGetSetting(db(), (string)$group, []) ?: []);
         foreach ((array)$values as $k => $v) {
@@ -435,13 +496,24 @@ function usersList(): void {
     ]);
 }
 
+/** Роли пользователей: всё остальное — отклоняем. */
+function validRole(string $role): string {
+    return in_array($role, ['admin', 'operator'], true) ? $role : 'operator';
+}
+
+/** Пароль: минимум 8 символов, буквы и цифры. */
+function validPassword(string $p): bool {
+    return strlen($p) >= 8 && preg_match('/\p{L}/u', $p) && preg_match('/\d/', $p);
+}
+
 function userAdd(array $in): void {
     requireAdmin();
     $u = trim((string)($in['username'] ?? ''));
     $p = (string)($in['password'] ?? '');
-    if ($u === '' || strlen($p) < 6) fail('Логин обязателен, пароль — минимум 6 символов');
+    if ($u === '') fail('Укажите логин');
+    if (!validPassword($p)) fail('Пароль — минимум 8 символов, буквы и цифры');
     if (dbGetUser(db(), $u)) fail('Такой логин уже есть');
-    dbCreateUser(db(), $u, $p, (string)($in['role'] ?? 'operator'));
+    dbCreateUser(db(), $u, $p, validRole((string)($in['role'] ?? 'operator')));
     success(['users' => dbAllUsers(db())]);
 }
 
@@ -450,11 +522,11 @@ function userUpdate(array $in): void {
     $u = trim((string)($in['username'] ?? ''));
     $me = requireAdmin();
     if (!empty($in['password'])) {
-        if (strlen((string)$in['password']) < 6) fail('Пароль — минимум 6 символов');
+        if (!validPassword((string)$in['password'])) fail('Пароль — минимум 8 символов, буквы и цифры');
         dbSetPassword(db(), $u, (string)$in['password']);
         dbAudit(db(), $me['username'], 'password', clientIp(), 'смена пароля: ' . $u);
     }
-    if (!empty($in['role'])) dbSetRole(db(), $u, (string)$in['role']);
+    if (!empty($in['role'])) dbSetRole(db(), $u, validRole((string)$in['role']));
     success(['users' => dbAllUsers(db())]);
 }
 
@@ -541,11 +613,14 @@ function upload(array $in): void {
     if (!move_uploaded_file((string)$_FILES['file']['tmp_name'], $dest)) fail('Не удалось сохранить файл');
     @chmod($dest, 0644);
 
+    /* Миниатюра — отдельный файл <имя>-t.jpg для любого исходника
+       (jpg/png/webp). Раньше для не-JPG путём подмены затирался оригинал. */
+    $thumbName = preg_replace('~\.(jpe?g|png|webp)$~i', '-t.jpg', $name) ?: $name;
     if (function_exists('makeThumb')) {
-        makeThumb($dest, preg_replace('~\.jpg$~i', '-t.jpg', $dest) ?: $dest, 400);
+        makeThumb($dest, $dir . '/' . $thumbName, 400);
     }
 
-    success(['path' => 'images/products/' . $name, 'thumb' => 'images/products/' . preg_replace('~\.jpg$~i', '-t.jpg', $name)]);
+    success(['path' => 'images/products/' . $name, 'thumb' => 'images/products/' . $thumbName]);
 }
 
 function photoDelete(array $in): void {
@@ -555,7 +630,7 @@ function photoDelete(array $in): void {
     $abs = __DIR__ . '/' . $rel;
     if (!is_file($abs)) fail('Файла нет');
     @unlink($abs);
-    $t = preg_replace('~\.jpe?g$~i', '-t.jpg', $rel);
+    $t = preg_replace('~\.(jpe?g|png|webp)$~i', '-t.jpg', $rel);
     if ($t && is_file(__DIR__ . '/' . $t)) @unlink(__DIR__ . '/' . $t);
     success();
 }
@@ -577,7 +652,7 @@ function catalogPublic(): void {
 }
 
 function exportJson(): void {
-    requireAdminRead();
+    requireAuthDownload();
     header('Content-Disposition: attachment; filename="products.json"');
     echo json_encode(dbCatalog(db()), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     exit;
@@ -615,7 +690,7 @@ function makeThumb(string $src, string $dest, int $maxW): void {
 }
 
 function backupDb(): void {
-    requireAdminRead();
+    requireAuthDownload();
     $file = getenv('SITE_DB') ?: (__DIR__ . '/site.db');
     if (!is_file($file)) fail('Файл базы не найден');
     header('Content-Disposition: attachment; filename="poliform-' . date('Ymd-His') . '.sqlite"');
@@ -629,13 +704,13 @@ function backupDb(): void {
  * Сначала принудительно списываем WAL в основной файл, чтобы копия базы была целостной.
  */
 function backupFull(): void {
-    requireAdminRead();
+    requireAuthDownload();
     $base = __DIR__;
 
     /* Предыдущие копии, служебные файлы и мусор в архив не берём. */
-    $skipSegments = ['.git', '.github', 'node_modules'];
-    $skipNames = ['site.db-wal', 'site.db-shm'];
-    $skipPrefixes = ['site.db-bak-', '~$']; /* прежние бэкапы БД и временные файлы Office */
+    $skipSegments = ['.git', '.github', 'node_modules', 'logs', 'dist'];
+    $skipNames = ['site.db-wal', 'site.db-shm', 'Пароль.txt'];
+    $skipPrefixes = ['site.db-bak-', 'site.db.bak-', '~$']; /* бэкапы БД и временные файлы Office */
 
     try {
         db()->query('PRAGMA wal_checkpoint(TRUNCATE)');
@@ -770,9 +845,9 @@ function reportData(array $in): void {
     success(['name' => $sheet['name'], 'rows' => $sheet['rows']]);
 }
 
-/** Выгрузка отчёта в .xlsx обычной ссылкой (GET, без CSRF). */
+/** Выгрузка отчёта в .xlsx обычной ссылкой (GET): токен в параметре ?csrf=…. */
 function reportExport(): void {
-    requireAuth();
+    requireAuthDownload(false);
     $type   = (string)($_GET['type'] ?? 'products');
     $from   = (string)($_GET['from'] ?? '');
     $to     = (string)($_GET['to'] ?? '');
@@ -842,6 +917,7 @@ try {
         default:             fail('Неизвестное действие', 400);
     }
 } catch (Throwable $e) {
-    error_log('api: ' . $e->getMessage());
-    fail('Ошибка сервера: ' . $e->getMessage(), 500);
+    /* Текст исключения — только в лог сервера: клиенту наружу детали не выдаём. */
+    error_log('api: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    fail('Внутренняя ошибка сервера. Попробуйте ещё раз или позвоните менеджеру.', 500);
 }
