@@ -288,8 +288,8 @@ function seedFromJson(PDO $db): void {
             $st = $db->prepare("INSERT OR REPLACE INTO products
                 (sku,title,shortTitle,categoryId,art,form,sizeL,sizeW,sizeH,gridGap,color,colorHex,
                  packCount,packNote,weightG,priceRetail,priceOpt,volumeMl,material,country,cert,
-                 description,features,images,inStock,stockNote,sima,pos,baseArt,updated,colorGroup)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                 description,features,images,inStock,stockNote,sima,pos,baseArt,updated,colorGroup,onHome)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             $st->execute([
                 (string)($p['sku'] ?? ''),
                 (string)($p['title'] ?? ''),
@@ -322,6 +322,7 @@ function seedFromJson(PDO $db): void {
                 (string)($p['baseArt'] ?? ''),
                 $now,
                 (string)($p['colorGroup'] ?? ''),
+                !empty($p['onHome']) ? 1 : 0,
             ]);
         }
 
