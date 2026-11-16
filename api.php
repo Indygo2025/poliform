@@ -25,10 +25,14 @@ header('Referrer-Policy: same-origin');
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/lib/xlsx.php';
+require_once __DIR__ . '/lib/image.php';
 require_once __DIR__ . '/inc/orders_mail.php';
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_MINUTES      = 5;
+/** Перебор по IP: не больше попыток с одного адреса за окно (в минутах). */
+const IP_LOGIN_ATTEMPTS = 30;
+const IP_LOGIN_WINDOW   = 15;
 /** Спам-фильтр заявок: не больше LIMIT заявок с одного IP за WINDOW минут. */
 const ORDER_RATE_LIMIT  = 8;
 const ORDER_RATE_WINDOW = 15;
@@ -118,6 +122,12 @@ function login(array $in): array {
 
     if ($username === '' || $password === '') fail('Введите логин и пароль');
 
+    $ip = clientIp();
+    if (dbIpLoginBlocked($db, $ip, IP_LOGIN_ATTEMPTS, IP_LOGIN_WINDOW)) {
+        dbAudit($db, $username, 'ip_block', $ip, 'слишком много неудачных входов');
+        fail('Слишком много неудачных попыток. Попробуйте позже.', 429);
+    }
+
     $lock = dbLockInfo($db, $username);
     if ($lock) {
         fail('Вход заблокирован до ' . date('H:i', strtotime((string)$lock['locked_until'])), 429);
@@ -131,6 +141,8 @@ function login(array $in): array {
         if ($msg !== null) {
             dbAudit($db, $username, 'lock', clientIp(), 'автоблокировка на ' . $lockMin . ' мин.');
         }
+        /* Небольшая задержка замедляет перебор даже при смене логинов. */
+        usleep(250000);
         fail($msg ?? 'Неверный логин или пароль', 401);
     }
 
@@ -176,18 +188,49 @@ function requireAdminRead(): array {
 }
 
 /**
- * Скачивания обычной ссылкой (backup/export/report): токен передаём в параметре
- * ?csrf=… и проверяем вручную. SameSite=Lax не блокирует top-level переход,
- * поэтому без параметра чужая страница могла бы ссылкой инициировать выгрузку
- * БД из открытой сессии админа.
+ * Короткоживущий одноразовый токен для скачивания обычной ссылкой.
+ * CSRF-токен в URL не светим: он долгоживущий и годится для всех действий.
+ * Токен живёт 5 минут и удаляется после первого использования.
+ */
+function downloadToken(): string {
+    $now  = time();
+    $list = (array)($_SESSION['pl_dl'] ?? []);
+    foreach ($list as $t => $exp) {
+        if ((int)$exp < $now) unset($list[$t]);
+    }
+    $t = bin2hex(random_bytes(16));
+    $list[$t] = $now + 300;
+    $_SESSION['pl_dl'] = $list;
+    return $t;
+}
+
+function checkDownloadToken(): void {
+    $t = isset($_GET['token']) && is_string($_GET['token']) ? $_GET['token'] : '';
+    $list = (array)($_SESSION['pl_dl'] ?? []);
+    $exp  = ($t !== '' && isset($list[$t])) ? (int)$list[$t] : 0;
+    if ($exp === 0 || $exp < time()) {
+        fail('Ссылка устарела — обновите страницу и скачайте снова', 403);
+    }
+    unset($_SESSION['pl_dl'][$t]);
+}
+
+/**
+ * Скачивания обычной ссылкой (backup/export/report): одноразовый токен
+ * передаём в параметре ?token=… и проверяем вручную. SameSite=Lax не
+ * блокирует top-level переход, поэтому без токена чужая страница могла бы
+ * ссылкой инициировать выгрузку БД из открытой сессии админа.
  */
 function requireAuthDownload(bool $adminOnly = true): array {
     $u = $adminOnly ? requireAuth('admin') : requireAuth();
-    $t = (string)($_GET['csrf'] ?? '');
-    if ($t === '' || !hash_equals(csrfToken(), $t)) {
-        fail('Ссылка устарела — обновите страницу и скачайте снова', 403);
-    }
+    checkDownloadToken();
     return $u;
+}
+
+/** Выдать токен для скачивания (POST с CSRF-заголовком). */
+function downloadTokenAction(): void {
+    requireAuth();
+    checkCsrf();
+    success(['token' => downloadToken()]);
 }
 
 /* -------------------------------------------------------------- товары */
@@ -518,15 +561,24 @@ function userAdd(array $in): void {
 }
 
 function userUpdate(array $in): void {
-    requireAdmin();
-    $u = trim((string)($in['username'] ?? ''));
     $me = requireAdmin();
+    $u = trim((string)($in['username'] ?? ''));
+    if ($u === '') fail('Не указан логин');
+
     if (!empty($in['password'])) {
         if (!validPassword((string)$in['password'])) fail('Пароль — минимум 8 символов, буквы и цифры');
         dbSetPassword(db(), $u, (string)$in['password']);
         dbAudit(db(), $me['username'], 'password', clientIp(), 'смена пароля: ' . $u);
     }
-    if (!empty($in['role'])) dbSetRole(db(), $u, validRole((string)$in['role']));
+    if (!empty($in['role'])) {
+        $target = dbGetUser(db(), $u);
+        if (!$target) fail('Пользователь не найден');
+        $newRole = validRole((string)$in['role']);
+        if ((string)$target['role'] === 'admin' && $newRole !== 'admin' && dbCountAdmins(db()) <= 1) {
+            fail('Нельзя понизить последнего администратора');
+        }
+        dbSetRole(db(), $u, $newRole);
+    }
     success(['users' => dbAllUsers(db())]);
 }
 
@@ -534,6 +586,11 @@ function userDelete(array $in): void {
     $me = requireAdmin();
     $u = (string)($in['username'] ?? '');
     if ($u === $me['username']) fail('Нельзя удалить себя');
+    $target = dbGetUser(db(), $u);
+    if (!$target) fail('Пользователь не найден');
+    if ((string)$target['role'] === 'admin' && dbCountAdmins(db()) <= 1) {
+        fail('Нельзя удалить последнего администратора');
+    }
     dbDeleteUser(db(), $u);
     success(['users' => dbAllUsers(db())]);
 }
@@ -603,8 +660,25 @@ function upload(array $in): void {
     $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
     if (!isset($allowed[$mime])) fail('Только JPG, PNG или WebP');
 
+    /* Ограничиваем размер файла и пикселей: без этого GD при создании
+       миниатюры мог съесть память на «бомбе декомпрессии». */
+    $size = (int)($_FILES['file']['size'] ?? 0);
+    if ($size <= 0 || $size > 8 * 1024 * 1024) fail('Файл больше 8 МБ');
+    $info = @getimagesize((string)$_FILES['file']['tmp_name']);
+    if (!$info || (int)$info[0] < 1 || (int)$info[1] < 1) fail('Не удалось прочитать изображение');
+    if ((int)$info[0] > 6000 || (int)$info[1] > 6000 || (int)$info[0] * (int)$info[1] > 24000000) {
+        fail('Слишком большое изображение: максимум 6000 px по стороне');
+    }
+
     $dir = __DIR__ . '/images/products';
     if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) fail('Нет папки для фото');
+
+    /* Без GD нельзя сделать .webp и миниатюру, а фронтенд ждёт .webp рядом
+       с исходником. Лучше явная ошибка, чем тихо сломанная карточка. */
+    if (!function_exists('imagewebp')) {
+        fail('На сервере не включено расширение GD (imagewebp) — фото не может быть обработано. '
+            . 'Включите extension=gd в php.ini и перезапустите Apache.');
+    }
 
     $base = preg_replace('/[^0-9A-Za-z_-]+/', '', $sku) ?: 'sku';
     $name = $base . '-' . bin2hex(random_bytes(4)) . '.' . $allowed[$mime];
@@ -620,18 +694,59 @@ function upload(array $in): void {
         makeThumb($dest, $dir . '/' . $thumbName, 400);
     }
 
+    /* Фронтенд повсюду подставляет .webp / -t.webp по расширению. Если их не
+       создать, <picture> и js/shop.js получат 404 и фото не откроется. */
+    $webpName = plWebpName($name);
+    if ($webpName !== $name) plToWebp($dest, $dir . '/' . $webpName);
+    $thumbWebp = preg_replace('~\.(jpe?g|png|webp)$~i', '-t.webp', $name) ?: ($name . '-t.webp');
+    $thumbJpg  = $dir . '/' . $thumbName;
+    plToWebpThumb(is_file($thumbJpg) ? $thumbJpg : $dest, $dir . '/' . $thumbWebp, 400);
+
     success(['path' => 'images/products/' . $name, 'thumb' => 'images/products/' . $thumbName]);
 }
 
 function photoDelete(array $in): void {
     requireAdmin();
     $rel = (string)($in['path'] ?? '');
-    if (!preg_match('~^images/products/[0-9A-Za-z_.-]+\.(jpg|jpeg|png|webp)$~i', $rel)) fail('Недопустимый путь');
-    $abs = __DIR__ . '/' . $rel;
-    if (!is_file($abs)) fail('Файла нет');
-    @unlink($abs);
-    $t = preg_replace('~\.(jpe?g|png|webp)$~i', '-t.jpg', $rel);
-    if ($t && is_file(__DIR__ . '/' . $t)) @unlink(__DIR__ . '/' . $t);
+
+    /* Разрешаем подпапки внутри images/products/ (например, from-price-sep-2026/),
+       но запрещаем «..», обратные слеши и выход за пределы каталога фото. */
+    if (!preg_match('~^images/products/(?:[0-9A-Za-z_.-]+/)*[0-9A-Za-z_.-]+\.(jpg|jpeg|png|webp)$~i', $rel)
+        || str_contains($rel, '..') || str_contains($rel, '\\')) {
+        fail('Недопустимый путь');
+    }
+    $root = realpath(__DIR__ . '/images/products');
+    $abs  = realpath(__DIR__ . '/' . $rel);
+    if ($root === false || $abs === false
+        || !str_starts_with($abs, $root . DIRECTORY_SEPARATOR)) {
+        fail('Недопустимый путь');
+    }
+    if (!is_file($abs)) success(['removed' => false]); // файл уже удалён — это не ошибка
+
+    /* Файл, на который ссылается хоть один товар, физически не удаляем:
+       иначе карточка останется без фото до сохранения, а общий файл из прайса
+       сломается сразу у десятка товаров. Из черновика его уберёт админка. */
+    $st = db()->prepare('SELECT COUNT(*) FROM products WHERE images LIKE ?');
+    $st->execute(['%' . $rel . '%']);
+    if ((int)$st->fetchColumn() >= 1) {
+        success(['removed' => false, 'reason' => 'in_use']);
+    }
+
+    /* Удаляем файл и все его производные: -t.jpg, .webp, -t.webp.
+       Проверяем каждый через realpath, чтобы не выйти за пределы каталога. */
+    $candidates = [
+        $rel,
+        (string)preg_replace('~\.(jpe?g|png|webp)$~i', '-t.jpg', $rel),
+        plWebpName($rel),
+        (string)preg_replace('~\.(jpe?g|png|webp)$~i', '-t.webp', $rel),
+    ];
+    foreach (array_unique($candidates) as $c) {
+        if ($c === '') continue;
+        $f = realpath(__DIR__ . '/' . $c);
+        if ($f !== false && str_starts_with($f, $root . DIRECTORY_SEPARATOR) && is_file($f)) {
+            @unlink($f);
+        }
+    }
     success();
 }
 
@@ -845,13 +960,13 @@ function reportData(array $in): void {
     success(['name' => $sheet['name'], 'rows' => $sheet['rows']]);
 }
 
-/** Выгрузка отчёта в .xlsx обычной ссылкой (GET): токен в параметре ?csrf=…. */
+/** Выгрузка отчёта в .xlsx обычной ссылкой (GET): токен в параметре ?token=…. */
 function reportExport(): void {
     requireAuthDownload(false);
-    $type   = (string)($_GET['type'] ?? 'products');
-    $from   = (string)($_GET['from'] ?? '');
-    $to     = (string)($_GET['to'] ?? '');
-    $status = (string)($_GET['status'] ?? '');
+    $type   = isset($_GET['type']) && is_string($_GET['type']) ? $_GET['type'] : 'products';
+    $from   = isset($_GET['from']) && is_string($_GET['from']) ? $_GET['from'] : '';
+    $to     = isset($_GET['to']) && is_string($_GET['to']) ? $_GET['to'] : '';
+    $status = isset($_GET['status']) && is_string($_GET['status']) ? $_GET['status'] : '';
     if (!in_array($type, ['products', 'sales', 'orders'], true)) $type = 'products';
 
     $sheet = reportSheet($type, $from, $to, $status);
@@ -866,13 +981,23 @@ function reportExport(): void {
 
 /* --------------------------------------------------------------- роутер */
 
-$action = (string)($_GET['action'] ?? ($_POST['action'] ?? ''));
+$action = '';
+if (isset($_GET['action']) && is_string($_GET['action'])) {
+    $action = $_GET['action'];
+} elseif (isset($_POST['action']) && is_string($_POST['action'])) {
+    $action = $_POST['action'];
+}
 $in     = input();
 
 try {
     switch ($action) {
         case 'login':        success(login($in)); break;
-        case 'logout':       logout(); success(); break;
+        case 'logout':
+            requireAuth();
+            checkCsrf();
+            logout();
+            success();
+            break;
         case 'session':      success(['user' => currentUser(), 'csrf' => csrfToken()]); break;
 
         case 'products':     requireAuth(); success(productsPayload()); break;
@@ -908,6 +1033,7 @@ try {
         case 'photo_del':    photoDelete($in); break;
         case 'report_data':  reportData($in); break;
         case 'report_export': reportExport(); break;
+        case 'dl_token':     downloadTokenAction(); break;
         case 'export':       exportJson(); break;
         case 'backup':       backupDb(); break;
         case 'backup_full':  backupFull(); break;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 require __DIR__ . '/inc/layout.php';
 
 $d     = pl_boot();
-$base  = 'https://poliform.pages.dev/';
-$sku   = trim((string)($_GET['sku'] ?? ''));
+$base  = pl_base_url();
+$sku   = isset($_GET['sku']) && is_string($_GET['sku']) ? trim($_GET['sku']) : '';
 $catBy = [];
 foreach ($d['categories'] as $c) $catBy[(string)$c['id']] = $c;
 
@@ -62,7 +62,7 @@ pl_product_jsonld($p, $base);
     <div class="sec-head">
       <div>
         <span class="eyebrow">Товар №<?= e($artDisplay) ?></span>
-        <div class="page-top__title"><?= e((string)$p['shortTitle']) ?></div>
+        <h1 class="page-top__title"><?= e((string)$p['shortTitle']) ?></h1>
       </div>
     </div>
 
@@ -88,8 +88,9 @@ pl_product_jsonld($p, $base);
 
         <div class="product-info">
           <div class="product-head">
-            <h1 class="product-title"><?= e((string)$p['title']) ?></h1>
-            <div class="product-sku">Артикул <b><?= e($artDisplay) ?></b><?= (int)$p['inStock'] === 0 ? ' <span class="pbadge pbadge--out">Под заказ</span>' : '' ?></div>
+            <?php if ((int)$p['inStock'] === 0): ?>
+            <div class="product-sku"><span class="pbadge pbadge--out">Под заказ</span></div>
+            <?php endif; ?>
             <p class="product-desc"><?= e((string)$p['description']) ?></p>
           </div>
 

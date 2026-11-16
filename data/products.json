@@ -1,5 +1,5 @@
 {
-    "generated": "2026-11-09T15:53:36+00:00",
+    "generated": "2026-11-16T18:06:18+00:00",
     "source": "database",
     "categories": [
         {
@@ -903,14 +903,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/100013-0.jpg",
-                "images/products/100013-1.jpg",
-                "images/products/100013-2.jpg"
+                "images/products/100013-add0bb5a.jpg",
+                "images/products/100013-028480ab.jpg",
+                "images/products/100013-0cccbb04.jpg",
+                "images/products/100013-c1b0064c.jpg",
+                "images/products/100013-7b9a2cdb.jpg",
+                "images/products/100013-7c3abc3a.jpg",
+                "images/products/100013-d3c46cb8.jpg",
+                "images/products/100013-d2652c18.jpg"
             ],
             "thumbs": [
-                "images/products/100013-0-t.jpg",
-                "images/products/100013-1-t.jpg",
-                "images/products/100013-2-t.jpg"
+                "images/products/100013-add0bb5a-t.jpg",
+                "images/products/100013-028480ab-t.jpg",
+                "images/products/100013-0cccbb04-t.jpg",
+                "images/products/100013-c1b0064c-t.jpg",
+                "images/products/100013-7b9a2cdb-t.jpg",
+                "images/products/100013-7c3abc3a-t.jpg",
+                "images/products/100013-d3c46cb8-t.jpg",
+                "images/products/100013-d2652c18-t.jpg"
             ],
             "description": "Прямоугольный лоток открытого типа из пластика. Глубокий борт 9 см удерживает наполнитель внутри, а съёмная решётка позволяет убирать отходы без замены всего наполнителя. Поверхность гладкая, острых краёв нет. Габариты 36×25,5×9 см, вес 380 г. Подойдёт для взрослых кошек средних пород.",
             "features": [
@@ -1001,11 +1011,27 @@
             "country": "Китай",
             "cert": "Не подлежит сертификации",
             "images": [
+                "images/products/100015-a1744c8a.jpg",
+                "images/products/100015-42981807.jpg",
+                "images/products/100015-05c17b6c.jpg",
+                "images/products/100015-535408fa.jpg",
+                "images/products/100015-18b9439e.jpg",
+                "images/products/100015-b19f4975.jpg",
+                "images/products/100015-d4789584.jpg",
+                "images/products/100015-26e25d2f.jpg",
                 "images/products/100015-0.jpg",
                 "images/products/100015-1.jpg",
                 "images/products/100015-2.jpg"
             ],
             "thumbs": [
+                "images/products/100015-a1744c8a-t.jpg",
+                "images/products/100015-42981807-t.jpg",
+                "images/products/100015-05c17b6c-t.jpg",
+                "images/products/100015-535408fa-t.jpg",
+                "images/products/100015-18b9439e-t.jpg",
+                "images/products/100015-b19f4975-t.jpg",
+                "images/products/100015-d4789584-t.jpg",
+                "images/products/100015-26e25d2f-t.jpg",
                 "images/products/100015-0-t.jpg",
                 "images/products/100015-1-t.jpg",
                 "images/products/100015-2-t.jpg"
@@ -1052,12 +1078,26 @@
             "images": [
                 "images/products/100016-0.jpg",
                 "images/products/100016-1.jpg",
-                "images/products/100016-2.jpg"
+                "images/products/100016-2.jpg",
+                "images/products/100016-3f04f091.webp",
+                "images/products/100016-6d56f778.webp",
+                "images/products/100016-767c1d09.webp",
+                "images/products/100016-21a5baef.webp",
+                "images/products/100016-903227c2.webp",
+                "images/products/100016-2f153d02.webp",
+                "images/products/100016-6184ba8b.webp"
             ],
             "thumbs": [
                 "images/products/100016-0-t.jpg",
                 "images/products/100016-1-t.jpg",
-                "images/products/100016-2-t.jpg"
+                "images/products/100016-2-t.jpg",
+                "images/products/100016-3f04f091-t.jpg",
+                "images/products/100016-6d56f778-t.jpg",
+                "images/products/100016-767c1d09-t.jpg",
+                "images/products/100016-21a5baef-t.jpg",
+                "images/products/100016-903227c2-t.jpg",
+                "images/products/100016-2f153d02-t.jpg",
+                "images/products/100016-6184ba8b-t.jpg"
             ],
             "description": "Самый крупный лоток из группы: габариты 43×33×12,5 см. Высокий борт 12,5 см удерживает наполнитель, когда кошка активно закапывает. Пластик бело-серого цвета, вес 671 г. Сверху решётка, по периметру бортик.",
             "features": [
@@ -1099,10 +1139,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100017-619111cc.webp",
+                "images/products/100017-c0bb5b05.webp",
+                "images/products/100017-50b11dd1.webp",
+                "images/products/100017-53883d46.webp",
+                "images/products/100017-3178df39.webp",
+                "images/products/100017-d3546bdc.webp",
+                "images/products/100017-38024de7.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100017-619111cc-t.jpg",
+                "images/products/100017-c0bb5b05-t.jpg",
+                "images/products/100017-50b11dd1-t.jpg",
+                "images/products/100017-53883d46-t.jpg",
+                "images/products/100017-3178df39-t.jpg",
+                "images/products/100017-d3546bdc-t.jpg",
+                "images/products/100017-38024de7-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1143,10 +1195,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100018-b6ac3d98.webp",
+                "images/products/100018-61ef6e02.webp",
+                "images/products/100018-a2a81be1.webp",
+                "images/products/100018-f7145037.webp",
+                "images/products/100018-19d00497.webp",
+                "images/products/100018-abf60105.webp",
+                "images/products/100018-d7e48948.webp",
+                "images/products/100018-8564e2ea.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100018-b6ac3d98-t.jpg",
+                "images/products/100018-61ef6e02-t.jpg",
+                "images/products/100018-a2a81be1-t.jpg",
+                "images/products/100018-f7145037-t.jpg",
+                "images/products/100018-19d00497-t.jpg",
+                "images/products/100018-abf60105-t.jpg",
+                "images/products/100018-d7e48948-t.jpg",
+                "images/products/100018-8564e2ea-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1187,10 +1253,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100019-5a604c7d.jpg",
+                "images/products/100019-75f1fec2.jpg",
+                "images/products/100019-b3997cb6.jpg",
+                "images/products/100019-afb6e4df.jpg",
+                "images/products/100019-55a13416.jpg",
+                "images/products/100019-5e27f6b2.jpg",
+                "images/products/100019-88a5f33e.jpg",
+                "images/products/100019-94d53899.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100019-5a604c7d-t.jpg",
+                "images/products/100019-75f1fec2-t.jpg",
+                "images/products/100019-b3997cb6-t.jpg",
+                "images/products/100019-afb6e4df-t.jpg",
+                "images/products/100019-55a13416-t.jpg",
+                "images/products/100019-5e27f6b2-t.jpg",
+                "images/products/100019-88a5f33e-t.jpg",
+                "images/products/100019-94d53899-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1231,10 +1311,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100020-e0698cc0.jpg",
+                "images/products/100020-080e31d3.jpg",
+                "images/products/100020-75f85f31.jpg",
+                "images/products/100020-8d2a4081.jpg",
+                "images/products/100020-e8be2af3.jpg",
+                "images/products/100020-a290471f.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100020-e0698cc0-t.jpg",
+                "images/products/100020-080e31d3-t.jpg",
+                "images/products/100020-75f85f31-t.jpg",
+                "images/products/100020-8d2a4081-t.jpg",
+                "images/products/100020-e8be2af3-t.jpg",
+                "images/products/100020-a290471f-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1275,10 +1365,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100021-021048a1.jpg",
+                "images/products/100021-c1db6483.jpg",
+                "images/products/100021-22bd14f4.jpg",
+                "images/products/100021-b3de1dcd.jpg",
+                "images/products/100021-0a387557.jpg",
+                "images/products/100021-72e12581.jpg",
+                "images/products/100021-939acd50.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100021-021048a1-t.jpg",
+                "images/products/100021-c1db6483-t.jpg",
+                "images/products/100021-22bd14f4-t.jpg",
+                "images/products/100021-b3de1dcd-t.jpg",
+                "images/products/100021-0a387557-t.jpg",
+                "images/products/100021-72e12581-t.jpg",
+                "images/products/100021-939acd50-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1319,10 +1421,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100022-999a32e2.jpg",
+                "images/products/100022-b6d7128f.jpg",
+                "images/products/100022-87280dc9.jpg",
+                "images/products/100022-8925012c.jpg",
+                "images/products/100022-320ddcc7.jpg",
+                "images/products/100022-8f739e19.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100022-999a32e2-t.jpg",
+                "images/products/100022-b6d7128f-t.jpg",
+                "images/products/100022-87280dc9-t.jpg",
+                "images/products/100022-8925012c-t.jpg",
+                "images/products/100022-320ddcc7-t.jpg",
+                "images/products/100022-8f739e19-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1363,10 +1475,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100023-e402ab71.jpg",
+                "images/products/100023-27223abe.jpg",
+                "images/products/100023-0074e09a.jpg",
+                "images/products/100023-16ca4a44.jpg",
+                "images/products/100023-979be29b.jpg",
+                "images/products/100023-20c6adb0.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100023-e402ab71-t.jpg",
+                "images/products/100023-27223abe-t.jpg",
+                "images/products/100023-0074e09a-t.jpg",
+                "images/products/100023-16ca4a44-t.jpg",
+                "images/products/100023-979be29b-t.jpg",
+                "images/products/100023-20c6adb0-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1407,10 +1529,26 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
+                "images/products/100024-42a0539b.jpg",
+                "images/products/100024-5a880451.jpg",
+                "images/products/100024-b4dcd552.jpg",
+                "images/products/100024-00062b0d.jpg",
+                "images/products/100024-3b8cc540.jpg",
+                "images/products/100024-86f04174.jpg",
+                "images/products/100024-3aed119b.jpg",
+                "images/products/100024-cfd37bff.jpg",
                 "images/products/from-price-sep-2026/price-row2-image1.png"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100024-42a0539b-t.jpg",
+                "images/products/100024-5a880451-t.jpg",
+                "images/products/100024-b4dcd552-t.jpg",
+                "images/products/100024-00062b0d-t.jpg",
+                "images/products/100024-3b8cc540-t.jpg",
+                "images/products/100024-86f04174-t.jpg",
+                "images/products/100024-3aed119b-t.jpg",
+                "images/products/100024-cfd37bff-t.jpg",
+                "images/products/from-price-sep-2026/price-row2-image1-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1451,10 +1589,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100025-ffce026e.jpg",
+                "images/products/100025-2df0ff75.jpg",
+                "images/products/100025-276cdd50.jpg",
+                "images/products/100025-2b1b45b2.jpg",
+                "images/products/100025-b2bcbc1c.jpg",
+                "images/products/100025-f1e42703.jpg",
+                "images/products/100025-4a9e941c.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100025-ffce026e-t.jpg",
+                "images/products/100025-2df0ff75-t.jpg",
+                "images/products/100025-276cdd50-t.jpg",
+                "images/products/100025-2b1b45b2-t.jpg",
+                "images/products/100025-b2bcbc1c-t.jpg",
+                "images/products/100025-f1e42703-t.jpg",
+                "images/products/100025-4a9e941c-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1495,10 +1645,26 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
+                "images/products/100026-bfc4b231.jpg",
+                "images/products/100026-2030d31c.jpg",
+                "images/products/100026-12210f3b.jpg",
+                "images/products/100026-782d3ee3.jpg",
+                "images/products/100026-f963a236.jpg",
+                "images/products/100026-6f5cc25e.jpg",
+                "images/products/100026-d3aa5dac.jpg",
+                "images/products/100026-483680e3.jpg",
                 "images/products/from-price-sep-2026/price-row2-image1.png"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100026-bfc4b231-t.jpg",
+                "images/products/100026-2030d31c-t.jpg",
+                "images/products/100026-12210f3b-t.jpg",
+                "images/products/100026-782d3ee3-t.jpg",
+                "images/products/100026-f963a236-t.jpg",
+                "images/products/100026-6f5cc25e-t.jpg",
+                "images/products/100026-d3aa5dac-t.jpg",
+                "images/products/100026-483680e3-t.jpg",
+                "images/products/from-price-sep-2026/price-row2-image1-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1539,10 +1705,26 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
+                "images/products/100027-160e919a.jpg",
+                "images/products/100027-c9cc9025.jpg",
+                "images/products/100027-1f031d85.jpg",
+                "images/products/100027-0dff4b4f.jpg",
+                "images/products/100027-1228f9c3.jpg",
+                "images/products/100027-83f3d125.jpg",
+                "images/products/100027-03d83ce0.jpg",
+                "images/products/100027-8420e2f5.jpg",
                 "images/products/from-price-sep-2026/price-row2-image1.png"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100027-160e919a-t.jpg",
+                "images/products/100027-c9cc9025-t.jpg",
+                "images/products/100027-1f031d85-t.jpg",
+                "images/products/100027-0dff4b4f-t.jpg",
+                "images/products/100027-1228f9c3-t.jpg",
+                "images/products/100027-83f3d125-t.jpg",
+                "images/products/100027-03d83ce0-t.jpg",
+                "images/products/100027-8420e2f5-t.jpg",
+                "images/products/from-price-sep-2026/price-row2-image1-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1583,10 +1765,38 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100028-ff512e10.jpg",
+                "images/products/100028-80ed6a6f.jpg",
+                "images/products/100028-c19bfdad.jpg",
+                "images/products/100028-913b17fc.jpg",
+                "images/products/100028-ae95e338.jpg",
+                "images/products/100028-a5102ee0.jpg",
+                "images/products/100028-01927d69.jpg",
+                "images/products/100028-afb94fe7.jpg",
+                "images/products/100028-ef70e23c.jpg",
+                "images/products/100028-1be1c5ef.jpg",
+                "images/products/100028-f8a6cc8c.jpg",
+                "images/products/100028-e9ea82e4.jpg",
+                "images/products/100028-bd119969.jpg",
+                "images/products/100028-1c6ac498.jpg",
+                "images/products/100028-02722153.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100028-ff512e10-t.jpg",
+                "images/products/100028-80ed6a6f-t.jpg",
+                "images/products/100028-c19bfdad-t.jpg",
+                "images/products/100028-913b17fc-t.jpg",
+                "images/products/100028-ae95e338-t.jpg",
+                "images/products/100028-a5102ee0-t.jpg",
+                "images/products/100028-01927d69-t.jpg",
+                "images/products/100028-afb94fe7-t.jpg",
+                "images/products/100028-ef70e23c-t.jpg",
+                "images/products/100028-1be1c5ef-t.jpg",
+                "images/products/100028-f8a6cc8c-t.jpg",
+                "images/products/100028-e9ea82e4-t.jpg",
+                "images/products/100028-bd119969-t.jpg",
+                "images/products/100028-1c6ac498-t.jpg",
+                "images/products/100028-02722153-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1627,10 +1837,38 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100029-61ff1427.jpg",
+                "images/products/100029-feb7685a.jpg",
+                "images/products/100029-734e21c3.jpg",
+                "images/products/100029-836352bc.jpg",
+                "images/products/100029-ffa12cfa.jpg",
+                "images/products/100029-2cb58287.jpg",
+                "images/products/100029-2f5b79e6.jpg",
+                "images/products/100029-b0337651.jpg",
+                "images/products/100029-fd2ad442.jpg",
+                "images/products/100029-3be490c5.jpg",
+                "images/products/100029-b609562b.jpg",
+                "images/products/100029-5d712e48.jpg",
+                "images/products/100029-f6db9fd8.jpg",
+                "images/products/100029-cb6ad625.jpg",
+                "images/products/100029-f455237e.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row2-image1.png"
+                "images/products/100029-61ff1427-t.jpg",
+                "images/products/100029-feb7685a-t.jpg",
+                "images/products/100029-734e21c3-t.jpg",
+                "images/products/100029-836352bc-t.jpg",
+                "images/products/100029-ffa12cfa-t.jpg",
+                "images/products/100029-2cb58287-t.jpg",
+                "images/products/100029-2f5b79e6-t.jpg",
+                "images/products/100029-b0337651-t.jpg",
+                "images/products/100029-fd2ad442-t.jpg",
+                "images/products/100029-3be490c5-t.jpg",
+                "images/products/100029-b609562b-t.jpg",
+                "images/products/100029-5d712e48-t.jpg",
+                "images/products/100029-f6db9fd8-t.jpg",
+                "images/products/100029-cb6ad625-t.jpg",
+                "images/products/100029-f455237e-t.jpg"
             ],
             "description": "Экономия и чистота в нежном дизайне! Средний лоток для кошек с сеткой — практичное гигиеническое решение, сочетающее функциональность с эстетикой. Перламутровый оттенок пластика придает изделию благородный вид, а система с решеткой обеспечивает сухость лап питомца и существенную экономию наполнителя.",
             "features": [
@@ -1671,10 +1909,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100030-c36ce557.webp",
+                "images/products/100030-65a5dcb3.webp",
+                "images/products/100030-6a89fa48.webp",
+                "images/products/100030-98dc7d90.webp",
+                "images/products/100030-5f07ebe3.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100030-c36ce557-t.jpg",
+                "images/products/100030-65a5dcb3-t.jpg",
+                "images/products/100030-6a89fa48-t.jpg",
+                "images/products/100030-98dc7d90-t.jpg",
+                "images/products/100030-5f07ebe3-t.jpg"
             ],
             "description": "Компактный округлый туалет для кошек 33,5×25×6 см без сетки. Гладкий пластик, легко очищается. Подходит для использования с любым наполнителем.",
             "features": [
@@ -1715,10 +1961,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100031-6b4a1164.webp",
+                "images/products/100031-6b6d6abd.webp",
+                "images/products/100031-ec7f88fa.webp",
+                "images/products/100031-3d66c359.webp",
+                "images/products/100031-4a419b28.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100031-6b4a1164-t.jpg",
+                "images/products/100031-6b6d6abd-t.jpg",
+                "images/products/100031-ec7f88fa-t.jpg",
+                "images/products/100031-3d66c359-t.jpg",
+                "images/products/100031-4a419b28-t.jpg"
             ],
             "description": "Компактный округлый туалет для кошек 33,5×25×6 см без сетки. Гладкий пластик, легко очищается. Подходит для использования с любым наполнителем.",
             "features": [
@@ -1759,10 +2013,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100032-b331f810.jpg",
+                "images/products/100032-27c9bd99.jpg",
+                "images/products/100032-9573f3ac.jpg",
+                "images/products/100032-f3a23f27.jpg",
+                "images/products/100032-a5bb8312.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100032-b331f810-t.jpg",
+                "images/products/100032-27c9bd99-t.jpg",
+                "images/products/100032-9573f3ac-t.jpg",
+                "images/products/100032-f3a23f27-t.jpg",
+                "images/products/100032-a5bb8312-t.jpg"
             ],
             "description": "Компактный округлый туалет для кошек 33,5×25×6 см без сетки. Гладкий пластик, легко очищается. Подходит для использования с любым наполнителем.",
             "features": [
@@ -1803,10 +2065,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100033-e6916c95.jpg",
+                "images/products/100033-88b52201.jpg",
+                "images/products/100033-b00387d2.jpg",
+                "images/products/100033-ae59e2c3.jpg",
+                "images/products/100033-15e0469a.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100033-e6916c95-t.jpg",
+                "images/products/100033-88b52201-t.jpg",
+                "images/products/100033-b00387d2-t.jpg",
+                "images/products/100033-ae59e2c3-t.jpg",
+                "images/products/100033-15e0469a-t.jpg"
             ],
             "description": "Компактный округлый туалет для кошек 33,5×25×6 см без сетки. Гладкий пластик, легко очищается. Подходит для использования с любым наполнителем.",
             "features": [
@@ -1847,10 +2117,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100034-7a095a2c.jpg",
+                "images/products/100034-904f8a05.jpg",
+                "images/products/100034-e21a85c1.jpg",
+                "images/products/100034-5e32d81e.jpg",
+                "images/products/100034-b1f3bc6a.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100034-7a095a2c-t.jpg",
+                "images/products/100034-904f8a05-t.jpg",
+                "images/products/100034-e21a85c1-t.jpg",
+                "images/products/100034-5e32d81e-t.jpg",
+                "images/products/100034-b1f3bc6a-t.jpg"
             ],
             "description": "Компактный округлый туалет для кошек 33,5×25×6 см без сетки. Гладкий пластик, легко очищается. Подходит для использования с любым наполнителем.",
             "features": [
@@ -1891,10 +2169,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100035-892ebdbf.webp",
+                "images/products/100035-36ffc1d9.webp",
+                "images/products/100035-4d327921.webp",
+                "images/products/from-price-sep-2026/price-row3-image2.png",
+                "images/products/100035-d7e1a85a.webp",
+                "images/products/100035-ff6ae7ad.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row3-image2.png"
+                "images/products/100035-892ebdbf-t.jpg",
+                "images/products/100035-36ffc1d9-t.jpg",
+                "images/products/100035-4d327921-t.jpg",
+                "images/products/from-price-sep-2026/price-row3-image2-t.jpg",
+                "images/products/100035-d7e1a85a-t.jpg",
+                "images/products/100035-ff6ae7ad-t.jpg"
             ],
             "description": "Компактный округлый туалет для кошек 33,5×25×6 см без сетки. Гладкий пластик, легко очищается. Подходит для использования с любым наполнителем.",
             "features": [
@@ -1935,10 +2223,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100036-ddb1b15b.webp",
+                "images/products/100036-0aa7140a.webp",
+                "images/products/100036-cb90d6ad.webp",
+                "images/products/100036-15ec8480.webp",
+                "images/products/100036-5fa06853.webp",
+                "images/products/100036-8170c543.webp",
+                "images/products/100036-89201e0f.webp",
+                "images/products/100036-55c19e27.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100036-ddb1b15b-t.jpg",
+                "images/products/100036-0aa7140a-t.jpg",
+                "images/products/100036-cb90d6ad-t.jpg",
+                "images/products/100036-15ec8480-t.jpg",
+                "images/products/100036-5fa06853-t.jpg",
+                "images/products/100036-8170c543-t.jpg",
+                "images/products/100036-89201e0f-t.jpg",
+                "images/products/100036-55c19e27-t.jpg"
             ],
             "description": "Экономия и гигиена в компактном формате! Лоток для кошек с сеткой — практичное решение для содержания питомца без лишних затрат. Система со съемной решеткой разделяет отходы, обеспечивая сухость лап животного и сокращая расход наполнителя.",
             "features": [
@@ -1979,10 +2281,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100037-f1802f8f.webp",
+                "images/products/100037-5afca09d.webp",
+                "images/products/100037-84ba547e.webp",
+                "images/products/100037-1da619eb.webp",
+                "images/products/100037-8c24be42.webp",
+                "images/products/100037-c2713ed2.webp",
+                "images/products/100037-cd84a54b.webp",
+                "images/products/100037-85b08e96.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100037-f1802f8f-t.jpg",
+                "images/products/100037-5afca09d-t.jpg",
+                "images/products/100037-84ba547e-t.jpg",
+                "images/products/100037-1da619eb-t.jpg",
+                "images/products/100037-8c24be42-t.jpg",
+                "images/products/100037-c2713ed2-t.jpg",
+                "images/products/100037-cd84a54b-t.jpg",
+                "images/products/100037-85b08e96-t.jpg"
             ],
             "description": "Экономия и гигиена в компактном формате! Лоток для кошек с сеткой — практичное решение для содержания питомца без лишних затрат. Система со съемной решеткой разделяет отходы, обеспечивая сухость лап животного и сокращая расход наполнителя.",
             "features": [
@@ -2023,10 +2339,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100038-cd337032.webp",
+                "images/products/100038-a18670e8.webp",
+                "images/products/100038-c523587d.webp",
+                "images/products/100038-dfad1e87.webp",
+                "images/products/100038-05ffb21f.webp",
+                "images/products/100038-92d65b9a.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100038-cd337032-t.jpg",
+                "images/products/100038-a18670e8-t.jpg",
+                "images/products/100038-c523587d-t.jpg",
+                "images/products/100038-dfad1e87-t.jpg",
+                "images/products/100038-05ffb21f-t.jpg",
+                "images/products/100038-92d65b9a-t.jpg"
             ],
             "description": "Экономия и гигиена в компактном формате! Лоток для кошек с сеткой — практичное решение для содержания питомца без лишних затрат. Система со съемной решеткой разделяет отходы, обеспечивая сухость лап животного и сокращая расход наполнителя.",
             "features": [
@@ -2067,10 +2393,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100039-6f97769f.jpg",
+                "images/products/100039-1bf7b2ad.jpg",
+                "images/products/100039-34c6d478.jpg",
+                "images/products/100039-10267a66.jpg",
+                "images/products/100039-bf2e901d.jpg",
+                "images/products/100039-1cfdc674.jpg",
+                "images/products/100039-166ca7aa.jpg",
+                "images/products/100039-fc4adbc8.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100039-6f97769f-t.jpg",
+                "images/products/100039-1bf7b2ad-t.jpg",
+                "images/products/100039-34c6d478-t.jpg",
+                "images/products/100039-10267a66-t.jpg",
+                "images/products/100039-bf2e901d-t.jpg",
+                "images/products/100039-1cfdc674-t.jpg",
+                "images/products/100039-166ca7aa-t.jpg",
+                "images/products/100039-fc4adbc8-t.jpg"
             ],
             "description": "Экономия и гигиена в компактном формате! Лоток для кошек с сеткой — практичное решение для содержания питомца без лишних затрат. Система со съемной решеткой разделяет отходы, обеспечивая сухость лап животного и сокращая расход наполнителя.",
             "features": [
@@ -2111,10 +2451,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100040-f5112185.webp",
+                "images/products/100040-e35d3b37.webp",
+                "images/products/100040-abdf8fa5.webp",
+                "images/products/100040-e551e7ae.webp",
+                "images/products/100040-958eeea3.webp",
+                "images/products/100040-02011190.webp",
+                "images/products/100040-3a04bee3.webp",
+                "images/products/100040-5b7771c4.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row4-image3.png"
+                "images/products/100040-f5112185-t.jpg",
+                "images/products/100040-e35d3b37-t.jpg",
+                "images/products/100040-abdf8fa5-t.jpg",
+                "images/products/100040-e551e7ae-t.jpg",
+                "images/products/100040-958eeea3-t.jpg",
+                "images/products/100040-02011190-t.jpg",
+                "images/products/100040-3a04bee3-t.jpg",
+                "images/products/100040-5b7771c4-t.jpg"
             ],
             "description": "Экономия и гигиена в компактном формате! Лоток для кошек с сеткой — практичное решение для содержания питомца без лишних затрат. Система со съемной решеткой разделяет отходы, обеспечивая сухость лап животного и сокращая расход наполнителя.",
             "features": [
@@ -2155,12 +2509,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100041-6655303b.jpg",
+                "images/products/100041-ad01cb98.jpg",
+                "images/products/100041-c89186ef.jpg",
+                "images/products/100041-3d9f3cb6.jpg",
+                "images/products/100041-4b1d94f6.jpg",
+                "images/products/100041-42bd0fe9.jpg",
+                "images/products/100041-4ecba3fa.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100041-6655303b-t.jpg",
+                "images/products/100041-ad01cb98-t.jpg",
+                "images/products/100041-c89186ef-t.jpg",
+                "images/products/100041-3d9f3cb6-t.jpg",
+                "images/products/100041-4b1d94f6-t.jpg",
+                "images/products/100041-42bd0fe9-t.jpg",
+                "images/products/100041-4ecba3fa-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2201,12 +2565,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100042-e5070511.webp",
+                "images/products/100042-40aeb203.webp",
+                "images/products/100042-f5644225.webp",
+                "images/products/100042-cd2dfa1b.webp",
+                "images/products/100042-1dda5a11.webp",
+                "images/products/100042-818dbfe2.webp",
+                "images/products/100042-e482968d.webp",
+                "images/products/100042-2c44e379.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100042-e5070511-t.jpg",
+                "images/products/100042-40aeb203-t.jpg",
+                "images/products/100042-f5644225-t.jpg",
+                "images/products/100042-cd2dfa1b-t.jpg",
+                "images/products/100042-1dda5a11-t.jpg",
+                "images/products/100042-818dbfe2-t.jpg",
+                "images/products/100042-e482968d-t.jpg",
+                "images/products/100042-2c44e379-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2247,12 +2623,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100043-ca5427cc.jpg",
+                "images/products/100043-0bc79036.jpg",
+                "images/products/100043-04ea7e45.jpg",
+                "images/products/100043-205f0018.jpg",
+                "images/products/100043-b19501c6.jpg",
+                "images/products/100043-ac2dc036.jpg",
+                "images/products/100043-43813b98.jpg",
+                "images/products/100043-005b34e0.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100043-ca5427cc-t.jpg",
+                "images/products/100043-0bc79036-t.jpg",
+                "images/products/100043-04ea7e45-t.jpg",
+                "images/products/100043-205f0018-t.jpg",
+                "images/products/100043-b19501c6-t.jpg",
+                "images/products/100043-ac2dc036-t.jpg",
+                "images/products/100043-43813b98-t.jpg",
+                "images/products/100043-005b34e0-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2293,12 +2681,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100044-2120b054.jpg",
+                "images/products/100044-5d98c398.jpg",
+                "images/products/100044-033cff14.jpg",
+                "images/products/100044-2558e597.jpg",
+                "images/products/100044-923e6a0a.jpg",
+                "images/products/100044-be88321c.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100044-2120b054-t.jpg",
+                "images/products/100044-5d98c398-t.jpg",
+                "images/products/100044-033cff14-t.jpg",
+                "images/products/100044-2558e597-t.jpg",
+                "images/products/100044-923e6a0a-t.jpg",
+                "images/products/100044-be88321c-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2339,12 +2735,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100045-fe9b7635.jpg",
+                "images/products/100045-7ac9df54.jpg",
+                "images/products/100045-5144dd22.jpg",
+                "images/products/100045-0ffcc882.jpg",
+                "images/products/100045-048b4e15.jpg",
+                "images/products/100045-e5d3f7c9.jpg",
+                "images/products/100045-d119528f.jpg",
+                "images/products/100045-87a90709.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100045-fe9b7635-t.jpg",
+                "images/products/100045-7ac9df54-t.jpg",
+                "images/products/100045-5144dd22-t.jpg",
+                "images/products/100045-0ffcc882-t.jpg",
+                "images/products/100045-048b4e15-t.jpg",
+                "images/products/100045-e5d3f7c9-t.jpg",
+                "images/products/100045-d119528f-t.jpg",
+                "images/products/100045-87a90709-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2385,12 +2793,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100046-88d76ce4.jpg",
+                "images/products/100046-6817c806.jpg",
+                "images/products/100046-574e8f77.jpg",
+                "images/products/100046-31db6082.jpg",
+                "images/products/100046-2b24a945.jpg",
+                "images/products/100046-13efeb59.jpg",
+                "images/products/100046-401ea2b6.jpg",
+                "images/products/100046-77697aa5.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100046-88d76ce4-t.jpg",
+                "images/products/100046-6817c806-t.jpg",
+                "images/products/100046-574e8f77-t.jpg",
+                "images/products/100046-31db6082-t.jpg",
+                "images/products/100046-2b24a945-t.jpg",
+                "images/products/100046-13efeb59-t.jpg",
+                "images/products/100046-401ea2b6-t.jpg",
+                "images/products/100046-77697aa5-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2435,8 +2855,8 @@
                 "images/products/from-price-sep-2026/price-row5-image12.png"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/from-price-sep-2026/price-row5-image4-t.jpg",
+                "images/products/from-price-sep-2026/price-row5-image12-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2477,12 +2897,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100048-96e1b811.jpg",
+                "images/products/100048-02bc2513.jpg",
+                "images/products/100048-f7145968.jpg",
+                "images/products/100048-99e90276.jpg",
+                "images/products/100048-551baff3.jpg",
+                "images/products/100048-22506f55.jpg",
+                "images/products/100048-b294321e.jpg",
+                "images/products/100048-24a0b818.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100048-96e1b811-t.jpg",
+                "images/products/100048-02bc2513-t.jpg",
+                "images/products/100048-f7145968-t.jpg",
+                "images/products/100048-99e90276-t.jpg",
+                "images/products/100048-551baff3-t.jpg",
+                "images/products/100048-22506f55-t.jpg",
+                "images/products/100048-b294321e-t.jpg",
+                "images/products/100048-24a0b818-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2523,12 +2955,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100049-31965158.jpg",
+                "images/products/100049-2feb98eb.jpg",
+                "images/products/100049-7ebc2d39.jpg",
+                "images/products/100049-a17cadec.jpg",
+                "images/products/100049-98460f7a.jpg",
+                "images/products/100049-625a7765.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100049-31965158-t.jpg",
+                "images/products/100049-2feb98eb-t.jpg",
+                "images/products/100049-7ebc2d39-t.jpg",
+                "images/products/100049-a17cadec-t.jpg",
+                "images/products/100049-98460f7a-t.jpg",
+                "images/products/100049-625a7765-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2569,12 +3009,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100050-fc25a425.jpg",
+                "images/products/100050-d2331f4f.jpg",
+                "images/products/100050-f5fb0fff.jpg",
+                "images/products/100050-9be81b96.jpg",
+                "images/products/100050-9ac9efb5.jpg",
+                "images/products/100050-4bcc09c3.jpg",
+                "images/products/100050-124b838c.jpg",
+                "images/products/100050-f644cf05.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100050-fc25a425-t.jpg",
+                "images/products/100050-d2331f4f-t.jpg",
+                "images/products/100050-f5fb0fff-t.jpg",
+                "images/products/100050-9be81b96-t.jpg",
+                "images/products/100050-9ac9efb5-t.jpg",
+                "images/products/100050-4bcc09c3-t.jpg",
+                "images/products/100050-124b838c-t.jpg",
+                "images/products/100050-f644cf05-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2615,12 +3067,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100051-89b6453a.jpg",
+                "images/products/100051-7a2b4c18.jpg",
+                "images/products/100051-e1de3f74.jpg",
+                "images/products/100051-d45d293d.jpg",
+                "images/products/100051-8d1c7ecc.jpg",
+                "images/products/100051-895843ef.jpg",
+                "images/products/100051-813abfe2.jpg",
+                "images/products/100051-182ed510.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100051-89b6453a-t.jpg",
+                "images/products/100051-7a2b4c18-t.jpg",
+                "images/products/100051-e1de3f74-t.jpg",
+                "images/products/100051-d45d293d-t.jpg",
+                "images/products/100051-8d1c7ecc-t.jpg",
+                "images/products/100051-895843ef-t.jpg",
+                "images/products/100051-813abfe2-t.jpg",
+                "images/products/100051-182ed510-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2661,12 +3125,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100052-3416b2c5.jpg",
+                "images/products/100052-d06d2962.jpg",
+                "images/products/100052-be64ee4e.jpg",
+                "images/products/100052-2210da80.jpg",
+                "images/products/100052-5aeb8343.jpg",
+                "images/products/100052-98676872.jpg",
+                "images/products/100052-eb473696.jpg",
+                "images/products/100052-364ac9a1.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100052-3416b2c5-t.jpg",
+                "images/products/100052-d06d2962-t.jpg",
+                "images/products/100052-be64ee4e-t.jpg",
+                "images/products/100052-2210da80-t.jpg",
+                "images/products/100052-5aeb8343-t.jpg",
+                "images/products/100052-98676872-t.jpg",
+                "images/products/100052-eb473696-t.jpg",
+                "images/products/100052-364ac9a1-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2707,12 +3183,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100053-fca22acd.jpg",
+                "images/products/100053-244eb367.jpg",
+                "images/products/100053-211aac5f.jpg",
+                "images/products/100053-c6d62f3d.jpg",
+                "images/products/100053-063ac43d.jpg",
+                "images/products/100053-f5fb194d.jpg",
+                "images/products/100053-a141c446.jpg",
+                "images/products/100053-8472f842.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100053-fca22acd-t.jpg",
+                "images/products/100053-244eb367-t.jpg",
+                "images/products/100053-211aac5f-t.jpg",
+                "images/products/100053-c6d62f3d-t.jpg",
+                "images/products/100053-063ac43d-t.jpg",
+                "images/products/100053-f5fb194d-t.jpg",
+                "images/products/100053-a141c446-t.jpg",
+                "images/products/100053-8472f842-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2753,12 +3241,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100054-8ddedbdf.jpg",
+                "images/products/100054-6a6e6db2.jpg",
+                "images/products/100054-44641250.jpg",
+                "images/products/100054-d75ea231.jpg",
+                "images/products/100054-fcfcaefe.jpg",
+                "images/products/100054-6d92bafc.jpg",
+                "images/products/100054-1fb58496.jpg",
+                "images/products/100054-dd10891c.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row5-image4.png",
-                "images/products/from-price-sep-2026/price-row5-image12.png"
+                "images/products/100054-8ddedbdf-t.jpg",
+                "images/products/100054-6a6e6db2-t.jpg",
+                "images/products/100054-44641250-t.jpg",
+                "images/products/100054-d75ea231-t.jpg",
+                "images/products/100054-fcfcaefe-t.jpg",
+                "images/products/100054-6d92bafc-t.jpg",
+                "images/products/100054-1fb58496-t.jpg",
+                "images/products/100054-dd10891c-t.jpg"
             ],
             "description": "Лоток для кошек глубокий — гигиеничное и практичное решение для ежедневного ухода за питомцем. Пластиковый туалет размером 36×25×9 см оснащен съемной сеткой и выполнен в насыщенном цвете. Высокие борта предотвращают рассыпание наполнителя, а решетка обеспечивает чистоту лап даже при использовании минимального количества субстрата.",
             "features": [
@@ -2799,10 +3299,14 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row6-image5.png"
+                "images/products/100055-19a6d992.jpg",
+                "images/products/100055-7db5fd4a.jpg",
+                "images/products/100055-e304c6b7.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row6-image5.png"
+                "images/products/100055-19a6d992-t.jpg",
+                "images/products/100055-7db5fd4a-t.jpg",
+                "images/products/100055-e304c6b7-t.jpg"
             ],
             "description": "Средний туалет для кошек 36×26×6,5 см без сетки. Прямоугольная форма, прочный пластик, легко очищается. Подходит для любого вида наполнителя.",
             "features": [
@@ -2843,10 +3347,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row6-image5.png"
+                "images/products/100056-7f0dbb17.webp",
+                "images/products/100056-7b162f1d.webp",
+                "images/products/100056-aa60b703.webp",
+                "images/products/100056-63272fb5.webp",
+                "images/products/100056-7983d163.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row6-image5.png"
+                "images/products/100056-7f0dbb17-t.jpg",
+                "images/products/100056-7b162f1d-t.jpg",
+                "images/products/100056-aa60b703-t.jpg",
+                "images/products/100056-63272fb5-t.jpg",
+                "images/products/100056-7983d163-t.jpg"
             ],
             "description": "Средний туалет для кошек 36×26×6,5 см без сетки. Прямоугольная форма, прочный пластик, легко очищается. Подходит для любого вида наполнителя.",
             "features": [
@@ -2887,10 +3399,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row6-image5.png"
+                "images/products/100057-16a81c80.jpg",
+                "images/products/100057-34941000.jpg",
+                "images/products/100057-9f9711f4.jpg",
+                "images/products/100057-2a9d6539.jpg",
+                "images/products/100057-ae936983.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row6-image5.png"
+                "images/products/100057-16a81c80-t.jpg",
+                "images/products/100057-34941000-t.jpg",
+                "images/products/100057-9f9711f4-t.jpg",
+                "images/products/100057-2a9d6539-t.jpg",
+                "images/products/100057-ae936983-t.jpg"
             ],
             "description": "Средний туалет для кошек 36×26×6,5 см без сетки. Прямоугольная форма, прочный пластик, легко очищается. Подходит для любого вида наполнителя.",
             "features": [
@@ -2931,10 +3451,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row7-image6.png"
+                "images/products/100058-c791ece3.jpg",
+                "images/products/100058-2c7d4b81.jpg",
+                "images/products/100058-c4f4fd17.jpg",
+                "images/products/100058-ec98ad67.jpg",
+                "images/products/100058-38d78922.jpg",
+                "images/products/100058-bdb11537.jpg",
+                "images/products/100058-7d16caa0.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row7-image6.png"
+                "images/products/100058-c791ece3-t.jpg",
+                "images/products/100058-2c7d4b81-t.jpg",
+                "images/products/100058-c4f4fd17-t.jpg",
+                "images/products/100058-ec98ad67-t.jpg",
+                "images/products/100058-38d78922-t.jpg",
+                "images/products/100058-bdb11537-t.jpg",
+                "images/products/100058-7d16caa0-t.jpg"
             ],
             "description": "Кошачий туалет с бортом — решение для владельцев, ценящих чистоту вокруг лотка. Высокие борта предотвращают высыпание наполнителя за пределы изделия, что особенно важно для активных кошек. Пластик устойчив к воздействию влаги, легко очищается, подходит для древесных, силиконовых и комкующихся наполнителей.",
             "features": [
@@ -2975,10 +3507,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row7-image6.png"
+                "images/products/100059-8b894d05.jpg",
+                "images/products/100059-74b834b0.jpg",
+                "images/products/100059-bc56af57.jpg",
+                "images/products/100059-24aa8fbe.jpg",
+                "images/products/100059-e50113a3.jpg",
+                "images/products/100059-5f18c387.jpg",
+                "images/products/100059-4c28eb72.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row7-image6.png"
+                "images/products/100059-8b894d05-t.jpg",
+                "images/products/100059-74b834b0-t.jpg",
+                "images/products/100059-bc56af57-t.jpg",
+                "images/products/100059-24aa8fbe-t.jpg",
+                "images/products/100059-e50113a3-t.jpg",
+                "images/products/100059-5f18c387-t.jpg",
+                "images/products/100059-4c28eb72-t.jpg"
             ],
             "description": "Кошачий туалет с бортом — решение для владельцев, ценящих чистоту вокруг лотка. Высокие борта предотвращают высыпание наполнителя за пределы изделия, что особенно важно для активных кошек. Пластик устойчив к воздействию влаги, легко очищается, подходит для древесных, силиконовых и комкующихся наполнителей.",
             "features": [
@@ -3019,10 +3563,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row8-image7.png"
+                "images/products/100060-8aab0afb.jpg",
+                "images/products/100060-41b59a27.jpg",
+                "images/products/100060-e1780b90.jpg",
+                "images/products/100060-4465e83f.jpg",
+                "images/products/100060-bc47e1d6.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row8-image7.png"
+                "images/products/100060-8aab0afb-t.jpg",
+                "images/products/100060-41b59a27-t.jpg",
+                "images/products/100060-e1780b90-t.jpg",
+                "images/products/100060-4465e83f-t.jpg",
+                "images/products/100060-bc47e1d6-t.jpg"
             ],
             "description": "Глубокий туалет для кошек 36×26×9 см без сетки. Высокие борта помогают удерживать наполнитель внутри лотка. Прочный пластик, легко очищается.",
             "features": [
@@ -3063,10 +3615,14 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row8-image7.png"
+                "images/products/100061-2f160ad4.jpg",
+                "images/products/100061-ffdb0735.jpg",
+                "images/products/100061-e3344941.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row8-image7.png"
+                "images/products/100061-2f160ad4-t.jpg",
+                "images/products/100061-ffdb0735-t.jpg",
+                "images/products/100061-e3344941-t.jpg"
             ],
             "description": "Глубокий туалет для кошек 36×26×9 см без сетки. Высокие борта помогают удерживать наполнитель внутри лотка. Прочный пластик, легко очищается.",
             "features": [
@@ -3107,10 +3663,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100062-27d76d7b.jpg",
+                "images/products/100062-df6cee93.jpg",
+                "images/products/100062-a8efbb23.jpg",
+                "images/products/100062-da376222.jpg",
+                "images/products/100062-8d000ba8.jpg",
+                "images/products/100062-404d643b.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100062-27d76d7b-t.jpg",
+                "images/products/100062-df6cee93-t.jpg",
+                "images/products/100062-a8efbb23-t.jpg",
+                "images/products/100062-da376222-t.jpg",
+                "images/products/100062-8d000ba8-t.jpg",
+                "images/products/100062-404d643b-t.jpg"
             ],
             "description": "Миски для домашних питомцев. Посуда изготовлена из качественного материала, соответствует всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подходят для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3151,10 +3717,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100063-1b217169.webp",
+                "images/products/100063-77077306.webp",
+                "images/products/100063-8e8d55ed.webp",
+                "images/products/100063-d8259397.webp",
+                "images/products/100063-43285782.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100063-1b217169-t.jpg",
+                "images/products/100063-77077306-t.jpg",
+                "images/products/100063-8e8d55ed-t.jpg",
+                "images/products/100063-d8259397-t.jpg",
+                "images/products/100063-43285782-t.jpg"
             ],
             "description": "Миски для домашних питомцев. Посуда изготовлена из качественного материала, соответствует всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подходят для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3195,10 +3769,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100064-3f3e7d5c.jpg",
+                "images/products/100064-2b5f7874.jpg",
+                "images/products/100064-22d7c8e3.jpg",
+                "images/products/100064-9f9ea0e9.jpg",
+                "images/products/100064-f02477ac.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100064-3f3e7d5c-t.jpg",
+                "images/products/100064-2b5f7874-t.jpg",
+                "images/products/100064-22d7c8e3-t.jpg",
+                "images/products/100064-9f9ea0e9-t.jpg",
+                "images/products/100064-f02477ac-t.jpg"
             ],
             "description": "Миски для домашних питомцев. Посуда изготовлена из качественного материала, соответствует всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подходят для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3239,10 +3821,28 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100065-11b745e7.webp",
+                "images/products/100065-d71f19f7.webp",
+                "images/products/100065-b56d0489.webp",
+                "images/products/100065-865dec3b.webp",
+                "images/products/100065-fc4c003a.webp",
+                "images/products/100065-55ceb980.webp",
+                "images/products/100065-1ed7abd6.webp",
+                "images/products/100065-fc7a55d5.webp",
+                "images/products/100065-60044e44.webp",
+                "images/products/100065-7d988ec6.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100065-11b745e7-t.jpg",
+                "images/products/100065-d71f19f7-t.jpg",
+                "images/products/100065-b56d0489-t.jpg",
+                "images/products/100065-865dec3b-t.jpg",
+                "images/products/100065-fc4c003a-t.jpg",
+                "images/products/100065-55ceb980-t.jpg",
+                "images/products/100065-1ed7abd6-t.jpg",
+                "images/products/100065-fc7a55d5-t.jpg",
+                "images/products/100065-60044e44-t.jpg",
+                "images/products/100065-7d988ec6-t.jpg"
             ],
             "description": "Миски для домашних питомцев. Посуда изготовлена из качественного материала, соответствует всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подходят для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3283,10 +3883,16 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100066-03cba113.jpg",
+                "images/products/100066-3c825d50.jpg",
+                "images/products/100066-6a01e6b7.jpg",
+                "images/products/100066-102d31ad.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row9-image8.png"
+                "images/products/100066-03cba113-t.jpg",
+                "images/products/100066-3c825d50-t.jpg",
+                "images/products/100066-6a01e6b7-t.jpg",
+                "images/products/100066-102d31ad-t.jpg"
             ],
             "description": "Миски для домашних питомцев. Посуда изготовлена из качественного материала, соответствует всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подходят для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3327,10 +3933,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100067-4302a56e.jpg",
+                "images/products/100067-25e60f16.jpg",
+                "images/products/100067-8fdeff58.jpg",
+                "images/products/100067-0cb3f9a5.jpg",
+                "images/products/100067-05cdcda0.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100067-4302a56e-t.jpg",
+                "images/products/100067-25e60f16-t.jpg",
+                "images/products/100067-8fdeff58-t.jpg",
+                "images/products/100067-0cb3f9a5-t.jpg",
+                "images/products/100067-05cdcda0-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3371,10 +3985,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100068-72947a54.webp",
+                "images/products/100068-b756cfad.webp",
+                "images/products/100068-40d4371f.webp",
+                "images/products/100068-8d12fdd6.webp",
+                "images/products/100068-715762d9.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100068-72947a54-t.jpg",
+                "images/products/100068-b756cfad-t.jpg",
+                "images/products/100068-40d4371f-t.jpg",
+                "images/products/100068-8d12fdd6-t.jpg",
+                "images/products/100068-715762d9-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3415,10 +4037,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100069-8eba7bce.jpg",
+                "images/products/100069-d163a38a.jpg",
+                "images/products/100069-cbd7fd39.jpg",
+                "images/products/100069-1f25fe6b.jpg",
+                "images/products/100069-8ca0561d.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100069-8eba7bce-t.jpg",
+                "images/products/100069-d163a38a-t.jpg",
+                "images/products/100069-cbd7fd39-t.jpg",
+                "images/products/100069-1f25fe6b-t.jpg",
+                "images/products/100069-8ca0561d-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3459,10 +4089,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100070-fa00a398.jpg",
+                "images/products/100070-5ef69550.jpg",
+                "images/products/100070-d295d270.jpg",
+                "images/products/100070-43acc3a4.jpg",
+                "images/products/100070-6b74699a.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100070-fa00a398-t.jpg",
+                "images/products/100070-5ef69550-t.jpg",
+                "images/products/100070-d295d270-t.jpg",
+                "images/products/100070-43acc3a4-t.jpg",
+                "images/products/100070-6b74699a-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3503,10 +4141,20 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100071-16a28c68.jpg",
+                "images/products/100071-27fbfa41.jpg",
+                "images/products/100071-acb9b056.jpg",
+                "images/products/100071-0909a7f0.jpg",
+                "images/products/100071-c7811272.jpg",
+                "images/products/100071-0ccd1e4a.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100071-16a28c68-t.jpg",
+                "images/products/100071-27fbfa41-t.jpg",
+                "images/products/100071-acb9b056-t.jpg",
+                "images/products/100071-0909a7f0-t.jpg",
+                "images/products/100071-c7811272-t.jpg",
+                "images/products/100071-0ccd1e4a-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3547,10 +4195,16 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100072-20f95040.jpg",
+                "images/products/100072-f37de85f.jpg",
+                "images/products/100072-b22b0c67.jpg",
+                "images/products/100072-b5465ee4.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100072-20f95040-t.jpg",
+                "images/products/100072-f37de85f-t.jpg",
+                "images/products/100072-b22b0c67-t.jpg",
+                "images/products/100072-b5465ee4-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3591,10 +4245,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100073-95f66253.jpg",
+                "images/products/100073-096e22d3.jpg",
+                "images/products/100073-8fbaf35d.jpg",
+                "images/products/100073-c02ffb1b.jpg",
+                "images/products/100073-bcebf3fe.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100073-95f66253-t.jpg",
+                "images/products/100073-096e22d3-t.jpg",
+                "images/products/100073-8fbaf35d-t.jpg",
+                "images/products/100073-c02ffb1b-t.jpg",
+                "images/products/100073-bcebf3fe-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3635,10 +4297,30 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100074-10331432.webp",
+                "images/products/100074-50289737.webp",
+                "images/products/100074-45365434.webp",
+                "images/products/100074-fb626419.webp",
+                "images/products/100074-a441c671.webp",
+                "images/products/100074-fd7f87e1.webp",
+                "images/products/100074-93f0a6a5.webp",
+                "images/products/100074-e12ab5c7.webp",
+                "images/products/100074-3e1e4d7c.webp",
+                "images/products/100074-2048dd4d.webp",
+                "images/products/100074-534e861c.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row10-image9.png"
+                "images/products/100074-10331432-t.jpg",
+                "images/products/100074-50289737-t.jpg",
+                "images/products/100074-45365434-t.jpg",
+                "images/products/100074-fb626419-t.jpg",
+                "images/products/100074-a441c671-t.jpg",
+                "images/products/100074-fd7f87e1-t.jpg",
+                "images/products/100074-93f0a6a5-t.jpg",
+                "images/products/100074-e12ab5c7-t.jpg",
+                "images/products/100074-3e1e4d7c-t.jpg",
+                "images/products/100074-2048dd4d-t.jpg",
+                "images/products/100074-534e861c-t.jpg"
             ],
             "description": "Миски для домашних питомцев изготовлены из качественного материала и соответствуют всем стандартам. Миски представлены в разных формах и размерах, тяжелые и устойчивые, маленькие и большие. Подойдут для средних, крупных и мелких пород кошек, маленьких собак, грызунов и птиц. Миски подойдут для воды и корма любой консистенции. Легко моются водой, можно мыть в посудомоечной машине. Также могут использоваться в быту.",
             "features": [
@@ -3679,12 +4361,32 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100075-cf4bc228.jpg",
+                "images/products/100075-963700c9.jpg",
+                "images/products/100075-c3b47758.jpg",
+                "images/products/100075-fcc24406.jpg",
+                "images/products/100075-71500672.jpg",
+                "images/products/100075-c997cb38.jpg",
+                "images/products/100075-ed547a13.jpg",
+                "images/products/100075-100236d6.jpg",
+                "images/products/100075-c72055f9.webp",
+                "images/products/100075-8e75b136.webp",
+                "images/products/100075-f3b04926.webp",
+                "images/products/100075-eea1f9a7.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100075-cf4bc228-t.jpg",
+                "images/products/100075-963700c9-t.jpg",
+                "images/products/100075-c3b47758-t.jpg",
+                "images/products/100075-fcc24406-t.jpg",
+                "images/products/100075-71500672-t.jpg",
+                "images/products/100075-c997cb38-t.jpg",
+                "images/products/100075-ed547a13-t.jpg",
+                "images/products/100075-100236d6-t.jpg",
+                "images/products/100075-c72055f9-t.jpg",
+                "images/products/100075-8e75b136-t.jpg",
+                "images/products/100075-f3b04926-t.jpg",
+                "images/products/100075-eea1f9a7-t.jpg"
             ],
             "description": "Туалет для кошек 36×26×9 см со съёмным бортом и сеткой. Конструкция помогает удерживать наполнитель и поддерживать чистоту. Прочный пластик, удобно разбирать и мыть.",
             "features": [
@@ -3725,12 +4427,24 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100076-c0eede43.jpg",
+                "images/products/100076-82e56cf8.jpg",
+                "images/products/100076-6d8269d6.jpg",
+                "images/products/100076-7cd2f206.jpg",
+                "images/products/100076-f480e047.jpg",
+                "images/products/100076-8e0d0f48.jpg",
+                "images/products/100076-82d53c07.jpg",
+                "images/products/100076-ba181cd6.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100076-c0eede43-t.jpg",
+                "images/products/100076-82e56cf8-t.jpg",
+                "images/products/100076-6d8269d6-t.jpg",
+                "images/products/100076-7cd2f206-t.jpg",
+                "images/products/100076-f480e047-t.jpg",
+                "images/products/100076-8e0d0f48-t.jpg",
+                "images/products/100076-82d53c07-t.jpg",
+                "images/products/100076-ba181cd6-t.jpg"
             ],
             "description": "Туалет для кошек 36×26×9 см со съёмным бортом и сеткой. Конструкция помогает удерживать наполнитель и поддерживать чистоту. Прочный пластик, удобно разбирать и мыть.",
             "features": [
@@ -3771,12 +4485,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100077-06a359b8.webp",
+                "images/products/100077-9a9f6c46.webp",
+                "images/products/100077-0b2ffb17.webp",
+                "images/products/100077-e5db8c1d.webp",
+                "images/products/100077-1a240af1.webp",
+                "images/products/100077-44a1a441.webp",
+                "images/products/100077-85025c39.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100077-06a359b8-t.jpg",
+                "images/products/100077-9a9f6c46-t.jpg",
+                "images/products/100077-0b2ffb17-t.jpg",
+                "images/products/100077-e5db8c1d-t.jpg",
+                "images/products/100077-1a240af1-t.jpg",
+                "images/products/100077-44a1a441-t.jpg",
+                "images/products/100077-85025c39-t.jpg"
             ],
             "description": "Туалет для кошек 36×26×9 см со съёмным бортом и сеткой. Конструкция помогает удерживать наполнитель и поддерживать чистоту. Прочный пластик, удобно разбирать и мыть.",
             "features": [
@@ -3817,12 +4541,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100078-f8f0040c.webp",
+                "images/products/100078-dd781f9f.webp",
+                "images/products/100078-81e492f6.webp",
+                "images/products/100078-14819547.webp",
+                "images/products/100078-ba8f5ef1.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100078-f8f0040c-t.jpg",
+                "images/products/100078-dd781f9f-t.jpg",
+                "images/products/100078-81e492f6-t.jpg",
+                "images/products/100078-14819547-t.jpg",
+                "images/products/100078-ba8f5ef1-t.jpg"
             ],
             "description": "Туалет для кошек 36×26×9 см со съёмным бортом и сеткой. Конструкция помогает удерживать наполнитель и поддерживать чистоту. Прочный пластик, удобно разбирать и мыть.",
             "features": [
@@ -3863,12 +4593,18 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100079-abe41cbb.jpg",
+                "images/products/100079-abc9b658.jpg",
+                "images/products/100079-feb9b26a.jpg",
+                "images/products/100079-8753fcce.jpg",
+                "images/products/100079-743881b4.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100079-abe41cbb-t.jpg",
+                "images/products/100079-abc9b658-t.jpg",
+                "images/products/100079-feb9b26a-t.jpg",
+                "images/products/100079-8753fcce-t.jpg",
+                "images/products/100079-743881b4-t.jpg"
             ],
             "description": "Туалет для кошек 36×26×9 см со съёмным бортом и сеткой. Конструкция помогает удерживать наполнитель и поддерживать чистоту. Прочный пластик, удобно разбирать и мыть.",
             "features": [
@@ -3909,12 +4645,40 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100080-8156ae0c.jpg",
+                "images/products/100080-93fb2562.jpg",
+                "images/products/100080-be215717.jpg",
+                "images/products/100080-e5199cb0.jpg",
+                "images/products/100080-a019223f.jpg",
+                "images/products/100080-19f51ec1.jpg",
+                "images/products/100080-15df07c7.jpg",
+                "images/products/100080-9a189675.jpg",
+                "images/products/100080-cf3b1974.jpg",
+                "images/products/100080-e5c9a2c2.jpg",
+                "images/products/100080-1fbdb4ff.jpg",
+                "images/products/100080-f500c950.jpg",
+                "images/products/100080-a9dd9647.jpg",
+                "images/products/100080-c81f2398.jpg",
+                "images/products/100080-db9c59f4.jpg",
+                "images/products/100080-dae63941.jpg"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100080-8156ae0c-t.jpg",
+                "images/products/100080-93fb2562-t.jpg",
+                "images/products/100080-be215717-t.jpg",
+                "images/products/100080-e5199cb0-t.jpg",
+                "images/products/100080-a019223f-t.jpg",
+                "images/products/100080-19f51ec1-t.jpg",
+                "images/products/100080-15df07c7-t.jpg",
+                "images/products/100080-9a189675-t.jpg",
+                "images/products/100080-cf3b1974-t.jpg",
+                "images/products/100080-e5c9a2c2-t.jpg",
+                "images/products/100080-1fbdb4ff-t.jpg",
+                "images/products/100080-f500c950-t.jpg",
+                "images/products/100080-a9dd9647-t.jpg",
+                "images/products/100080-c81f2398-t.jpg",
+                "images/products/100080-db9c59f4-t.jpg",
+                "images/products/100080-dae63941-t.jpg"
             ],
             "description": "Туалет для кошек 36×26×9 см со съёмным бортом и сеткой. Конструкция помогает удерживать наполнитель и поддерживать чистоту. Прочный пластик, удобно разбирать и мыть.",
             "features": [
@@ -3955,12 +4719,22 @@
             "country": "Россия",
             "cert": "Не подлежит сертификации",
             "images": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100081-640a8165.webp",
+                "images/products/100081-f7d255b0.webp",
+                "images/products/100081-35d2ffe5.webp",
+                "images/products/100081-c6652e99.webp",
+                "images/products/100081-6a1c35bf.webp",
+                "images/products/100081-92498d90.webp",
+                "images/products/100081-95c304ed.webp"
             ],
             "thumbs": [
-                "images/products/from-price-sep-2026/price-row11-image10.png",
-                "images/products/from-price-sep-2026/price-row11-image11.png"
+                "images/products/100081-640a8165-t.jpg",
+                "images/products/100081-f7d255b0-t.jpg",
+                "images/products/100081-35d2ffe5-t.jpg",
+                "images/products/100081-c6652e99-t.jpg",
+                "images/products/100081-6a1c35bf-t.jpg",
+                "images/products/100081-92498d90-t.jpg",
+                "images/products/100081-95c304ed-t.jpg"
             ],
             "description": "Туалет для кошек 36×26×9 см со съёмным бортом и сеткой. Конструкция помогает удерживать наполнитель и поддерживать чистоту. Прочный пластик, удобно разбирать и мыть.",
             "features": [
@@ -3988,6 +4762,10 @@
             "telegram": "https://t.me/poliform",
             "tgLabel": "@poliform",
             "hours": "Пн–Пт, 09:00–18:00 (МСК)"
+        },
+        "shop": {
+            "hidePrice": "1",
+            "hideCart": "1"
         }
     }
 }

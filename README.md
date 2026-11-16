@@ -1,8 +1,9 @@
 # ПОЛИФОРМ КОМПАНИ — интернет-магазин пластиковых изделий
 
-Статический сайт собственного производства: лотки и туалеты для кошек, миски одинарные и двойные.
-Без CMS, без бэкенда и без серверной обработки форм. Корзина и режим цены живут в `localStorage`,
-заявка собирается в текст и отправляется в Telegram или по телефону. Деплой — GitHub Pages.
+Сайт на PHP и SQLite: витрина, корзина с заявками и админка. Каталог, настройки, пользователи
+и заявки хранятся в `site.db`. Для GitHub Pages собирается статический снимок `dist/`
+(`php tools/build-static.php`), поэтому на Pages работают витрина и корзина без сервера,
+а полная версия с админкой и приёмом заявок запускается на Apache + PHP.
 
 ## Структура
 
@@ -17,8 +18,8 @@ poliform-plastic/
 ├── api.php                  API для админки: каталог, заказы, тексты, пользователи, заявки
 ├── db.php                   SQLite + запросы (настройки, товары, категории, заявки)
 ├── inc/                     layout: head/footer/шапка/подвал, helpers (pl_asset, pl_boot, …)
-├── lib/                     …
-├── tools/                   build-static.php, render-page.php (сборка dist/)
+├── lib/                     image.php (WebP), mailer.php, xlsx.php, zip.php
+├── tools/                   build-static.php, render-page.php, make-webp.php, recolor.php, reset-password.php
 ├── data/                    products.json, settings, logs
 ├── images/                  фото товаров + миниатюры
 ├── js/                      main.js, shop.js, plastic-live.js, admin.js
@@ -63,17 +64,30 @@ poliform-plastic/
 ## Производительность
 
 - Фото товаров отдаются в WebP (генерируются из JPG/PNG через GD), для галереи — `<picture>` с фолбэком на оригинал.
+  **Нужно расширение GD с поддержкой WebP** (`extension=gd` в `php.ini`, перезапуск Apache). Без него загрузка
+  фото в админке вернёт понятную ошибку, а не молча сломает карточку.
+- Догенерация отсутствующих `.webp` / `-t.webp` для уже загруженных фото: `php tools/make-webp.php`
+  (`--dry-run` — только показать список, `--force` — пересоздать). Скрипт ничего не удаляет.
 - Шрифты Space Grotesk и JetBrains Mono — self-hosted (`fonts/*.woff2`), внешних запросов к Google Fonts нет.
 - CSS/JS подключаются с меткой времени изменения (`pl_asset`), поэтому браузер не держит устаревшие файлы.
 - Сборка снапшота: `php tools/build-static.php` (копирует css/js/images/fonts, пишет sitemap.xml и robots.txt).
+- Перекраска фото под цвет товара: `php tools/recolor.php <src> <out> "#7A2430"` — меняет только пиксели исходного
+  насыщенного тона (товар и надпись), фон и тени не трогает; `--hue`, `--tol`, `--smin` — подстройка маски.
 
 ## Безопасность
 
-- Заголовки: CSP (без внешних скриптов/стилей, шрифты Google разрешены), `X-Content-Type-Options: nosniff`,
-  `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`.
-- Закрыт веб-корень: `site.db`, бэкапы, админка/API/инструменты/исходники недоступны публично.
-- CSRF для скачиваний (`api.php?action=backup&csrf=`), rate limit, серверный пересчёт цен,
-  маскировка настроек в ответах API, валидация сессии.
+- Заголовки: CSP (без внешних скриптов/стилей, шрифты self-hosted из `fonts/`), `X-Content-Type-Options: nosniff`,
+  `X-Frame-Options: SAMEORIGIN` (у админки и API — `DENY`), `Referrer-Policy`, `Permissions-Policy`.
+- `display_errors=Off` на уровне приложения: предупреждения PHP не раскрывают пути сервера.
+- Закрыт веб-корень: `site.db`, бэкапы, служебные каталоги, исходники и `db.php` недоступны публично.
+- CSRF-заголовок для изменяющих запросов; для скачиваний — одноразовый короткоживущий токен
+  (`api.php?action=backup&token=…`), поэтому CSRF-токен не попадает в логи и историю браузера.
+- Антибрутфорс: блокировка по логину и по IP, задержка на неудачный вход, журнал в `audit_log`.
+- Защита от потери доступа: нельзя удалить или понизить последнего администратора.
+- Заявки: honeypot, rate limit по IP, серверный пересчёт цен по базе.
+- Загрузка фото: проверка MIME, лимиты размера файла (8 МБ) и изображения (6000 px / 24 Мп).
+- Сброс пароля админа без входа: `php tools/reset-password.php --user=admin --generate` — меняет хеш,
+  снимает блокировку входа и пишет запись в `audit_log` (нужен доступ к серверу).
 
 ## Что заменить перед запуском
 
@@ -81,9 +95,9 @@ poliform-plastic/
 
 | Что | Где |
 |---|---|
-| Телефон | 4 HTML + `tel:` ссылки |
-| E-mail | 4 HTML + `mailto:` ссылки |
-| Telegram | 4 HTML + `js/shop.js` (ссылка `share/url`) |
+| Телефон | PHP-страницы + `tel:` ссылки |
+| E-mail | PHP-страницы + `mailto:` ссылки |
+| Telegram | PHP-страницы + `js/shop.js` (ссылка `share/url`) |
 | Домен | `sitemap.xml`, `robots.txt`, JSON-LD в HTML |
 | Логотип | `images/favicon.svg` + инлайн-SVG в шапке и футере |
 | Фото цеха и склада | заглушки `.photo-slot` в `about.html` |
@@ -105,6 +119,12 @@ poliform-plastic/
 
 Push в `main` → workflow разворачивает сайт на GitHub Pages.
 Адрес по умолчанию: `https://indygo2025.github.io/poliform/`. Свой домен: Settings → Pages → Custom domain.
+Канонический домен на PHP определяется по текущему хосту (`pl_base_url()`), а для статического
+снимка задаётся константой `PL_SITE_BASE` в `db.php`.
+
+Первый администратор создаётся при инициализации базы. Пароль можно задать переменной окружения
+`POLIFORM_ADMIN_PASSWORD`; без неё генерируется случайный и показывается один раз в логе сервера.
+Смените пароль сразу после первого входа.
 
 ## Локальный запуск
 

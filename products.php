@@ -5,7 +5,7 @@ require __DIR__ . '/inc/layout.php';
 
 $d    = pl_boot();
 $n    = $d['counts'];
-$base = 'https://poliform.pages.dev/';
+$base = pl_base_url();
 $s    = $d['site'];
 
 pl_head($d, [

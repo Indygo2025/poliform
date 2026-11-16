@@ -124,7 +124,7 @@
         a.href = 'product.php?sku=' + encodeURIComponent(v.sku);
         more.appendChild(a);
       });
-      box.appendChild(more);
+      box._more = more; /* вызывающий код поставит блок «Другие цвета» после миниатюр */
     }
     return box;
   }
@@ -1260,27 +1260,19 @@
 
     /* галерея */
     var g = el('div', 'gallery');
+    var gTop = el('div', 'gallery__top');
     var main = el('div', 'gallery__main');
     var big = el('img');
     big.src = String(p.images[0]).replace(/\.(jpe?g|png)$/i, '.webp');
     big.alt = p.title;
     main.appendChild(big);
-    g.appendChild(main);
-
-    /* зум фото по курсору, как на маркетплейсе */
-    if (window.matchMedia('(pointer: fine)').matches) {
-      main.addEventListener('mousemove', function (e) {
-        var r = main.getBoundingClientRect();
-        var px = ((e.clientX - r.left) / r.width) * 100;
-        var py = ((e.clientY - r.top) / r.height) * 100;
-        big.style.transformOrigin = px + '% ' + py + '%';
-      });
-      main.addEventListener('mouseleave', function () { big.style.transformOrigin = '50% 50%'; });
-    }
+    gTop.appendChild(main);
+    g.appendChild(gTop);
 
     var nimg = p.images.length;
     var gi = 0;
     var thEl = null;
+    var suppressClick = false;
     function showPhoto(i) {
       if (i < 0) i = nimg - 1;
       if (i >= nimg) i = 0;
@@ -1288,7 +1280,12 @@
       big.src = String(p.images[i]).replace(/\.(jpe?g|png)$/i, '.webp');
       var cnt = g.querySelector('.gallery__count');
       if (cnt) cnt.textContent = (i + 1) + ' / ' + nimg;
-      if (thEl) $$('button', thEl).forEach(function (x, k) { x.classList.toggle('is-active', k === i); });
+      if (thEl) {
+        $$('button', thEl).forEach(function (x, k) {
+          x.classList.toggle('is-active', k === i);
+          x.setAttribute('aria-selected', k === i ? 'true' : 'false');
+        });
+      }
     }
     if (nimg > 1) {
       var navPrev = el('button', 'gallery__nav gallery__nav--prev', '‹');
@@ -1302,6 +1299,49 @@
       navNext.addEventListener('click', function () { showPhoto(gi + 1); });
       main.appendChild(navNext);
       main.appendChild(el('div', 'gallery__count', '1 / ' + nimg));
+    }
+
+    /* Лента миниатюр под крупным фото: клик переключает снимок.
+       Источники перебираются по цепочке — от лёгкой webp-миниатюры до оригинала. */
+    if (nimg > 1) {
+      var thumbs = el('div', 'gallery__thumbs');
+      thumbs.setAttribute('role', 'tablist');
+      thumbs.setAttribute('aria-label', 'Фотографии товара');
+      for (var ti = 0; ti < nimg; ti++) {
+        (function (idx) {
+          var src = String(p.images[idx]);
+          var tries = [
+            src.replace(/\.(jpe?g|png)$/i, '-t.webp'),
+            src.replace(/\.(jpe?g|png)$/i, '-t.jpg'),
+            src.replace(/\.(jpe?g|png)$/i, '.webp'),
+            src
+          ];
+          var b = el('button', 'gallery__thumb' + (idx === 0 ? ' is-active' : ''));
+          b.type = 'button';
+          b.setAttribute('role', 'tab');
+          b.setAttribute('aria-label', 'Фото ' + (idx + 1));
+          b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+          var timg = el('img');
+          timg.alt = '';
+          timg.loading = 'lazy';
+          timg.decoding = 'async';
+          var k = 0;
+          timg.addEventListener('error', function () {
+            k++;
+            if (k < tries.length) timg.src = tries[k];
+          });
+          timg.src = tries[0];
+          b.appendChild(timg);
+          b.addEventListener('click', function () {
+            showPhoto(idx);
+            try { b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); } catch (err) {}
+          });
+          thumbs.appendChild(b);
+        })(ti);
+      }
+      /* Лента миниатюр — сразу под фото, внутри липкой части. */
+      gTop.appendChild(thumbs);
+      thEl = thumbs;
     }
 
     /* Свайп и перетаскивание фото пальцем/мышью, как на Озоне:
@@ -1343,6 +1383,8 @@
         var a = axis; axis = null; dragging = false;
         main.classList.remove('is-dragging');
         if (a !== 'x') return;
+        /* После перетаскивания клик не должен открывать полноэкранный просмотр. */
+        suppressClick = true;
         var sgn = dx < 0 ? -1 : 1; /* куда уехало фото: влево/вправо */
         var flick = Math.abs(vx) > 0.45 && Math.abs(dx) > 24;
         /* на первом/последнем фото не листаем даже фликом — только возврат */
@@ -1371,20 +1413,117 @@
       main.addEventListener('pointercancel', endDrag);
     }
 
-    /* инфо */
-    head.appendChild(el('h1', 'product-title', p.title));
+    /* ---------- Просмотр на весь экран: стрелки листают фото, не закрывая ---------- */
+    var lb = null, lbImg = null, lbCount = null, lbClose = null;
+    var SVG_NS = 'http://www.w3.org/2000/svg';
 
-    var skuRow = el('div', 'product-sku');
-    skuRow.innerHTML = 'Артикул <b></b>';
-    skuRow.querySelector('b').textContent = artLabel(p);
-    if (p.inStock === false) {
-      skuRow.innerHTML += ' <span class="pbadge pbadge--out">Под заказ</span>';
+    function lbIcon(kind) {
+      var svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('aria-hidden', 'true');
+      var path = document.createElementNS(SVG_NS, 'path');
+      path.setAttribute('d', kind === 'close' ? 'M6 6l12 12M18 6L6 18'
+        : kind === 'prev' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7');
+      svg.appendChild(path);
+      return svg;
     }
-    head.appendChild(skuRow);
 
-    /* Блок «Цвет» — сразу под фото, на месте убранных миниатюр */
+    function lbButton(cls, label, icon, onClick) {
+      var b = el('button', 'pl-lb__btn ' + cls);
+      b.type = 'button';
+      b.setAttribute('aria-label', label);
+      b.appendChild(lbIcon(icon));
+      b.addEventListener('click', onClick);
+      return b;
+    }
+
+    function lbShow(i) {
+      if (i < 0) i = nimg - 1;
+      if (i >= nimg) i = 0;
+      var orig = String(p.images[i]);
+      var webp = orig.replace(/\.(jpe?g|png)$/i, '.webp');
+      lbImg.onerror = function () {
+        lbImg.onerror = null;
+        if (lbImg.getAttribute('src') !== orig) lbImg.src = orig;
+      };
+      lbImg.src = webp;
+      lbImg.alt = p.title + ' — фото ' + (i + 1);
+      lbCount.textContent = (i + 1) + ' / ' + nimg;
+      showPhoto(i);
+    }
+
+    function lbOpen(i) {
+      if (!lb) {
+        lb = el('div', 'pl-lb');
+        lb.hidden = true;
+        lb.setAttribute('role', 'dialog');
+        lb.setAttribute('aria-modal', 'true');
+        lb.setAttribute('aria-label', 'Просмотр фотографий');
+
+        var bd = el('button', 'pl-lb__backdrop');
+        bd.type = 'button';
+        bd.tabIndex = -1;
+        bd.setAttribute('aria-label', 'Закрыть просмотр');
+        bd.addEventListener('click', lbCloseFn);
+        lb.appendChild(bd);
+
+        var fig = el('figure', 'pl-lb__figure');
+        lbImg = el('img', 'pl-lb__img');
+        lbImg.alt = '';
+        fig.appendChild(lbImg);
+        lb.appendChild(fig);
+
+        lbCount = el('div', 'pl-lb__count');
+        lb.appendChild(lbCount);
+
+        lbClose = lbButton('pl-lb__close', 'Закрыть просмотр', 'close', lbCloseFn);
+        lb.appendChild(lbClose);
+        if (nimg > 1) {
+          lb.appendChild(lbButton('pl-lb__nav pl-lb__prev', 'Предыдущее фото', 'prev', function () { lbShow(gi - 1); }));
+          lb.appendChild(lbButton('pl-lb__nav pl-lb__next', 'Следующее фото', 'next', function () { lbShow(gi + 1); }));
+        }
+        document.body.appendChild(lb);
+      }
+      lbShow(i);
+      lb.hidden = false;
+      document.body.classList.add('pl-lb-open');
+      if (lbClose) lbClose.focus();
+    }
+
+    function lbCloseFn() {
+      if (!lb || lb.hidden) return;
+      lb.hidden = true;
+      document.body.classList.remove('pl-lb-open');
+      try { main.tabIndex = -1; main.focus({ preventScroll: true }); } catch (err) {}
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (!lb || lb.hidden) return;
+      if (e.key === 'Escape') { lbCloseFn(); }
+      else if (e.key === 'ArrowLeft' && nimg > 1) { lbShow(gi - 1); }
+      else if (e.key === 'ArrowRight' && nimg > 1) { lbShow(gi + 1); }
+    });
+
+    main.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('button')) return; /* стрелки/счётчик */
+      if (suppressClick) { suppressClick = false; return; }
+      lbOpen(gi);
+    });
+
+    /* инфо: название и артикул уже есть в шапке страницы и в характеристиках,
+       поэтому здесь сразу описание; бейдж «Под заказ» показываем только при нуле */
+    if (p.inStock === false) {
+      var outRow = el('div', 'product-sku');
+      outRow.appendChild(el('span', 'pbadge pbadge--out', 'Под заказ'));
+      head.appendChild(outRow);
+    }
+
+    /* Под фото: сначала миниатюры (липнут вместе с фото), затем блок «Цвет»,
+       ещё ниже — текстовый список остальных цветов. */
     var mates = groupMates(p);
-    if (mates.length > 1) g.appendChild(productColors(p, mates));
+    var colorsBox = mates.length > 1 ? productColors(p, mates) : null;
+    if (colorsBox) g.appendChild(colorsBox);
+    if (colorsBox && colorsBox._more) g.appendChild(colorsBox._more);
 
     /* цена */
     var box = el('div', 'product-price-box');
@@ -1564,10 +1703,12 @@
 
     info.appendChild(head);
     info.appendChild(quick);
-    info.appendChild(specs);
     layout.appendChild(g);
     layout.appendChild(info);
     layout.appendChild(buy);
+    /* Характеристики и особенности — отдельной строкой на всю ширину:
+       в узкой средней колонке таблица растягивалась на километр. */
+    layout.appendChild(specs);
     host.appendChild(layout);
 
   }

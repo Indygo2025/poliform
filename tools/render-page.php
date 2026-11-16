@@ -16,4 +16,18 @@ if (is_string($envJson) && $envJson !== '') {
     $decoded = json_decode((string)$argv[2], true);
     if (is_array($decoded)) $_GET = $decoded;
 }
-include __DIR__ . '/../' . ltrim((string)($argv[1] ?? ''), '/');
+
+/* Белый список страниц: include по произвольному пути был бы LFI. */
+$page = basename((string)($argv[1] ?? ''));
+$allowedPages = ['index.php', 'products.php', 'product.php', 'about.php', 'cart.php'];
+if (!in_array($page, $allowedPages, true)) {
+    fwrite(STDERR, "render-page: неизвестная страница\n");
+    exit(1);
+}
+
+/* В CLI нет REQUEST_URI, поэтому canonical/og:url собирались как «/».
+   Подставляем путь страницы — pl_canonicalPath() построит корректный URL. */
+$qs = http_build_query($_GET);
+$_SERVER['REQUEST_URI'] = '/' . $page . ($qs !== '' ? '?' . $qs : '');
+
+include __DIR__ . '/../' . $page;

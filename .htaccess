@@ -20,8 +20,18 @@ Options -Indexes
 RedirectMatch 404 (?i)\.git
 
 # Заголовки безопасности для статики (для PHP их ставит код).
+# setifempty — не перекрываем значения, которые уже выставил PHP
+# (admin.php/api.php ставят X-Frame-Options: DENY, Referrer-Policy: same-origin).
 <IfModule mod_headers.c>
-  Header set X-Content-Type-Options "nosniff"
-  Header set X-Frame-Options "SAMEORIGIN"
-  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header setifempty X-Content-Type-Options "nosniff"
+  Header setifempty X-Frame-Options "SAMEORIGIN"
+  Header setifempty Referrer-Policy "strict-origin-when-cross-origin"
+  # Не раскрываем версию PHP (expose_php=On в php.ini).
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
 </IfModule>
+
+# Слой данных подключается только через include, по HTTP не отдаётся.
+<Files "db.php">
+  Require all denied
+</Files>

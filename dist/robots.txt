@@ -7,4 +7,4 @@ Disallow: /tools/
 Disallow: /inc/
 Disallow: /lib/
 
-Sitemap: https://poliform.pages.dev/sitemap.xml
+Sitemap: https://indygo2025.github.io/poliform/sitemap.xml

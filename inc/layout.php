@@ -58,6 +58,23 @@ function e(?string $s): string {
     return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/**
+ * Базовый адрес сайта. На сервере — текущий хост и каталог (работает и на
+ * localhost, и на боевом домене). В CLI-сборке HTTP_HOST пуст, поэтому
+ * берём PL_SITE_BASE — адрес статического снимка на GitHub Pages.
+ */
+function pl_base_url(): string {
+    $host = (string)($_SERVER['HTTP_HOST'] ?? '');
+    if ($host === '') return PL_SITE_BASE;
+
+    $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $dir   = str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/')));
+    $dir   = rtrim($dir, '/');
+    if ($dir === '.' || $dir === '/') $dir = '';
+
+    return ($https ? 'https' : 'http') . '://' . $host . $dir . '/';
+}
+
 function nl2br_e(?string $s): string {
     return nl2br(e($s), false);
 }
@@ -82,15 +99,15 @@ function pl_canonicalPath(): string {
     $script = basename($path);
     $map = [
         'index.php'   => '/',
-        'products.php' => '/products',
-        'product.php' => '/product',
-        'about.php'   => '/about',
-        'cart.php'    => '/cart',
+        'products.php' => '/products.php',
+        'product.php' => '/product.php',
+        'about.php'   => '/about.php',
+        'cart.php'    => '/cart.php',
     ];
     if (array_key_exists($script, $map)) {
         $canonical = (string)$map[$script];
         if ($script === 'product.php') {
-            $sku = isset($_GET['sku']) ? rawurlencode((string) $_GET['sku']) : '';
+            $sku = isset($_GET['sku']) && is_string($_GET['sku']) ? rawurlencode($_GET['sku']) : '';
             if ($sku !== '') $canonical .= '?sku=' . $sku;
         }
         return $canonical;
@@ -99,8 +116,8 @@ function pl_canonicalPath(): string {
 }
 
 /**
- * Базовые заголовки безопасности витрины. CSP пока разрешает шрифты Google —
- * после self-host убираем внешние источники.
+ * Базовые заголовки безопасности витрины. Шрифты отдаём сами (fonts/),
+ * внешних источников нет.
  */
 function pl_security_headers(): void {
     header('X-Content-Type-Options: nosniff');
@@ -127,7 +144,7 @@ $keys  = trim((string)($seo['keywords'] ?? ''));
 $ogTitle = trim((string)($opts['ogTitle'] ?? ''));
 if ($ogTitle === '') $ogTitle = trim((string)($d['blocks']['heroTitle'] ?? ''));
 $bodyCls = trim((string)($opts['bodyClass'] ?? ''));
-    $base  = rtrim((string)($opts['base'] ?? 'https://indygo2025.github.io/poliform/'), '/') . '/';
+    $base  = rtrim((string)($opts['base'] ?? pl_base_url()), '/') . '/';
     $canon = rtrim($base, '/') . pl_canonicalPath();
     $robots = (string)($opts['robots'] ?? 'index, follow');
     ?><!DOCTYPE html>

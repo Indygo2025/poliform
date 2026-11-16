@@ -4,7 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/inc/layout.php';
 
 $d     = pl_boot();
-$base  = 'https://poliform.pages.dev/';
+$base  = pl_base_url();
 $b     = $d['blocks'];
 $s     = $d['site'];
 

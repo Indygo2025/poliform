@@ -84,13 +84,14 @@ file_put_contents(
 echo "… data/products.json\n";
 
 /* ---- sitemap.xml ---- */
+$base = PL_SITE_BASE;
 $urls = [
-    ['https://poliform.pages.dev/', 'weekly', '1.0'],
-    ['https://poliform.pages.dev/products.html', 'weekly', '0.9'],
-    ['https://poliform.pages.dev/about.html', 'yearly', '0.6'],
+    [$base, 'weekly', '1.0'],
+    [$base . 'products.html', 'weekly', '0.9'],
+    [$base . 'about.html', 'yearly', '0.6'],
 ];
 foreach ($skus as $sku) {
-    $urls[] = ['https://poliform.pages.dev/product-' . $sku . '.html', 'monthly', '0.8'];
+    $urls[] = [$base . 'product-' . $sku . '.html', 'monthly', '0.8'];
 }
 $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 foreach ($urls as $u) {
@@ -101,22 +102,25 @@ file_put_contents("$dist/sitemap.xml", $sitemap);
 echo "… sitemap.xml\n";
 
 /* ---- Ассеты ---- */
+/* CSS и JS кладём в dist минифицированными: исходники остаются читаемыми,
+   а Pages отдаёт меньше байт. Минификация консервативная — не трогает
+   содержимое строк, data-URI, calc() и переводы строк в JS (ради ASI). */
 foreach (['css', 'images', 'fonts'] as $d) {
-    if (is_dir("$root/$d")) { copyDir("$root/$d", "$dist/$d"); }
+    if (is_dir("$root/$d")) { copyAssets("$root/$d", "$dist/$d", $d === 'css'); }
     echo "… $d/\n";
 }
 foreach (glob("$root/js/*.js") ?: [] as $f) {
     $body = (string)file_get_contents($f);
     if (basename($f) === 'shop.js') $body = patchShopJs($body);
-    file_put_contents("$dist/js/" . basename($f), $body);
+    file_put_contents("$dist/js/" . basename($f), minifyCode($body, false));
 }
-echo "… js/\n";
+echo "… js/ (minified)\n";
 
 foreach (['favicon.svg'] as $f) {
     if (is_file("$root/$f")) copy("$root/$f", "$dist/$f");
 }
 file_put_contents("$dist/.nojekyll", '');
-file_put_contents("$dist/robots.txt", "User-agent: *\nAllow: /\nDisallow: /admin.php\nDisallow: /admin.html\nDisallow: /api.php\nDisallow: /tools/\nDisallow: /inc/\nDisallow: /lib/\n\nSitemap: https://poliform.pages.dev/sitemap.xml\n");
+file_put_contents("$dist/robots.txt", "User-agent: *\nAllow: /\nDisallow: /admin.php\nDisallow: /admin.html\nDisallow: /api.php\nDisallow: /tools/\nDisallow: /inc/\nDisallow: /lib/\n\nSitemap: " . PL_SITE_BASE . "sitemap.xml\n");
 
 /* ---- Вспомогательное ---- */
 function copyDir(string $from, string $to): void {
@@ -127,6 +131,126 @@ function copyDir(string $from, string $to): void {
         if (is_dir($src)) { @mkdir($dst, 0777, true); copyDir($src, $dst); }
         else copy($src, $dst);
     }
+}
+
+/**
+ * Копирует папку ассетов; CSS по пути минифицируется.
+ * Изображения и шрифты копируются как есть (бинарные).
+ */
+function copyAssets(string $from, string $to, bool $minify): void {
+    foreach (scandir($from) ?: [] as $entry) {
+        if ($entry === '.' || $entry === '..') continue;
+        $src = "$from/$entry";
+        $dst = "$to/$entry";
+        if (is_dir($src)) { @mkdir($dst, 0777, true); copyAssets($src, $dst, $minify); continue; }
+        if ($minify && preg_match('~\.css$~i', $entry)) {
+            file_put_contents($dst, minifyCode((string)file_get_contents($src), true));
+        } else {
+            copy($src, $dst);
+        }
+    }
+}
+
+/**
+ * Консервативная минификация CSS/JS без внешних зависимостей.
+ *
+ * Идём построчно и NEVER трогаем содержимое строковых литералов: внутри
+ * кавычек лежат data:image/svg+xml, URL и текст разметки — их портить нельзя.
+ *
+ * CSS: убираем /* * /, склеиваем строки в один пробел, сжимаем пробелы
+ *      вокруг { } : ; , > ~ +  (знаки +,-,%,/ НЕ трогаем — это calc()).
+ * JS:  убираем /* * / и // комментарии, срезаем отступы, пустые строки.
+ *      ОБЯЗАТЕЛЬНО сохраняем \n между строками: в коде нет `;` в конце
+ *      части выражений, поэтому работает ASI (авто-вставка ; по переводу
+ *      строки). Пробелы вокруг операторов НЕ сжимаем: иначе `return -1`
+ *      станет `return-1`, а `a - -b` — инкрементом.
+ */
+function minifyCode(string $src, bool $isCss): string {
+    $src = str_replace(["\r\n", "\r"], "\n", $src);
+    $lines = explode("\n", $src);
+    $kept = [];
+    $inBlock = false;
+
+    foreach ($lines as $line) {
+        $clean = minifyStripLine($line, $inBlock, $isCss);
+        $t = trim($clean);
+        if ($t !== '') $kept[] = $t;
+    }
+
+    if ($isCss) {
+        $code = implode(' ', $kept);
+        $code = preg_replace('~\s+~', ' ', $code) ?? $code;
+        $code = preg_replace('~\s*([{}:;,>])\s*~', '$1', $code) ?? $code;
+        $code = str_replace(';}', '}', $code);
+        $code = preg_replace('~;{2,}~', ';', $code) ?? $code;
+        return trim($code);
+    }
+
+    /* JS: одна строка кода на строку — и ASI, и читаемость стека ошибок. */
+    return implode("\n", $kept);
+}
+
+/** Чистит одну строку: режет комментарии, но не заходит внутрь кавычек. */
+function minifyStripLine(string $line, bool &$inBlock, bool $isCss): string {
+    $out = '';
+    $n = strlen($line);
+    $i = 0;
+    while ($i < $n) {
+        $c = $line[$i];
+
+        /* Строковый литерал — копируем дословно, вместе с экранированиями. */
+        if ($c === '"' || $c === "'" || $c === '`') {
+            $quote = $c;
+            $out .= $c;
+            $i++;
+            while ($i < $n) {
+                $ch = $line[$i];
+                if ($ch === '\\' && $i + 1 < $n) { $out .= $ch . $line[$i + 1]; $i += 2; continue; }
+                $out .= $ch;
+                $i++;
+                if ($ch === $quote) break;
+            }
+            continue;
+        }
+
+        /* Продолжение многострочного /* ... * / с прошлой строки. */
+        if ($inBlock) {
+            $end = strpos($line, '*/', $i);
+            if ($end === false) { return $out; }
+            $i = $end + 2;
+            $inBlock = false;
+            continue;
+        }
+
+        /* Начало блочного комментария. /*! ... * / сохраняем (лицензии). */
+        if ($c === '/' && $i + 1 < $n && $line[$i + 1] === '*') {
+            $bang = ($i + 2 < $n && $line[$i + 2] === '!');
+            $end = strpos($line, '*/', $i + 2);
+            if ($bang) {
+                $stop = $end === false ? $n : $end + 2;
+                $out .= substr($line, $i, $stop - $i);
+                $i = $stop;
+                continue;
+            }
+            if ($end === false) { $inBlock = true; return $out; }
+            $i = $end + 2;
+            continue;
+        }
+
+        /* // комментарий — только в JS; в CSS это часть url() и не трогаем.
+           Если первый слэш экранирован (\/ в регулярке), это не комментарий:
+           иначе строка вида location.pathname.replace(/^.*\//, '') обрезалась. */
+        if (!$isCss && $c === '/' && $i + 1 < $n && $line[$i + 1] === '/') {
+            $prev = $out === '' ? '' : substr($out, -1);
+            if ($prev !== '\\') {
+                return $out;
+            }
+        }
+
+        $out .= $c;
+        $i++;
+    }
+    return $out;
 }
 
 /**

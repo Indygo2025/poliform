@@ -69,32 +69,79 @@
   }
 
   /* ---------- просмотр фото ---------- */
-  var photoLb = null;
-  function openPhoto(src) {
+  var photoLb = null, lbList = [], lbIndex = 0;
+
+  function lbShow(i) {
+    var img = photoLb.querySelector('.ab-lightbox__img');
+    var cnt = photoLb.querySelector('.ab-lightbox__count');
+    var prev = photoLb.querySelector('.ab-lightbox__prev');
+    var next = photoLb.querySelector('.ab-lightbox__next');
+    if (!lbList.length) return;
+    if (i < 0) i = lbList.length - 1;
+    if (i >= lbList.length) i = 0;
+    lbIndex = i;
+    if (img) img.src = lbList[i];
+    var multi = lbList.length > 1;
+    if (cnt) { cnt.textContent = (i + 1) + ' / ' + lbList.length; cnt.hidden = !multi; }
+    if (prev) prev.hidden = !multi;
+    if (next) next.hidden = !multi;
+  }
+
+  function openPhoto(src, list) {
     if (!src) return;
     if (!photoLb) {
       photoLb = el('div', 'ab-lightbox');
       photoLb.setAttribute('role', 'dialog');
-      photoLb.setAttribute('aria-label', 'Просмотр фотографии');
+      photoLb.setAttribute('aria-modal', 'true');
+      photoLb.setAttribute('aria-label', 'Просмотр фотографий');
+
       var close = el('button', 'ab-lightbox__close', '×');
       close.type = 'button';
       close.title = 'Закрыть';
       close.setAttribute('aria-label', 'Закрыть');
+
+      var prev = el('button', 'ab-lightbox__nav ab-lightbox__prev', '‹');
+      prev.type = 'button';
+      prev.title = 'Предыдущее фото';
+      prev.setAttribute('aria-label', 'Предыдущее фото');
+      prev.addEventListener('click', function () { lbShow(lbIndex - 1); });
+
+      var next = el('button', 'ab-lightbox__nav ab-lightbox__next', '›');
+      next.type = 'button';
+      next.title = 'Следующее фото';
+      next.setAttribute('aria-label', 'Следующее фото');
+      next.addEventListener('click', function () { lbShow(lbIndex + 1); });
+
       var img = el('img', 'ab-lightbox__img');
       img.alt = '';
+      var cnt = el('div', 'ab-lightbox__count');
+
       photoLb.appendChild(close);
+      photoLb.appendChild(prev);
       photoLb.appendChild(img);
+      photoLb.appendChild(next);
+      photoLb.appendChild(cnt);
+
       photoLb.addEventListener('click', function (e) {
         if (e.target === photoLb || e.target === close) closePhoto();
       });
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && photoLb && photoLb.classList.contains('is-open')) closePhoto();
+        if (!photoLb || !photoLb.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closePhoto();
+        else if (e.key === 'ArrowLeft') lbShow(lbIndex - 1);
+        else if (e.key === 'ArrowRight') lbShow(lbIndex + 1);
       });
       document.body.appendChild(photoLb);
     }
-    photoLb.querySelector('img').src = src;
+
+    lbList = (list && list.length) ? list.slice() : [src];
+    var at = lbList.indexOf(src);
+    lbShow(at < 0 ? 0 : at);
     photoLb.classList.add('is-open');
+    var cb = photoLb.querySelector('.ab-lightbox__close');
+    if (cb) cb.focus();
   }
+
   function closePhoto() {
     if (photoLb) photoLb.classList.remove('is-open');
   }
@@ -159,6 +206,27 @@
       throw new Error(e);
     }
     return j;
+  }
+
+  /* Скачивание через короткоживущий одноразовый токен:
+     CSRF-токен в URL не попадает в логи и историю браузера. */
+  function downloadFile(action, params) {
+    return api('dl_token').then(need).then(function (j) {
+      var q = '?action=' + encodeURIComponent(action) + '&token=' + encodeURIComponent(j.token);
+      if (params) {
+        for (var k in params) {
+          if (Object.prototype.hasOwnProperty.call(params, k) && params[k] !== '' && params[k] != null) {
+            q += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+          }
+        }
+      }
+      var a = document.createElement('a');
+      a.href = API + q;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }).catch(function () {});
   }
 
   /* ---------- поле формы ---------- */
@@ -677,8 +745,12 @@
     }
 
     var exp = el('a', 'ab-btn', 'Отчёт по товарам (.xlsx)');
-    exp.href = API + '?action=report_export&type=products&csrf=' + encodeURIComponent(S.csrf);
+    exp.href = '#';
     exp.title = 'Выгрузить каталог в Excel';
+    exp.addEventListener('click', function (e) {
+      e.preventDefault();
+      downloadFile('report_export', { type: 'products' });
+    });
     actions.appendChild(exp);
 
     var panel = el('div', 'ab-panel');
@@ -1075,31 +1147,60 @@ td.colSpan = COLS.length;
         im.src = src;
         im.alt = '';
         im.title = 'Открыть фото';
-        im.addEventListener('click', function () { openPhoto(src); });
+        im.addEventListener('click', function () { openPhoto(src, draft.images); });
         w.appendChild(im);
         var x = el('button', 'ab-photo__x', '×');
         x.type = 'button';
         x.title = 'Удалить фото';
         x.addEventListener('click', function () {
-          if (!confirm('Удалить файл ' + src + ' с сервера?')) return;
-          api('photo_del', { path: src }).then(need).then(function () {
-            draft.images.splice(i, 1);
+          if (!confirm('Удалить фото ' + src + ' из карточки' + (draft.images.length > 1 ? ' и с сервера' : '') + '?')) return;
+          /* Сначала убираем из черновика, затем пытаемся удалить файл.
+             Если файл уже отсутствует (или общий для других товаров),
+             сервер вернёт ошибку — это не должно мешать убрать фото из карточки. */
+          function drop() {
+            var at = draft.images.indexOf(src);
+            if (at !== -1) draft.images.splice(at, 1);
             S.dirty = true;
             drawPhotos();
-            toast('Фото удалено');
-          });
+            toast('Фото удалено из карточки');
+          }
+          api('photo_del', { path: src }).then(need).then(drop).catch(drop);
         });
         w.appendChild(x);
-        var left = el('button', 'ab-photo__up', '←');
-        left.type = 'button';
-        left.title = 'Первой';
-        left.disabled = i === 0;
-        left.addEventListener('click', function () {
-          draft.images.unshift(draft.images.splice(i, 1)[0]);
+
+        /* Порядок фото: шаг влево / шаг вправо. Первое фото — главное в карточке. */
+        function move(delta) {
+          var to = i + delta;
+          if (to < 0 || to >= draft.images.length) return;
+          var item = draft.images.splice(i, 1)[0];
+          draft.images.splice(to, 0, item);
           S.dirty = true;
           drawPhotos();
-        });
+        }
+
+        var left = el('button', 'ab-photo__nav ab-photo__nav--left', '←');
+        left.type = 'button';
+        left.title = 'Сдвинуть влево';
+        left.setAttribute('aria-label', 'Сдвинуть фото влево');
+        left.disabled = i === 0;
+        left.addEventListener('click', function () { move(-1); });
         w.appendChild(left);
+
+        var right = el('button', 'ab-photo__nav ab-photo__nav--right', '→');
+        right.type = 'button';
+        right.title = 'Сдвинуть вправо';
+        right.setAttribute('aria-label', 'Сдвинуть фото вправо');
+        right.disabled = i === draft.images.length - 1;
+        right.addEventListener('click', function () { move(1); });
+        w.appendChild(right);
+
+        var num = el('span', 'ab-photo__num', String(i + 1));
+        if (i === 0) {
+          num.title = 'Главное фото карточки';
+          num.classList.add('is-main');
+        }
+        w.appendChild(num);
+
         photos.insertBefore(w, up);
       });
     }
@@ -2583,10 +2684,17 @@ td.colSpan = COLS.length;
 
     function inp(w) { return $('input,select,textarea', w); }
 
-    function downloadHref(type, params) {
-      var q = '?action=report_export&type=' + encodeURIComponent(type) + '&csrf=' + encodeURIComponent(S.csrf);
-      if (params) for (var k in params) if (params[k]) q += '&' + k + '=' + encodeURIComponent(params[k]);
-      return API + q;
+    function bindDownload(link, type, paramsFn) {
+      link.href = '#';
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        var params = { type: type };
+        if (paramsFn) {
+          var p = paramsFn() || {};
+          for (var k in p) if (Object.prototype.hasOwnProperty.call(p, k)) params[k] = p[k];
+        }
+        downloadFile('report_export', params);
+      });
     }
 
     function loadReport(type, params, host, btn) {
@@ -2619,7 +2727,7 @@ td.colSpan = COLS.length;
     b1.appendChild(el('p', 'ab-muted', 'Артикул, название, категория, цвет, цены и наличие.'));
     var r1 = el('div', 'ab-row');
     var dl1 = el('a', 'ab-btn ab-btn--primary', 'Скачать .xlsx');
-    dl1.href = downloadHref('products');
+    bindDownload(dl1, 'products');
     r1.appendChild(dl1);
     var sh1 = el('button', 'ab-btn', 'Обновить');
     sh1.type = 'button';
@@ -2656,9 +2764,9 @@ td.colSpan = COLS.length;
     h2.style.marginTop = '14px';
     b2.appendChild(h2);
     function salesParams() { return { from: inp(sFrom).value, to: inp(sTo).value }; }
+    bindDownload(dl2, 'sales', salesParams);
     function refreshSales() {
       var p = salesParams();
-      dl2.href = downloadHref('sales', p);
       loadReport('sales', p, h2, sh2);
     }
     sh2.addEventListener('click', refreshSales);
@@ -2698,9 +2806,9 @@ td.colSpan = COLS.length;
     h3.style.marginTop = '14px';
     b3.appendChild(h3);
     function ordersParams() { return { from: inp(oFrom).value, to: inp(oTo).value, status: inp(oSt).value }; }
+    bindDownload(dl3, 'orders', ordersParams);
     function refreshOrders() {
       var p = ordersParams();
-      dl3.href = downloadHref('orders', p);
       loadReport('orders', p, h3, sh3);
     }
     sh3.addEventListener('click', refreshOrders);
@@ -2725,19 +2833,22 @@ td.colSpan = COLS.length;
       'Для восстановления распакуйте архив на хостинг — сайт заработает как есть. ' +
       'Бэкапы баз, .git, служебные логи и папка dist/ (собирается заново) в архив не входят.'));
     var full = el('a', 'ab-btn ab-btn--primary', 'Скачать копию сайта (ZIP)');
-    full.href = API + '?action=backup_full&csrf=' + encodeURIComponent(S.csrf);
+    full.href = '#';
+    full.addEventListener('click', function (e) { e.preventDefault(); downloadFile('backup_full'); });
     body.appendChild(full);
 
     body.appendChild(el('h3', null, 'База данных'));
     body.appendChild(el('p', 'ab-muted', 'Файл site.db: товары, заявки, тексты, цены и настройки. Подходит для быстрой точечной замены.'));
     var dl = el('a', 'ab-btn', 'Скачать site.db');
-    dl.href = API + '?action=backup&csrf=' + encodeURIComponent(S.csrf);
+    dl.href = '#';
+    dl.addEventListener('click', function (e) { e.preventDefault(); downloadFile('backup'); });
     body.appendChild(dl);
 
     body.appendChild(el('h3', null, 'Каталог в JSON'));
     body.appendChild(el('p', 'ab-muted', 'Формат data/products.json — каталог без заявок и настроек.'));
     var ex = el('a', 'ab-btn', 'Скачать products.json');
-    ex.href = API + '?action=export&csrf=' + encodeURIComponent(S.csrf);
+    ex.href = '#';
+    ex.addEventListener('click', function (e) { e.preventDefault(); downloadFile('export'); });
     body.appendChild(ex);
 
     body.appendChild(el('h3', null, 'Чек-лист перед публикацией'));

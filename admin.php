@@ -9,8 +9,8 @@ header('X-Frame-Options: DENY');
 header('Referrer-Policy: same-origin');
 header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
 header("Content-Security-Policy: default-src 'self'; script-src 'self'; "
-    . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-    . "font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; "
+    . "style-src 'self' 'unsafe-inline'; "
+    . "font-src 'self'; img-src 'self' data:; "
     . "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
 $v = function (string $path): string {
     $file = __DIR__ . '/' . $path;
@@ -25,9 +25,6 @@ $v = function (string $path): string {
 <title>Полиформ — админка</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= $v('css/admin.css') ?>">
 </head>
 <body>

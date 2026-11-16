@@ -7,6 +7,14 @@ declare(strict_types=1);
  * каталог один раз заливается из data/products.json.
  */
 
+/* Ошибки PHP пишем в лог сервера, но не в HTML: предупреждения раскрывают
+   абсолютные пути и внутреннее устройство (CWE-209). */
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+/** Канонический адрес витрины. Меняется в одном месте. */
+const PL_SITE_BASE = 'https://indygo2025.github.io/poliform/';
+
 $dbPath = getenv('SITE_DB') ?: (__DIR__ . '/site.db');
 $db = null;
 
@@ -469,6 +477,11 @@ function dbAllUsers(PDO $db): array {
     return $db->query("SELECT username, role, created, last_login FROM users ORDER BY username")->fetchAll();
 }
 
+/** Сколько в системе администраторов. Нужно, чтобы не остаться без доступа. */
+function dbCountAdmins(PDO $db): int {
+    return (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
+}
+
 function dbDeleteUser(PDO $db, string $username): bool {
     return $db->prepare("DELETE FROM users WHERE username = ?")->execute([$username]);
 }
@@ -525,6 +538,20 @@ function dbLockInfo(PDO $db, string $username): ?array {
     if (!$r || empty($r['locked_until'])) return null;
     if (time() < strtotime((string)$r['locked_until'])) return $r;
     return null;
+}
+
+/**
+ * Ограничение перебора по IP: суммируем неудачные входы и блокировки
+ * из журнала за окно времени. Нужно потому, что блокировка по логину
+ * не мешает перебирать разные учётные записи с одного адреса.
+ */
+function dbIpLoginBlocked(PDO $db, string $ip, int $limit, int $windowMin): bool {
+    if ($ip === '' || $ip === '0.0.0.0') return false;
+    $since = date('Y-m-d H:i:s', time() - max(1, $windowMin) * 60);
+    $st = $db->prepare("SELECT COUNT(*) FROM audit_log
+                        WHERE ip = ? AND action IN ('login_fail','lock') AND ts >= ?");
+    $st->execute([$ip, $since]);
+    return (int)$st->fetchColumn() >= max(1, $limit);
 }
 
 function dbFailLogin(PDO $db, string $username, string $ip, int $max = 5, int $lockMin = 5): ?string {

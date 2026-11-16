@@ -788,17 +788,14 @@ a.pcard__add:hover {
 }
 .product-head .product-desc { max-width: 760px; margin-top: 14px; }
 /* Покупка: цена за штуку, количество, кнопка «В корзину».
-   Блок закрепляется при прокрутке, как блок покупки на маркетплейсе. */
+   Блок в обычном потоке: своей прокрутки нет, содержимое видно целиком. */
 .product-buy {
   background: var(--shop-card);
   border: 1px solid var(--shop-line);
   border-radius: var(--r-lg);
   padding: 22px;
   box-shadow: var(--e1);
-  position: sticky;
-  top: 132px;
-  max-height: calc(100vh - 150px);
-  overflow-y: auto;
+  position: static;
 }
 .product-buy .product-price-box { margin-top: 0; }
 /* Старая (розничная) цена и выгода при опте — крупнее и заметнее */
@@ -813,8 +810,33 @@ a.pcard__add:hover {
   border-radius: 999px;
   background: rgba(1, 122, 82, .1);
 }
+/* Характеристики и особенности: своя строка под фото и описанием, две колонки.
+   Правую колонку с покупкой не занимаем — она «липкая» и перекрывала бы блок. */
+.product-layout .product-specs {
+  grid-column: 1 / 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 26px;
+}
 .product-specs .block:first-child { margin-top: 0; }
-.product-specs .block { margin-bottom: 22px; }
+.product-specs .block { margin-bottom: 0; }
+/* Компактнее: плотные строки таблицы и меньше отступов в карточках */
+.product-layout .product-specs .block--tint { padding: 18px 18px 10px; }
+.product-layout .product-specs .spec-table { margin-top: 4px; }
+.product-layout .product-specs .spec-table th,
+.product-layout .product-specs .spec-table td { padding: 7px 10px; font-size: .84rem; }
+.product-layout .product-specs .spec-table tr:last-child th,
+.product-layout .product-specs .spec-table tr:last-child td { border-bottom: 0; }
+.product-layout .product-specs .feature-list { gap: 8px; margin-top: 6px; }
+.product-layout .product-specs .feature-list li { font-size: .86rem; }
+@media (max-width: 1080px) {
+  .product-layout .product-specs { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 900px) {
+  .product-layout .product-specs { grid-column: 1 / -1; }
+}
 
 /* Мини-блоки правой колонки: доставка, продавец, оплата, график */
 .buy-facts { margin-top: 18px; border-top: 1px solid var(--shop-line); padding-top: 4px; }
@@ -832,15 +854,12 @@ a.pcard__add:hover {
 }
 .buy-facts__t { font-size: .8rem; font-weight: 700; color: #161616; margin-bottom: 3px; }
 .buy-facts__d { font-size: .82rem; line-height: 1.45; color: var(--ink-3); overflow-wrap: anywhere; }
-.gallery { position: sticky; top: 132px; }
+.gallery { position: static; }
+/* Галерея не липнет: под фото идут миниатюры и блок «Цвет»,
+   а при sticky они уезжали бы под фото при прокрутке. */
+.gallery__top { position: static; }
 /* Миниатюры — горизонтальная лента под крупным фото */
 .product-layout .gallery { display: block; grid-template-columns: none; }
-/* Зум фото по наведению, как на маркетплейсе: точка приближения следует за курсором */
-.product-layout .gallery__main img { transition: transform .28s ease; will-change: transform; }
-@media (pointer: fine) {
-  .product-layout .gallery__main:hover img { transform: scale(1.4); }
-  .product-layout .gallery__main img { cursor: zoom-in; }
-}
 /* Запасная вёрстка без JS: миниатюры — обычные картинки */
 .product-layout .gallery__thumbs > img {
   display: block;
@@ -852,8 +871,41 @@ a.pcard__add:hover {
   background: #f5f6f7;
   object-fit: contain;
 }
-/* /* Миниатюр под фото больше нет: фото листается свайпом/стрелками,
-   под фото — выбор цвета */ */
+
+/* Лента миниатюр: клик переключает крупное фото */
+.gallery__thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.gallery__thumb {
+  flex: 0 0 auto;
+  width: 76px;
+  height: 76px;
+  padding: 3px;
+  border: 1px solid #d9dde0;
+  border-radius: 10px;
+  background: #f5f6f7;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.gallery__thumb img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.gallery__thumb:hover { border-color: #aeb6bb; transform: translateY(-1px); }
+.gallery__thumb:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.gallery__thumb.is-active {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+@media (max-width: 640px) {
+  .gallery__thumb { width: 64px; height: 64px; }
+}
 
 /* Короткие характеристики пунктиром под названием */
 .quick-specs { display: grid; gap: 9px; margin: 20px 0 6px; }
@@ -872,7 +924,8 @@ a.pcard__add:hover {
 /* Свайп/перетаскивание крупного фото, как на Озоне */
 .gallery__main { touch-action: pan-y; cursor: grab; }
 .gallery__main.is-dragging { cursor: grabbing; }
-.gallery__main img { user-select: none; -webkit-user-drag: none; }
+.gallery__main img { user-select: none; -webkit-user-drag: none; cursor: zoom-in; }
+.gallery__main.is-dragging img { cursor: grabbing; }
 .gallery__main img {
   width: 100%;
   height: 100%;
@@ -917,7 +970,6 @@ a.pcard__add:hover {
   z-index: 3;
 }
 
-.product-title { font-size: clamp(1.4rem, 2.6vw, 1.9rem); line-height: 1.2; font-weight: 500; margin: 0 0 12px; }
 .product-sku {
   display: inline-flex;
   align-items: center;
