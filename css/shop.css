@@ -785,7 +785,21 @@ a.pcard__add:hover {
   gap: 34px;
   align-items: start;
   padding-bottom: 40px;
+  /* Длинные слова/артикулы переносятся, а не растягивают колонку за экран */
+  overflow-wrap: anywhere;
 }
+/* Защита от «вылезания» карточки вправо. У элементов grid по умолчанию
+   минимальная ширина = min-content (у фото это его внутренний размер, у
+   текста — длина самого длинного слова). На телефоне это раздувало колонку
+   шире экрана, и правая часть обрезалась (прокрутки вбок нет).
+   min-width: 0 разрешает блокам сжиматься до ширины экрана. */
+.product-layout > * { min-width: 0; }
+.product-layout .gallery,
+.product-layout .product-info,
+.product-layout .product-buy,
+.product-layout .product-specs { min-width: 0; max-width: 100%; }
+.gallery__main,
+.gallery__main img { max-width: 100%; }
 .product-head .product-desc { max-width: 760px; margin-top: 14px; }
 /* Покупка: цена за штуку, количество, кнопка «В корзину».
    Блок в обычном потоке: своей прокрутки нет, содержимое видно целиком. */
@@ -912,7 +926,7 @@ a.pcard__add:hover {
 .quick-specs__row { display: flex; align-items: baseline; gap: 8px; font-size: .92rem; }
 .quick-specs__row .q-key { color: var(--ink-3); flex: none; }
 .quick-specs__row .q-dots { flex: 1 1 auto; border-bottom: 1px dotted #c3c8cd; min-width: 12px; }
-.quick-specs__row .q-val { color: var(--ink); font-weight: 600; flex: none; text-align: right; }
+.quick-specs__row .q-val { color: var(--ink); font-weight: 600; flex: 0 1 auto; min-width: 0; text-align: right; overflow-wrap: anywhere; }
 .gallery__main {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -1020,7 +1034,7 @@ a.pcard__add:hover {
 .ppb__row[data-mode="opt"] .ppb__mode { background: #0f7a5a; color: #fff; }
 .ppb__row b { margin-left: auto; font-family: var(--font-display); font-size: 1.1rem; color: #161616; }
 .ppb__hint { font-size: .8rem; color: #8a9095; }
-.product-desc { font-size: .94rem; line-height: 1.65; color: #4a4f53; margin: 16px 0 0; }
+.product-desc { font-size: .94rem; line-height: 1.65; color: #4a4f53; margin: 16px 0 0; overflow-wrap: anywhere; }
 .product-sku { margin-bottom: 14px; }
 
 /* Блок «Цвет» на карточке товара: кружки расцветок рядом с фотографией.
@@ -1446,7 +1460,9 @@ a.pcard__add:hover {
   .product-info { grid-column: 1 / -1; grid-row: 2; }
 }
 @media (max-width: 900px) {
-  .product-layout { grid-template-columns: 1fr; gap: 28px; }
+  /* minmax(0, 1fr), а не 1fr: иначе минимальная ширина колонки = min-content
+     содержимого и карточка вылезала за правый край экрана на телефоне */
+  .product-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .product-layout .gallery,
   .product-info,
   .product-buy { grid-column: auto; grid-row: auto; }
